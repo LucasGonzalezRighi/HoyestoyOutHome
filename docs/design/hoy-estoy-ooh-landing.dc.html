@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/organic-c2a2f0bf-dfc2-4893-a3fd-0bfc162611ea/styles.css">
+  <script src="_ds/organic-c2a2f0bf-dfc2-4893-a3fd-0bfc162611ea/_ds_bundle.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { margin: 0; text-wrap: pretty; overflow-x: clip; }
+    img { display: block; }
+    a:not(.btn) { color: var(--color-accent-700); text-underline-offset: 3px; }
+    a:not(.btn):hover { color: var(--color-accent-600); }
+    @media (pointer: fine) { body, a, button { cursor: none; } }
+    @media (max-width: 820px) { .lc-navlinks { display: none !important; } .lc-split { grid-template-columns: 1fr !important; } .lc-sticky { position: static !important; } }
+  </style>
+</helmet>
+<div data-bgroot="" style="background-color: var(--color-bg); transition: background-color 1s cubic-bezier(.65,0,.35,1); min-height: 100vh;">
+
+<div data-curtain="" style="position: fixed; inset: 0; z-index: 120; perspective: 1800px; pointer-events: auto;">
+  <div data-leaf="left" style="position: absolute; left: 0; top: 0; width: 50.2%; height: 100%; background: linear-gradient(90deg, var(--color-accent-2-900), var(--color-accent-2-800)); transform-origin: left center; transition: transform 1.8s cubic-bezier(.77,0,.18,1), filter 1.8s; box-shadow: inset -30px 0 60px -30px rgba(0,0,0,.45);"></div>
+  <div data-leaf="right" style="position: absolute; right: 0; top: 0; width: 50.2%; height: 100%; background: linear-gradient(270deg, var(--color-accent-2-900), var(--color-accent-2-800)); transform-origin: right center; transition: transform 1.8s cubic-bezier(.77,0,.18,1), filter 1.8s; box-shadow: inset 30px 0 60px -30px rgba(0,0,0,.45);"></div>
+  <div data-curtain-logo="" style="position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 18px; transition: transform 1.1s cubic-bezier(.77,0,.18,1), opacity .9s cubic-bezier(.65,0,.35,1);">
+    <div style="width: 132px; height: 152px; border-radius: 28px; background: var(--color-bg); display: grid; place-content: center; box-shadow: 0 20px 50px -20px rgba(0,0,0,.5);">
+      <img src="assets/logo-ooh.png" alt="Hoy Estoy OOH" style="width: 118px; mix-blend-mode: multiply;">
+    </div>
+    <p style="margin: 0; font-family: var(--font-heading); font-size: 22px; color: var(--color-accent-2-100); letter-spacing: .02em;">Hoy Estoy Out Of Home</p>
+  </div>
+</div>
+<div data-cursor="" style="display: none; position: fixed; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--color-accent) 55%, transparent); pointer-events: none; z-index: 110; transition: background-color .3s, border-color .3s;"></div>
+<div data-cursor-dot="" style="position: fixed; left: 0; top: 0; width: 30px; height: 24px; margin: -3px 0 0 -12px; pointer-events: none; z-index: 111; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));"><svg width="30" height="24" viewBox="0 0 30 24" fill="none"><circle cx="23" cy="6" r="4" fill="var(--color-accent-400)"></circle><path d="M1 22 L12 3 L17 11 L20 7 L29 22 Z" fill="var(--color-accent-2)" stroke="var(--color-bg)" stroke-width="1.6" stroke-linejoin="round"></path><path d="M8.6 9 L12 3 L15.4 9 L13.6 8 L12 9.6 L10.4 8 Z" fill="var(--color-bg)"></path></svg></div>
+<div data-progress="" style="position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 90; background: linear-gradient(90deg, var(--color-accent-2), var(--color-accent-500)); transform-origin: left; transform: scaleX(0); pointer-events: none;"></div>
+
+<nav class="nav" style="position: sticky; top: 0; z-index: 60; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; backdrop-filter: blur(12px); background: color-mix(in srgb, var(--color-bg) 80%, transparent);">
+  <a href="#top" class="nav-brand" style="justify-self: start; margin-right: 0; display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; text-decoration: none; color: var(--color-text);">
+    <img src="assets/logo-ooh.png" alt="Logo Hoy Estoy OOH" style="width: 34px; height: 40px; object-fit: contain; mix-blend-mode: multiply;">
+    <span style="display: flex; flex-direction: column; line-height: 1.05;"><span style="font-size: 18px;">Hoy Estoy</span><span style="font-family: var(--font-body); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent-2);">Out Of Home</span></span>
+  </a>
+  <span class="lc-navlinks" style="display: flex; gap: 4px; align-items: center; justify-self: center;">
+    <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="4">
+      <a href="{{ l.href }}" style="display: block; padding: 8px 14px; text-decoration: none; font-weight: 600; font-size: 14px; line-height: 20px; color: var(--color-text); transition: color .4s;" style-hover="color: var(--color-accent-600);">
+        <span style="display: block; height: 20px; overflow: hidden;"><span style="display: flex; flex-direction: column; transition: transform .55s cubic-bezier(.76,0,.24,1);" style-hover="transform: translateY(-20px);"><span style="height: 20px; white-space: nowrap;">{{ l.t }}</span><span style="height: 20px; white-space: nowrap; color: var(--color-accent-600);">{{ l.t }}</span></span></span>
+      </a>
+    </sc-for>
+  </span>
+  <a class="btn btn-primary" href="{{ waLink }}" target="_blank" rel="noopener" style="justify-self: end; white-space: nowrap;">Escribinos</a>
+</nav>
+
+<header id="top" data-screen-label="01 Hero" style="position: relative; min-height: calc(100svh - 66px); display: grid; align-items: center; overflow: hidden;">
+  <div style="position: absolute; inset: 0;">
+    <div class="washed" style="position: absolute; inset: 0; overflow: hidden; filter: saturate(.92) contrast(1.02);">
+      <img data-parallax="0.4" src="assets/photos/IMG_20251125_105946729_HDR.jpg" alt="Cordón de montañas en Mendoza" style="position: absolute; left: 0; top: -10%; width: 100%; height: 122%; object-fit: cover;">
+    </div>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, transparent 30%, color-mix(in srgb, var(--color-accent-900) 40%, transparent) 62%, color-mix(in srgb, var(--color-accent-900) 55%, transparent) 90%, var(--color-bg) 100%);"></div>
+  </div>
+  <div data-drift="-0.5" aria-hidden="true" style="position: absolute; left: 0; top: 18%; white-space: nowrap; font-family: var(--font-heading); font-size: 21vw; line-height: 1; color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--color-bg) 85%, transparent); pointer-events: none;">Out Of Home · Out Of Home</div>
+  <div style="position: relative; align-self: stretch; max-width: none; margin: 0; width: 100%; box-sizing: border-box; padding: clamp(40px, 8vh, 96px) clamp(20px, 3.5vw, 56px) clamp(36px, 7vh, 72px); display: flex; flex-direction: column; justify-content: flex-end; gap: clamp(22px, 4vh, 40px);">
+    <h1 style="color: var(--color-bg); text-shadow: 0 2px 24px rgba(0,0,0,.25); font-size: min(72px, 5.3vw); white-space: nowrap; line-height: 1.04; margin: 0; display: grid; gap: .04em;">
+      <sc-for list="{{ heroLines }}" as="line" hint-placeholder-count="2">
+        <span style="display: flex; flex-wrap: nowrap; column-gap: .24em;">
+          <sc-for list="{{ line }}" as="w" hint-placeholder-count="5">
+            <span style="display: inline-block; overflow: hidden; padding: .04em .02em .14em; margin-bottom: -.1em;"><span data-rv="word" data-rv-d="{{ w.d }}" style="display: inline-block;">{{ w.t }}</span></span>
+          </sc-for>
+        </span>
+      </sc-for>
+    </h1>
+    <p data-rv="up" data-rv-intro="" data-rv-d="6" style="color: var(--color-accent-100); text-shadow: 0 1px 12px rgba(0,0,0,.3); align-self: flex-end; text-align: right; font-size: min(19px, 2.4vw); line-height: 1.6; max-width: none; margin: 0;"><span style="display: block; white-space: nowrap;">Trekkings y ascensos guiados por Mendoza y la Patagonia.</span><span style="display: block; white-space: nowrap;">Grupos chicos, atención personalizada y la montaña de verdad.</span></p>
+    <div data-rv="up" data-rv-intro="" data-rv-d="7" style="display: flex; justify-content: center; gap: 13px; flex-wrap: wrap;">
+      <a data-hero-btn="" class="btn btn-primary" href="#viajes" style="padding: 14px 26px; font-size: 16px;">Ver próximos viajes</a>
+      <a data-hero-btn="" class="btn btn-secondary" href="{{ waLink }}" target="_blank" rel="noopener" style="padding: 14px 26px; font-size: 16px; color: var(--color-bg); border-color: color-mix(in srgb, var(--color-bg) 70%, transparent);">Hablá con nosotros</a>
+    </div>
+  </div>
+</header>
+
+<div aria-hidden="true" style="background: var(--color-accent-2-800); color: var(--color-accent-2-100); overflow: hidden; padding: 20px 0; transform: rotate(-2deg) scale(1.04); margin: 10px 0 0;">
+  <div data-marquee="1" style="display: flex; width: max-content; gap: 38px; font-family: var(--font-heading); font-size: clamp(26px, 3.6vw, 48px); white-space: nowrap;">
+    <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="12">
+      <span style="display: inline-flex; align-items: center; gap: 38px;">{{ m }}<span style="width: 12px; height: 12px; border-radius: 50%; background: var(--color-accent-400);"></span></span>
+    </sc-for>
+  </div>
+</div>
+
+<main style="max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 72px);">
+
+  <section data-screen-label="02 Por qué" aria-label="Por qué viajar con nosotros" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <p data-rv="left" style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Por qué viajar con nosotros</p>
+    <h2 data-rv="up" data-rv-d="1" style="font-size: min(48px, 3.3vw); white-space: nowrap; margin: 0 0 44px;">La montaña de verdad, sin que tengas que resolver nada</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px;">
+      <sc-for list="{{ pilares }}" as="p" hint-placeholder-count="4">
+        <div data-rv="rot" data-rv-d="{{ $index }}">
+          <div data-tilt="" style="height: 100%; box-sizing: border-box; background-color: var(--color-surface); border-radius: var(--radius-lg); padding: 30px 26px;">
+            <p style="margin: 0; font-family: var(--font-heading); font-size: 48px; line-height: 1; color: var(--color-accent-500);">{{ p.n }}</p>
+            <h4 style="font-size: 22px; margin: 22px 0 8px;">{{ p.t }}</h4>
+            <p style="font-size: 15px; line-height: 1.6; margin: 0; color: var(--color-neutral-700);">{{ p.d }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</main>
+
+<section id="viajes" data-hscroll="" data-screen-label="03 Viajes" style="position: relative; margin-top: clamp(80px, 11vw, 140px);">
+  <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+    <div data-htrack="" style="display: flex; gap: 26px; align-items: stretch; width: max-content; padding: 60px clamp(20px, 5vw, 72px) 0;">
+      <div style="width: min(80vw, 380px); flex: none; display: flex; flex-direction: column; justify-content: center;">
+        <p style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Próximos viajes</p>
+        <h2 style="font-size: clamp(40px, 5vw, 72px); line-height: 1; margin: 0 0 18px;">Elegí tu próxima aventura</h2>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; color: var(--color-neutral-700); max-width: 30ch;">Deslizá hacia abajo y recorré las travesías. No necesitás experiencia en altura, solo ganas.</p>
+      </div>
+      <sc-for list="{{ trips }}" as="trip" hint-placeholder-count="4">
+        <article data-tilt="" data-skew="" class="card elev-md" style="width: min(80vw, 400px); flex: none; padding: 0; overflow: hidden; border-radius: 32px; display: flex; flex-direction: column;">
+          <div class="washed" style="height: 46vh; min-height: 220px; overflow: hidden;">
+            <img data-zoom="" loading="lazy" decoding="async" src="{{ trip.img }}" alt="{{ trip.nombre }}" style="width: 100%; height: 100%; object-fit: cover; object-position: {{ trip.pos }}; transition: transform 1.2s cubic-bezier(.2,.7,.2,1);">
+          </div>
+          <div style="padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
+            <p style="margin: 0; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--color-accent-2);">{{ trip.destino }}</p>
+            <h3 style="font-size: 26px; line-height: 1.1; margin: 0;">{{ trip.nombre }}</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <span class="tag tag-neutral">{{ trip.duracion }}</span>
+              <span class="tag tag-accent-2">Dificultad {{ trip.dificultad }}</span>
+              <span class="tag tag-outline">{{ trip.distancia }}</span>
+            </div>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <p style="margin: 0; font-family: var(--font-heading); font-size: 22px; color: var(--color-accent-700);">{{ trip.precio }}</p>
+              <a class="btn btn-primary" href="{{ trip.href }}">{{ trip.cta }}</a>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+      <div style="width: clamp(20px, 5vw, 72px); flex: none;"></div>
+    </div>
+    <div style="margin: 28px clamp(20px, 5vw, 72px) 0; height: 3px; border-radius: 3px; background: var(--color-neutral-300); overflow: hidden;"><div data-hbar="" style="height: 100%; background: var(--color-accent-2); transform-origin: left; transform: scaleX(0);"></div></div>
+  </div>
+</section>
+
+<main style="max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 72px);">
+  <section id="calle" data-screen-label="04 Calle y Stepanek" class="lc-split" style="display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 80px); padding: clamp(80px, 11vw, 140px) 0 0; align-items: start;">
+    <div class="lc-sticky" style="position: sticky; top: 96px;">
+      <div data-rv="clip" style="border-radius: 32px; overflow: hidden;">
+        <div class="washed" style="aspect-ratio: 4 / 5; overflow: hidden;"><img data-parallax="0.12" src="assets/photos/IMG_20251125_105222469_HDR.jpg" alt="Cartel de cumbre Adolfo Calle, 4.290 m s.n.m." style="width: 100%; height: 118%; object-fit: cover;"></div>
+      </div>
+      <div data-rv="up" data-rv-d="2" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;">
+        <span class="tag tag-accent">4 días, 3 noches</span>
+        <span class="tag tag-accent-2">Cumbre 4.290 m</span>
+        <span class="tag tag-outline">Dificultad media</span>
+      </div>
+    </div>
+    <div>
+      <p data-rv="left" style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Mendoza</p>
+      <h2 data-rv="up" data-rv-d="1" style="font-size: min(64px, 4.4vw); white-space: nowrap; line-height: 1; margin: 0;"><span style="color: var(--color-accent-500);">Calle &amp;</span> Stepanek</h2>
+      <p data-rv="up" data-rv-d="2" style="font-family: var(--font-heading); font-size: clamp(26px, 2.6vw, 38px); margin: 14px 0 22px;">Tu primer 4mil</p>
+      <p data-rv="up" data-rv-d="3" style="font-size: 17px; line-height: 1.7; margin: 0 0 14px; max-width: 56ch;">Iniciate en la alta montaña: cuatro días para salir de la rutina, conocer el ambiente de montaña y vivir el desafío de alcanzar tus primeras cumbres de más de 4.000 metros.</p>
+      <p data-rv="up" data-rv-d="4" style="font-size: 17px; line-height: 1.7; margin: 0 0 14px; max-width: 56ch;">Queremos que puedas acercarte progresivamente a la montaña y disfrutar del desafío acompañado por un guía.</p>
+      <p data-rv="up" data-rv-d="5" style="font-size: 18px; font-weight: 700; line-height: 1.5; margin: 0 0 50px; max-width: 44ch;">Una experiencia física, intensa y profundamente desconectada de la rutina.</p>
+
+      <h3 data-rv="up" style="font-size: clamp(30px, 3vw, 44px); margin: 0 0 4px;">Cronograma</h3>
+      <p data-rv="up" data-rv-d="1" style="margin: 0 0 30px; color: var(--color-neutral-700);">4 días, 3 noches</p>
+      <div style="position: relative; padding-left: 64px;">
+        <div style="position: absolute; left: 21px; top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: var(--color-neutral-300);"><div data-tl="" style="height: 100%; border-radius: 3px; background: linear-gradient(180deg, var(--color-accent-2), var(--color-accent-500)); transform-origin: top; transform: scaleY(0);"></div></div>
+        <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="4">
+          <div data-rv="right" data-rv-d="{{ $index }}" style="position: relative; margin-bottom: 34px;">
+            <span style="position: absolute; left: -64px; top: -4px; width: 45px; height: 45px; border-radius: 50%; display: grid; place-content: center; background: var(--color-bg); border: 2px solid var(--color-accent-500); font-family: var(--font-heading); font-size: 22px; color: var(--color-accent-700);">{{ c.n }}</span>
+            <h4 style="font-size: 23px; margin: 0 0 8px; color: var(--color-accent-600);">{{ c.t }}</h4>
+            <p style="margin: 0 0 12px; font-size: 15.5px; line-height: 1.65; color: var(--color-neutral-800);">{{ c.d }}</p>
+            <sc-if value="{{ c.stats }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <sc-for list="{{ c.stats }}" as="s" hint-placeholder-count="3"><span class="tag tag-outline" style="border-color: var(--color-accent-500);">{{ s }}</span></sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="05 Puedo" style="padding: clamp(70px, 9vw, 120px) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px;">
+    <div data-rv="flip">
+      <div data-tilt="" style="height: 100%; box-sizing: border-box; background-color: var(--color-accent-100); border-radius: 32px; padding: clamp(28px, 4vw, 44px);">
+        <h3 style="font-size: clamp(38px, 4vw, 56px); margin: 0 0 14px; color: var(--color-accent-600); letter-spacing: .02em;">¿Puedo?</h3>
+        <p style="font-size: 16.5px; line-height: 1.65; margin: 0 0 26px;">No hace falta experiencia en altura, aunque es recomendable haber realizado trekkings con anterioridad.</p>
+        <div style="height: 3px; border-radius: 3px; background: var(--color-accent-400); margin-bottom: 24px;"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px 18px;">
+          <sc-for list="{{ puedo }}" as="q" hint-placeholder-count="5">
+            <div data-rv="up" data-rv-d="{{ $index }}" data-rv-span="0.18">
+              <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-600);">{{ q.k }}</p>
+              <p style="margin: 2px 0 0; font-size: 17px;">{{ q.v }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div data-rv="flip" data-rv-d="1">
+      <div data-tilt="" style="height: 100%; box-sizing: border-box; background-color: var(--color-accent-2-100); border-radius: 32px; padding: clamp(28px, 4vw, 44px);">
+        <h3 style="font-size: clamp(38px, 4vw, 56px); margin: 0 0 14px; color: var(--color-accent-2-700);">¿Es para mí?</h3>
+        <p style="font-size: 16.5px; line-height: 1.65; margin: 0 0 26px;">Si sentís que necesitás salir del ruido, moverte y vivir una experiencia distinta, este ascenso probablemente sea para vos.</p>
+        <p style="margin: 0 0 10px; font-weight: 700;">Ideal si:</p>
+        <ul style="margin: 0 0 22px; padding: 0; list-style: none; display: grid; gap: 9px;">
+          <sc-for list="{{ ideal }}" as="i" hint-placeholder-count="4"><li data-rv="left" data-rv-d="{{ $index }}" data-rv-span="0.16" style="display: flex; gap: 10px; align-items: baseline; font-weight: 600; color: var(--color-accent-2-700);"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent-500); transform: translateY(-2px);"></span>{{ i }}</li></sc-for>
+        </ul>
+        <p style="margin: 0 0 10px; font-weight: 700;">Trabajamos con:</p>
+        <ul style="margin: 0; padding: 0; list-style: none; display: grid; gap: 9px;">
+          <sc-for list="{{ trabajamos }}" as="i" hint-placeholder-count="2"><li data-rv="left" data-rv-d="{{ $index }}" data-rv-span="0.16" style="display: flex; gap: 10px; align-items: baseline; font-weight: 600; color: var(--color-accent-2-700);"><span style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent-500); transform: translateY(-2px);"></span>{{ i }}</li></sc-for>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section data-screen-label="06 Banda" aria-label="La montaña te espera" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+  <div data-rv="expand" data-rv-span="0.7" style="position: relative; height: 92vh; min-height: 460px; overflow: hidden; border-radius: 40px; margin: 0 clamp(10px, 2vw, 24px);">
+    <div class="washed" style="position: absolute; inset: 0; overflow: hidden;"><img data-parallax="0.25" src="assets/photos/IMG_20260310_104358.jpg" alt="Grupo en la cumbre sobre las nubes" style="position: absolute; left: 0; top: -15%; width: 100%; height: 130%; object-fit: cover; object-position: center 62%;"></div>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, color-mix(in srgb, var(--color-accent-2-900) 78%, transparent) 100%);"></div>
+    <div style="position: absolute; left: clamp(22px, 5vw, 72px); right: clamp(22px, 5vw, 72px); bottom: clamp(28px, 6vw, 72px);">
+      <p data-rv="zoom" style="margin: 0; font-family: var(--font-heading); font-style: italic; font-size: clamp(40px, 7vw, 110px); line-height: .98; color: var(--color-bg); transform-origin: left bottom;">La montaña te espera.</p>
+    </div>
+  </div>
+</section>
+
+<main style="max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 72px);">
+  <section id="lolog" data-screen-label="07 Lolog" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <p data-rv="left" style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Neuquén · Huella Andina</p>
+    <h2 data-rv="up" data-rv-d="1" style="font-size: min(64px, 4.4vw); white-space: nowrap; line-height: 1; margin: 0 0 12px;">Lago Lolog a Laguna Verde</h2>
+    <p data-rv="up" data-rv-d="2" style="margin: 0 0 40px; font-family: var(--font-heading); font-style: italic; font-size: clamp(22px, 2.2vw, 30px); color: var(--color-accent-600);">Bosques, volcanes y lagos…</p>
+    <div class="lc-split" style="display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(28px, 5vw, 72px); align-items: start;">
+      <div style="display: grid; gap: 16px;">
+        <sc-for list="{{ lologDesc }}" as="d" hint-placeholder-count="5"><p data-rv="up" data-rv-d="{{ $index }}" data-rv-span="0.2" style="margin: 0; font-size: 16.5px; line-height: 1.75;">{{ d }}</p></sc-for>
+      </div>
+      <div class="lc-sticky" style="position: sticky; top: 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <sc-for list="{{ lologStats }}" as="s" hint-placeholder-count="4">
+          <div data-rv="scale" data-rv-d="{{ $index }}" style="height: 100%;">
+            <div data-tilt="" style="aspect-ratio: 5 / 4; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; background-color: var(--color-accent-2-800); color: var(--color-accent-2-100); border-radius: 28px; padding: 24px 20px;">
+              <p style="margin: 0; font-family: var(--font-heading); font-size: clamp(30px, 3vw, 44px); line-height: 1; white-space: nowrap; color: var(--color-bg);">{{ s.pre }}<span data-count="{{ s.v }}">{{ s.v }}</span>{{ s.suf }}</p>
+              <p style="margin: 8px 0 0; font-size: 13.5px;">{{ s.l }}</p>
+            </div>
+          </div>
+        </sc-for>
+        <div data-rv="up" data-rv-d="4" style="grid-column: 1 / -1; font-size: 14.5px; line-height: 1.6; color: var(--color-neutral-700);">Modalidad: travesía con mochila completa y pernocte en campamento. Dificultad media (etapas largas, con desnivel y terreno variado).</div>
+      </div>
+    </div>
+
+    <h3 data-rv="up" style="font-size: clamp(34px, 3.6vw, 52px); margin: clamp(70px, 9vw, 110px) 0 30px;">Itinerario</h3>
+    <div>
+      <sc-for list="{{ itinerario }}" as="it" hint-placeholder-count="5">
+        <div data-stack="" style="position: sticky; top: calc(90px + {{ it.offset }}px); padding-bottom: 28px;">
+          <article class="lc-split" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--color-surface); border-radius: 36px; overflow: hidden; box-shadow: var(--shadow-lg); min-height: 420px; transform-origin: center top;">
+            <div style="padding: clamp(26px, 4vw, 48px); display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;">
+                <span style="font-family: var(--font-heading); font-size: clamp(44px, 5vw, 68px); line-height: 1; color: var(--color-accent-700);">{{ it.dia }}</span>
+                <span style="font-size: 15px; color: var(--color-neutral-700);">{{ it.tramo }}</span>
+              </div>
+              <sc-for list="{{ it.textos }}" as="tx" hint-placeholder-count="2"><p style="margin: 0; font-size: 15.5px; line-height: 1.7;">{{ tx }}</p></sc-for>
+              <sc-if value="{{ it.dist }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto;">
+                  <span class="tag tag-accent-2">Distancia: {{ it.dist }}</span>
+                  <span class="tag tag-accent">Desnivel: {{ it.desn }}</span>
+                </div>
+              </sc-if>
+            </div>
+            <div class="washed" style="min-height: 280px; overflow: hidden;"><img loading="lazy" decoding="async" src="{{ it.img }}" alt="{{ it.tramo }}" style="width: 100%; height: 100%; object-fit: cover; object-position: {{ it.pos }};"></div>
+          </article>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="08 Pensión" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <p data-rv="left" style="margin: 0 0 6px; font-size: 18px; color: var(--color-neutral-700);">Incluye</p>
+    <h2 data-rv="up" data-rv-d="1" style="font-size: clamp(38px, 4.6vw, 64px); margin: 0 0 44px;">Pensión completa*</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 26px;">
+      <sc-for list="{{ comidas }}" as="f" hint-placeholder-count="4">
+        <figure data-rv="roll" data-rv-d="{{ $index }}" data-rv-span="0.45" style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <div style="width: min(220px, 100%); aspect-ratio: 1; border-radius: 50%; overflow: hidden; box-shadow: var(--shadow-md); transition: transform .6s cubic-bezier(.34,1.56,.64,1), border-radius .6s;" style-hover="transform: scale(1.08) rotate(6deg); border-radius: 42% 58% 55% 45% / 50% 44% 56% 50%;"><img src="{{ f.img }}" alt="{{ f.n }}" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.12);"></div>
+          <figcaption style="font-size: 17px;">{{ f.n }}</figcaption>
+        </figure>
+      </sc-for>
+    </div>
+    <p data-rv="up" style="margin: 26px 0 0; font-size: 13px; color: var(--color-neutral-600);">*Las imágenes son a modo de ilustración. En Lago Lolog no incluye día 0 ni la cena del día 4.</p>
+  </section>
+
+  <section data-screen-label="09 Servicios" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 30px;">
+      <div>
+        <p data-rv="left" style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Servicios y equipo</p>
+        <h2 data-rv="up" data-rv-d="1" style="font-size: clamp(34px, 4vw, 56px); margin: 0;">¿Qué incluye y qué necesito?</h2>
+      </div>
+      <div data-rv="right" style="display: flex; gap: 8px; padding: 6px; border-radius: 999px; background: var(--color-surface);">
+        <button class="btn {{ tabCalleCls }}" onClick="{{ showCalle }}">Calle &amp; Stepanek</button>
+        <button class="btn {{ tabLologCls }}" onClick="{{ showLolog }}">Lago Lolog</button>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
+      <sc-for list="{{ panels }}" as="pn" hint-placeholder-count="3">
+        <div data-rv="up" data-rv-d="{{ $index }}">
+          <div data-tilt="" style="height: 100%; box-sizing: border-box; background-color: var(--color-surface); border-radius: 30px; padding: 30px 28px;">
+            <sc-for list="{{ pn.grupos }}" as="g" hint-placeholder-count="2">
+              <div style="margin-bottom: 22px;">
+                <h4 style="font-family: var(--font-body); font-weight: 800; font-size: 17px; margin: 0 0 10px;">{{ g.t }}</h4>
+                <ul style="margin: 0; padding: 0; list-style: none; display: grid; gap: 7px;">
+                  <sc-for list="{{ g.items }}" as="x" hint-placeholder-count="4"><li style="display: flex; gap: 10px; align-items: baseline; font-size: 15px; line-height: 1.5;"><span style="flex: none; width: 7px; height: 7px; border-radius: 50%; background: {{ g.dot }}; transform: translateY(-2px);"></span>{{ x }}</li></sc-for>
+                </ul>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="equipo" data-screen-label="10 Quiénes somos" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <p data-rv="left" style="margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-2);">Sobre nosotros</p>
+    <h2 data-rv="up" data-rv-d="1" style="font-size: clamp(38px, 4.6vw, 64px); margin: 0 0 14px;">¿Quiénes somos?</h2>
+    <p data-rv="up" data-rv-d="2" style="font-size: 17px; line-height: 1.7; max-width: 58ch; margin: 0 0 46px;">Somos Hoy Estoy Out Of Home: guías que armamos travesías para que descubras nuevos paisajes y superes tus propios límites, de forma segura y responsable. Grupos chicos y atención personalizada, antes y durante cada salida.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px 22px;">
+      <sc-for list="{{ equipo }}" as="e" hint-placeholder-count="4">
+        <a data-rv="scale" data-rv-d="{{ $index }}" href="{{ e.url }}" target="_blank" rel="noopener" style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-decoration: none; color: var(--color-text); text-align: center;">
+          <div style="width: min(220px, 100%); aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 4px solid var(--color-bg); box-shadow: 0 0 0 2px var(--color-accent-400); transition: border-radius .7s cubic-bezier(.34,1.56,.64,1), transform .7s cubic-bezier(.34,1.56,.64,1), box-shadow .4s;" style-hover="border-radius: 38% 62% 54% 46% / 48% 40% 60% 52%; transform: rotate(-4deg) scale(1.05); box-shadow: 0 0 0 6px var(--color-accent-2-400);"><img src="{{ e.img }}" alt="{{ e.nombre }}" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.1);"></div>
+          <span style="font-family: var(--font-heading); font-size: 22px;">{{ e.nombre }}</span>
+          <span style="font-size: 13.5px; color: var(--color-neutral-700); max-width: 26ch;">{{ e.rol }}</span>
+          <span class="tag tag-neutral" style="text-decoration: underline;">{{ e.handle }}</span>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="11 Testimonios" aria-label="Testimonios" style="padding: clamp(80px, 11vw, 140px) 0 0;">
+    <h2 data-rv="up" style="font-size: clamp(32px, 3.6vw, 50px); margin: 0 0 34px;">Lo que se traen de la montaña</h2>
+    <div data-rv="up" data-rv-d="1" style="margin: 0 calc(50% - 50vw); overflow: hidden; padding: 12px 0 24px;">
+      <div data-marquee="1" data-marquee-speed="0.6" style="display: flex; gap: 20px; width: max-content;">
+        <sc-for list="{{ testimoniosLoop }}" as="t" hint-placeholder-count="7">
+          <figure data-tilt="" class="card elev-sm" style="flex: 0 0 min(340px, 78vw); box-sizing: border-box; margin: 0; padding: 28px 26px; border-radius: 28px; display: flex; flex-direction: column; gap: 14px;">
+            <span aria-label="5 estrellas" style="color: var(--color-accent-500); letter-spacing: 3px;">★★★★★</span>
+            <blockquote style="margin: 0; font-size: 15.5px; line-height: 1.65;">“{{ t.frase }}”</blockquote>
+            <figcaption style="margin-top: auto; font-size: 14px;"><strong>{{ t.nombre }}</strong> · {{ t.ciudad }} · <span style="color: var(--color-accent-2-700);">{{ t.viaje }}</span></figcaption>
+          </figure>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section data-screen-label="12 Galería" aria-label="Galería" style="padding: clamp(80px, 11vw, 140px) 0 0; overflow: hidden;">
+  <div style="max-width: 1240px; margin: 0 auto 30px; padding: 0 clamp(20px, 5vw, 72px); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 14px;">
+    <h2 data-rv="up" style="font-size: clamp(34px, 4vw, 56px); margin: 0;">Postales del camino</h2>
+    <a data-rv="right" href="https://instagram.com/chichizolalucas" target="_blank" rel="noopener" style="font-weight: 600;">@chichizolalucas</a>
+  </div>
+  <div style="display: grid; gap: 14px;">
+    <div data-marquee="1" style="display: flex; gap: 14px; width: max-content;">
+      <sc-for list="{{ gal1 }}" as="g" hint-placeholder-count="6"><div class="washed" style="width: clamp(220px, 26vw, 360px); height: clamp(170px, 20vw, 260px); border-radius: 26px; overflow: hidden; flex: none;"><img loading="lazy" decoding="async" src="{{ g }}" alt="" style="width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1);" style-hover="transform: scale(1.12) rotate(1.5deg);"></div></sc-for>
+    </div>
+    <div data-marquee="-1" style="display: flex; gap: 14px; width: max-content;">
+      <sc-for list="{{ gal2 }}" as="g" hint-placeholder-count="6"><div class="washed" style="width: clamp(220px, 26vw, 360px); height: clamp(170px, 20vw, 260px); border-radius: 26px; overflow: hidden; flex: none;"><img loading="lazy" decoding="async" src="{{ g }}" alt="" style="width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(.2,.7,.2,1);" style-hover="transform: scale(1.12) rotate(-1.5deg);"></div></sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" data-bg="var(--color-accent-2-900)" data-screen-label="13 Precio y contacto" style="padding: clamp(100px, 14vw, 180px) clamp(20px, 5vw, 72px) clamp(60px, 8vw, 100px);">
+  <div data-rv="expand" data-rv-span="0.6" style="max-width: 1100px; margin: 0 auto; position: relative; overflow: hidden; border-radius: 44px; background: var(--color-accent-2-800); color: var(--color-accent-2-100); padding: clamp(48px, 8vw, 100px) clamp(24px, 5vw, 80px); text-align: center;">
+    <div data-parallax="-0.3" style="position: absolute; width: 420px; height: 420px; border-radius: 50%; left: -140px; top: -160px; background: var(--color-accent-2-700); pointer-events: none;"></div>
+    <div data-parallax="0.25" style="position: absolute; width: 300px; height: 300px; border-radius: 50%; right: -90px; bottom: -130px; background: var(--color-accent-700); opacity: .7; pointer-events: none;"></div>
+    <img data-rv="roll" src="assets/logo-ooh.png" alt="Hoy Estoy OOH" style="position: relative; width: 74px; margin: 0 auto 26px; border-radius: 16px; background: var(--color-bg); padding: 6px;">
+    <p data-rv="up" data-rv-d="1" style="position: relative; margin: 0; font-size: 16px;">Calle &amp; Stepanek · Precio por persona</p>
+    <p data-rv="zoom" data-rv-d="2" style="position: relative; margin: 14px 0 10px; font-family: var(--font-heading); font-size: clamp(56px, 9vw, 120px); line-height: 1.1; color: var(--color-bg);">$<span data-count="690" data-count-fmt="k">690.000</span></p>
+    <p data-rv="up" data-rv-d="3" style="position: relative; margin: 0 auto 30px; max-width: 40ch; font-size: 15.5px; line-height: 1.6;">*Seña de $200.000. La diferencia la podés abonar el día de encuentro.</p>
+    <h2 data-rv="up" data-rv-d="4" style="position: relative; font-style: italic; font-size: clamp(34px, 4.4vw, 60px); line-height: 1.05; margin: 0 0 34px; color: var(--color-bg);">La montaña te espera.<br>¿Te animás a subir?</h2>
+    <div data-rv="scale" data-rv-d="5" style="position: relative; display: flex; justify-content: center;">
+      <a class="btn btn-primary" href="{{ waLink }}" target="_blank" rel="noopener" style="font-size: 17px; padding: 16px 32px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>Reservá tu lugar por WhatsApp</a>
+    </div>
+  </div>
+  <footer style="max-width: 1100px; margin: 50px auto 0; display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; justify-content: space-between; font-size: 13.5px; color: var(--color-accent-2-200);">
+    <span style="font-family: var(--font-heading); font-size: 18px; color: var(--color-bg);">Hoy Estoy Out Of Home</span>
+    <span style="display: flex; gap: 18px;">
+      <a href="https://instagram.com/chichizolalucas" target="_blank" rel="noopener" style="color: var(--color-accent-2-100);">Instagram</a>
+      <a href="https://www.tiktok.com/@lucas.turismoaventura" target="_blank" rel="noopener" style="color: var(--color-accent-2-100);">TikTok</a>
+      <a href="{{ waLink }}" target="_blank" rel="noopener" style="color: var(--color-accent-2-100);">WhatsApp</a>
+    </span>
+    <span>Turismo Aventura · Argentina · 2026</span>
+  </footer>
+</section>
+
+<sc-if value="{{ showFloat }}" hint-placeholder-val="{{ true }}">
+  <a data-magnet="" href="{{ waLink }}" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp" style="position: fixed; right: 20px; bottom: 20px; z-index: 70; width: 60px; height: 60px; border-radius: 50%; background: var(--color-accent-2); color: var(--color-accent-2-100); display: grid; place-content: center; box-shadow: var(--shadow-lg); text-decoration: none;">
+    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+  </a>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;motion&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;Suave&quot;, &quot;Equilibrado&quot;, &quot;Exagerado&quot;, &quot;Apagado&quot;], &quot;default&quot;: &quot;Exagerado&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Animaciones&quot; },
+  &quot;waPhone&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;541153347012&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;WhatsApp&quot; },
+  &quot;waMessage&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Hola! Quiero info sobre los viajes de Hoy Estoy Out Of Home&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;WhatsApp&quot; },
+  &quot;showFloat&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;WhatsApp&quot; }
+}">
+// Motion engine (one rAF loop). Hooks by data-attribute:
+// [data-rv] scroll-scrubbed entry+exit · [data-parallax] · [data-drift] · [data-marquee]
+// [data-hscroll]/[data-htrack] pinned horizontal scroll · [data-stack] stacking cards
+// [data-tl] timeline fill · [data-count] counters · [data-tilt] 3D tilt+glow
+// [data-magnet] magnetic buttons · [data-bg] page colour shift · custom cursor + curtain.
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const RV_T = 'transform .75s cubic-bezier(.22,.61,.36,1), opacity .75s, filter .75s, clip-path 1s cubic-bezier(.65,0,.35,1)';
+
+class Component extends DCLogic {
+  state = { tab: 'calle', tIdx: 0 };
+  tRef = React.createRef();
+  goT(i) {
+    const el = this.tRef.current; if (!el) return;
+    const c = el.firstElementChild; if (!c) return;
+    const n = el.children.length, idx = (i + n) % n;
+    el.scrollTo({ left: idx * (c.offsetWidth + 20), behavior: 'smooth' });
+    this.setState({ tIdx: idx });
+  }
+
+  k() { return { Suave: 0.6, Equilibrado: 1, Exagerado: 1.8, Apagado: 0 }[this.props.motion ?? 'Exagerado'] ?? 1.8; }
+  off() { return this.k() === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+
+  componentDidMount() {
+    this.mouse = { x: innerWidth / 2, y: innerHeight / 2 }; this.cur = { ...this.mouse };
+    this.lastY = 0; this.vel = 0; this.hot = false; this.dirty = true;
+    this.fine = window.matchMedia('(pointer: fine)').matches;
+    this.onMove = (e) => { this.mouseMoved = true; this.mouse.x = e.clientX; this.mouse.y = e.clientY; this.hot = !!(e.target.closest && e.target.closest('a,button')); this.tilt(e); };
+    document.addEventListener('pointermove', this.onMove, { passive: true });
+    this.mo = new MutationObserver((recs) => { if (recs.some((r) => r.type === 'childList' && !(r.target.closest && r.target.closest('[data-count]')) && Array.from(r.addedNodes).concat(Array.from(r.removedNodes)).some((n) => n.nodeType === 1))) this.dirty = true; });
+    this.mo.observe(document.body, { childList: true, subtree: true });
+    const lift = () => {
+      const c = document.querySelector('[data-curtain]');
+      const l = document.querySelector('[data-curtain-logo]');
+      if (l) { l.style.transform = 'scale(.82)'; l.style.opacity = '0'; }
+      setTimeout(() => {
+        document.querySelectorAll('[data-leaf]').forEach((leaf) => {
+          const left = leaf.dataset.leaf === 'left';
+          leaf.style.transform = `rotateY(${left ? -105 : 105}deg)`;
+          leaf.style.filter = 'brightness(.55)';
+        });
+        this.introStart = performance.now() + 500;
+      }, 450);
+      setTimeout(() => { if (c) { c.style.pointerEvents = 'none'; c.style.visibility = 'hidden'; } }, 2400);
+    };
+    this.timer = setTimeout(lift, this.off() ? 0 : 1300);
+    this.onResize = () => { this.dirty = true; }; window.addEventListener('resize', this.onResize);
+    this.tTimer = setInterval(() => {
+      if (this.tPaused || document.hidden) return;
+      const el = this.tRef.current; if (!el) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+      this.goT(atEnd ? 0 : this.state.tIdx + 1);
+    }, 3800);
+    const loop = (t) => { this.frame(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.tTimer);
+    document.removeEventListener('pointermove', this.onMove);
+    this.mo && this.mo.disconnect();
+  }
+
+  q() {
+    if (!this.dirty && this.els) return this.els;
+    const $ = (s) => Array.from(document.querySelectorAll(s));
+    this.els = { rv: $('[data-rv]'), par: $('[data-parallax]'), drift: $('[data-drift]'), mq: $('[data-marquee]'), hs: $('[data-hscroll]'), stack: $('[data-stack]'), tl: $('[data-tl]'), cnt: $('[data-count]'), skew: $('[data-skew]'), mag: $('[data-magnet]'), bg: $('[data-bg]') };
+    this.els.rv.forEach((el) => { if (!el.style.transition) el.style.transition = RV_T; });
+    this.els.mag.forEach((el) => { el.style.transition = 'transform .35s cubic-bezier(.34,1.56,.64,1)'; });
+    this.els.mq.forEach((el) => { el._half = el.scrollWidth / 2; });
+    this.dirty = false; this.force = true;
+    return this.els;
+  }
+
+  set(el, prop, v) { const key = '_' + prop; if (el[key] !== v) { el[key] = v; el.style[prop] = v; } }
+
+  frame(t) {
+    const E = this.q(), k = this.k(), off = this.off();
+    const vh = innerHeight, vw = innerWidth;
+    const se = document.scrollingElement || document.documentElement, y = se.scrollTop;
+    this.vel += ((y - this.lastY) - this.vel) * 0.12; this.lastY = y;
+    const vel = Math.abs(this.vel) < 0.05 ? 0 : Math.max(-60, Math.min(60, this.vel));
+    const intro = this.introStart ? clamp((t - this.introStart) / 1600) : 0;
+
+    // Cheap per-frame work: cursor + marquees (transform only, no layout reads).
+    const ring = this._ring || (this._ring = document.querySelector('[data-cursor]'));
+    const dot = this._dot || (this._dot = document.querySelector('[data-cursor-dot]'));
+    if (ring && dot) {
+      if (!this.fine) { ring.style.display = dot.style.display = 'none'; } else if (ring.style.display !== 'none') { ring.style.display = 'none'; }
+      else {
+        this.cur.x += (this.mouse.x - this.cur.x) * 0.16; this.cur.y += (this.mouse.y - this.cur.y) * 0.16;
+        const s = this.hot ? 2.2 : 1 + Math.min(0.6, Math.abs(vel) / 60);
+        ring.style.transform = `translate3d(${this.cur.x.toFixed(1)}px, ${this.cur.y.toFixed(1)}px, 0) scale(${s.toFixed(2)})`;
+        this.set(ring, 'backgroundColor', 'transparent');
+        dot.style.transform = `translate3d(${this.mouse.x}px, ${this.mouse.y}px, 0)`;
+      }
+    }
+    if (!off) E.mq.forEach((el) => {
+      const dir = parseFloat(el.dataset.marquee) || 1, half = el._half || 1;
+      if (el._x === undefined) el._x = dir > 0 ? 0 : -half;
+      if (!el.matches(':hover')) el._x -= ((parseFloat(el.dataset.marqueeSpeed) || 0.7) + Math.abs(vel) * 0.35) * Math.max(k, 1) * dir;
+      if (el._x <= -half) el._x += half; if (el._x > 0) el._x -= half;
+      el.style.transform = `translate3d(${el._x.toFixed(1)}px, 0, 0) skewX(${(-vel * 0.18 * k).toFixed(2)}deg)`;
+    });
+
+    // Magnets only when the mouse moved.
+    if (this.mouseMoved) {
+      this.mouseMoved = false;
+      const rs = E.mag.map((el) => el.getBoundingClientRect());
+      E.mag.forEach((el, i) => {
+        const r = rs[i], dx = this.mouse.x - (r.left + r.width / 2), dy = this.mouse.y - (r.top + r.height / 2);
+        this.set(el, 'transform', !off && Math.hypot(dx, dy) < 110 ? `translate3d(${(dx * 0.35 * k).toFixed(1)}px, ${(dy * 0.35 * k).toFixed(1)}px, 0) scale(1.06)` : '');
+      });
+    }
+
+    // Scroll-dependent work only when something changed.
+    const sig = `${y}|${vw}|${vh}|${intro}|${k}|${Math.round(vel)}`;
+    if (!this.force && sig === this.sig) return;
+    this.sig = sig; this.force = false;
+
+    // ---- READ phase ----
+    const hsR = E.hs.map((sec) => { const tr = sec.querySelector('[data-htrack]'); return { sec, tr, hb: sec.querySelector('[data-hbar]'), w: tr ? tr.scrollWidth : 0, top: sec.getBoundingClientRect().top }; });
+    const stR = E.stack.map((w) => w.getBoundingClientRect().top);
+    const tlR = E.tl.map((el) => el.parentElement.getBoundingClientRect());
+    const bgR = E.bg.map((s) => s.getBoundingClientRect());
+    const parR = off ? [] : E.par.map((el) => el.parentElement.getBoundingClientRect().top);
+    const rvR = off ? [] : E.rv.map((el) => el.getBoundingClientRect());
+    const cntR = E.cnt.map((el) => el.getBoundingClientRect().top);
+
+    // ---- WRITE phase ----
+    const bar = this._bar || (this._bar = document.querySelector('[data-progress]'));
+    if (bar) bar.style.transform = `scaleX(${clamp(y / Math.max(1, se.scrollHeight - vh)).toFixed(4)})`;
+    const root = this._root || (this._root = document.querySelector('[data-bgroot]'));
+    if (root) { let bg = ''; bgR.forEach((r, i) => { if (r.top < vh * 0.55 && r.bottom > vh * 0.45) bg = E.bg[i].dataset.bg; }); this.set(root, 'backgroundColor', bg || 'var(--color-bg)'); }
+
+    hsR.forEach(({ sec, tr, hb, w, top }) => {
+      if (!tr) return;
+      const dist = Math.max(0, w - vw);
+      this.set(sec, 'height', `${Math.round(dist + vh)}px`);
+      const p = clamp(-top / Math.max(1, dist));
+      tr.style.transform = `translate3d(${(-p * dist).toFixed(1)}px, 0, 0)`;
+      if (hb) hb.style.transform = `scaleX(${p.toFixed(4)})`;
+    });
+
+    E.stack.forEach((w, i) => {
+      const inner = w.firstElementChild; if (!inner) return;
+      if (off || i === E.stack.length - 1) { this.set(inner, 'transform', ''); this.set(inner, 'filter', ''); return; }
+      const p = clamp((vh - stR[i + 1]) / (vh - 90));
+      this.set(inner, 'transform', `scale(${(1 - 0.09 * p * Math.min(k, 1.4)).toFixed(4)}) rotate(${(-p * 1.8 * k).toFixed(2)}deg)`);
+      this.set(inner, 'filter', p > 0.01 ? `brightness(${(1 - 0.28 * p).toFixed(3)})` : '');
+    });
+
+    E.tl.forEach((el, i) => { const r = tlR[i]; el.style.transform = `scaleY(${clamp((vh * 0.6 - r.top) / r.height).toFixed(4)})`; });
+
+    E.cnt.forEach((el, i) => {
+      const txt = this.fmt(el, off ? 1 : ease(clamp((vh - cntR[i]) / (vh * 0.5))));
+      if (el._txt !== txt) { el._txt = txt; el.textContent = txt; }
+    });
+
+    if (off) {
+      E.par.concat(E.drift, E.mq, E.skew).forEach((el) => { el.style.transform = ''; });
+      E.rv.forEach((el) => { this.set(el, 'opacity', ''); this.set(el, 'transform', ''); this.set(el, 'clipPath', ''); });
+      return;
+    }
+
+    E.par.forEach((el, i) => {
+      const f = parseFloat(el.dataset.parallax) || 0;
+      const z = el.tagName === 'IMG' ? 1 + 0.18 * (1 - ease(intro)) * Math.min(k, 1.2) : 1;
+      this.set(el, 'transform', `translate3d(0, ${(-parR[i] * f * Math.min(k, 1.3)).toFixed(1)}px, 0) scale(${z.toFixed(4)})`);
+    });
+    E.drift.forEach((el) => { this.set(el, 'transform', `translate3d(${(y * parseFloat(el.dataset.drift) * k).toFixed(1)}px, 0, 0)`); });
+    E.skew.forEach((el) => { if (el !== this.tiltEl) this.set(el, 'transform', `skewX(${(-vel * 0.12 * k).toFixed(2)}deg) rotate(${(vel * 0.05 * k).toFixed(2)}deg)`); });
+
+    E.rv.forEach((el, i) => {
+      const r = rvR[i];
+      if ((r.top > vh * 1.6 || r.bottom < -vh * 0.6) && el._rvDone) return; // far off-screen, already parked
+      const d = parseFloat(el.dataset.rvD) || 0, span = parseFloat(el.dataset.rvSpan) || 0.16;
+      if (el.dataset.rv === 'word') { const w = ease(clamp(intro * 2.2 - d * 0.07)); this.set(el, 'transform', `translate3d(0, ${((1 - w) * 110).toFixed(2)}%, 0) rotate(${((1 - w) * 8).toFixed(2)}deg)`); el._rvDone = true; return; }
+      let a = clamp((vh * 1.02 - r.top - d * vh * 0.02) / (vh * span));
+      const b = el.dataset.rvIntro !== undefined ? 1 : clamp(r.bottom / (vh * 0.22));
+      if (el.dataset.rvIntro !== undefined) a = clamp(intro * 2.2 - d * 0.07);
+      const ea = ease(a), eb = ease(b), inv = 1 - ea, out = 1 - eb, type = el.dataset.rv;
+      let tf, op = Math.min(ea, eb);
+      switch (type) {
+        case 'word': tf = `translate3d(0, ${inv * 115}%, 0) rotate(${inv * 12 * k}deg)`; op = 1; break;
+        case 'left': tf = `translate3d(${-inv * 90 * k}px, ${-out * 50 * k}px, 0) rotate(${-inv * 3 * k}deg)`; break;
+        case 'right': tf = `translate3d(${inv * 90 * k}px, ${-out * 50 * k}px, 0) rotate(${inv * 3 * k}deg)`; break;
+        case 'rot': tf = `translate3d(0, ${inv * 120 * k - out * 60 * k}px, 0) rotate(${-inv * 9 * k}deg) scale(${1 - inv * 0.12})`; break;
+        case 'roll': tf = `translate3d(${-inv * 180 * k}px, 0, 0) rotate(${-inv * 300 * k}deg) scale(${1 - inv * 0.4})`; break;
+        case 'flip': tf = `perspective(900px) rotateX(${inv * 70 * Math.min(k, 1.2)}deg) translate3d(0, ${inv * 60 - out * 40}px, 0)`; break;
+        case 'clip': this.set(el, 'clipPath', `inset(${(inv * 100).toFixed(2)}% 0 0 0 round 32px)`); tf = `scale(${1 + inv * 0.15})`; op = 1; break;
+        case 'zoom': tf = `scale(${0.55 + 0.45 * ea}) translate3d(0, ${-out * 60}px, 0)`; break;
+        case 'scale': tf = `translate3d(0, ${inv * 40 * k - out * 50 * k}px, 0) scale(${1 - inv * 0.25 * Math.min(k, 1.4)})`; break;
+        case 'expand': tf = `translate3d(0, ${inv * 120 * k - out * 40 * k}px, 0) scale(${1 - inv * 0.22 * Math.min(k, 1.3) - out * 0.06})`; op = 0.3 + 0.7 * Math.min(ea, eb); break;
+        default: tf = `translate3d(0, ${inv * 70 * k - out * 50 * k}px, 0)`;
+      }
+      this.set(el, 'transform', tf.replace(/(\d+\.\d{3})\d+/g, '$1'));
+      this.set(el, 'opacity', op.toFixed(3));
+      el._rvDone = true;
+    });
+  }
+
+  fmt(el, p) {
+    const v = Math.round(parseFloat(el.dataset.count) * p);
+    return el.dataset.countFmt === 'k' ? `${v.toLocaleString('es-AR')}.000` : v.toLocaleString('es-AR');
+  }
+
+  tilt(e) {
+    const el = e.target && e.target.closest ? e.target.closest('[data-tilt]') : null;
+    if (this.tiltEl && this.tiltEl !== el) {
+      const o = this.tiltEl; o.style.transform = ''; o.style.boxShadow = ''; o.style.backgroundImage = '';
+      const z = o.querySelector('[data-zoom]'); if (z) z.style.transform = '';
+      this.tiltEl = null;
+    }
+    if (!el) return;
+    if (!el.style.transition) el.style.transition = 'transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .5s';
+    this.tiltEl = el;
+    const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, yy = (e.clientY - r.top) / r.height, k = this.k();
+    el.style.backgroundImage = `radial-gradient(420px circle at ${x * 100}% ${yy * 100}%, rgba(255,255,255,.42), transparent 60%)`;
+    el.style.boxShadow = 'var(--shadow-lg)';
+    if (!this.off()) {
+      el.style.transform = `perspective(1000px) rotateX(${(0.5 - yy) * 8 * k}deg) rotateY(${(x - 0.5) * 11 * k}deg) translateY(-8px) scale(1.02)`;
+      const z = el.querySelector('[data-zoom]'); if (z) z.style.transform = 'scale(1.1)';
+    }
+  }
+
+  renderVals() {
+    const phone = this.props.waPhone ?? '541153347012';
+    const msg = this.props.waMessage ?? 'Hola! Quiero info sobre los viajes de Hoy Estoy Out Of Home';
+    const tab = this.state.tab;
+    const dotA = 'var(--color-accent-500)', dotB = 'var(--color-accent-2)', dotX = 'var(--color-neutral-500)';
+    const data = {
+      calle: {
+        inc: ['Guías', 'Refugio de montaña', 'Pensión completa durante la travesía', 'Equipo y botiquín principal de primeros auxilios', 'Equipos de comunicación para emergencias: VHF', 'Reuniones previas informativas', 'Seguro de accidentes personales', 'Asistencia y coordinación permanente'],
+        tras: ['Mendoza a Vallecitos', 'Vallecitos a Mendoza'],
+        no: ['Viaje hasta Mendoza Capital', 'Gastos por abandono del programa'],
+        ropa: ['Camiseta sintética', 'Remera sintética manga corta', 'Medias sintéticas (2 pares)', 'Guantes', 'Buff (cuello sintético)', 'Ropa interior', 'Buzo micropolar', 'Pantalón de trekking', 'Campera de abrigo (tipo Uniqlo)', 'Parka impermeable', 'Gorro de lana', 'Gorra de sol', 'Botas de trekking'],
+        equipo: ['Mochila mediana', 'Bastones de trekking', 'Lentes de sol', 'Papel higiénico / toallas húmedas', 'Kit de higiene personal', 'Medicamentos personales', 'Protectores: solar y labial', 'Linterna frontal', '2 L de agua'],
+      },
+      lolog: {
+        inc: ['Guías habilitados', 'Carpas de montaña', 'Pensión completa (no incluye día 0 y cena del día 4)', 'Equipo y botiquín principal de primeros auxilios', 'Equipos de comunicación para emergencias: VHF', 'Reuniones previas informativas', 'Seguro de accidentes personales', 'Asistencia y coordinación permanente'],
+        tras: ['San Martín de los Andes hasta Puerto Arturo', 'Laguna Verde hasta San Martín de los Andes'],
+        no: ['Viaje hasta San Martín de los Andes', 'Gastos por abandono del programa'],
+        ropa: ['Camiseta térmica sintética', 'Remera sintética manga corta', 'Medias sintéticas', 'Guantes (tipo mágicos)', 'Buff', 'Ropa interior', 'Buzo micropolar', 'Pantalón de trekking', 'Campera tipo Uniqlo', 'Parka impermeable', 'Gorro de lana', 'Gorra de sol', 'Botas de trekking', 'Calzado tipo Crocs para campamento', 'Zapatillas para mojar'],
+        equipo: ['Bolsa de dormir (límite −8 / −10 °C)', 'Aislante', 'Mochila de 60 litros en adelante', 'Cubremochila', 'Bastones de trekking', 'Lentes de sol', 'Papel higiénico / toallas húmedas', 'Kit de higiene personal', 'Toalla chica (secado rápido)', 'Protectores: solar y labial', 'Repelente de insectos', 'Linterna frontal', 'Botella de 1 L'],
+      },
+    }[tab];
+    const G = (t, items, dot) => ({ t, items, dot });
+    const T = [
+      { frase: 'Nunca había hecho un trekking de más de un día. Me acompañaron en cada paso y llegué a lugares que no me creía capaz.', nombre: 'Sofía M.', ciudad: 'Buenos Aires', viaje: 'Calle & Stepanek' },
+      { frase: 'Todo resuelto: comida, refugio, tiempos. Vos solo caminás y mirás. El grupo terminó siendo lo mejor del viaje.', nombre: 'Martín R.', ciudad: 'Córdoba', viaje: 'Calle & Stepanek' },
+      { frase: 'Se nota que conocen la montaña y que la cuidan. Me volví con la cabeza limpia y ganas de repetir.', nombre: 'Carolina G.', ciudad: 'Rosario', viaje: 'Lago Lolog' },
+      { frase: 'Mi primer 4mil. Cuando llegamos a la cumbre del Adolfo Calle no lo podía creer. Los guías te hacen sentir seguro todo el tiempo.', nombre: 'Julián P.', ciudad: 'Mendoza', viaje: 'Calle & Stepanek' },
+      { frase: 'Dormir en carpa entre lengas y despertar con el Lanín enfrente es algo que no me voy a olvidar nunca.', nombre: 'Valentina S.', ciudad: 'La Plata', viaje: 'Lago Lolog' },
+      { frase: 'Fui sola y volví con amigos. Grupo chico, buena onda y una organización impecable de principio a fin.', nombre: 'Luciana F.', ciudad: 'Buenos Aires', viaje: 'Lago Lolog' },
+      { frase: 'Las reuniones previas me sirvieron un montón para preparar el equipo. Llegué tranquilo y lo disfruté cada día.', nombre: 'Tomás B.', ciudad: 'Neuquén', viaje: 'Calle & Stepanek' },
+    ];
+    return {
+      waLink: `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
+      showFloat: this.props.showFloat ?? true,
+      navLinks: [{ t: 'Viajes', href: '#viajes' }, { t: 'Calle & Stepanek', href: '#calle' }, { t: 'Lolog', href: '#lolog' }, { t: 'Quiénes somos', href: '#equipo' }],
+      heroLines: [['Creo', 'experiencias', 'en', 'la', 'montaña'], ['para', 'reconectar', 'con', 'lo', 'esencial.']].map((l, i) => l.map((t, j) => ({ t, d: i * 5 + j }))),
+      marquee: [0, 1].flatMap(() => ['Tu primer 4mil', 'Huella Andina', 'Mendoza', 'Neuquén', 'Grupos reducidos', 'Hoy Estoy Out Of Home']),
+      pilares: [
+        { n: '01', t: 'Guías habilitados', d: 'Guías de Turismo Aventura y de Montaña, con años de experiencia en el terreno.' },
+        { n: '02', t: 'Grupos pequeños', d: 'Salidas chicas para ir a tu ritmo, conocernos y disfrutar el camino.' },
+        { n: '03', t: 'Logística resuelta', d: 'Traslados, refugio o carpas, pensión completa y reuniones previas.' },
+        { n: '04', t: 'Seguridad siempre', d: 'Botiquín, comunicación VHF, seguro de accidentes y coordinación permanente.' },
+      ],
+      trips: [
+        { img: 'assets/photos/IMG_20251125_105222469_HDR.jpg', pos: 'center 62%', destino: 'Mendoza · Vallecitos', nombre: 'Calle & Stepanek — Tu primer 4mil', duracion: '4 días / 3 noches', dificultad: 'media', distancia: '24 km', precio: '$690.000', href: '#calle', cta: 'Ver viaje' },
+        { img: 'assets/photos/IMG_2907.jpg', pos: 'center', destino: 'Neuquén · Huella Andina', nombre: 'Lago Lolog a Laguna Verde', duracion: '4 días / 3 noches', dificultad: 'media', distancia: '44 km', precio: 'Consultar', href: '#lolog', cta: 'Ver viaje' },
+        { img: 'assets/photos/1.jpg', pos: 'center 70%', destino: 'Bariloche', nombre: 'Laguna Negra', duracion: '2 días / 1 noche', dificultad: 'media', distancia: '18 km', precio: 'Consultar', href: `https://wa.me/${phone}`, cta: 'Consultar' },
+        { img: 'assets/photos/IMG_2778.jpg', pos: 'center 35%', destino: 'El Bolsón', nombre: 'Cajón del Azul y Hielo Azul', duracion: '3 días / 2 noches', dificultad: 'media', distancia: '26 km', precio: 'Consultar', href: `https://wa.me/${phone}`, cta: 'Consultar' },
+      ],
+      cronograma: [
+        { n: '1', t: 'Mendoza – Refugio', d: '10:00 encuentro en la ciudad de Mendoza. Transfer al refugio en Vallecitos. Primera jornada de trekking y retorno al refugio.', stats: ['4 km', '280 m desnivel', '2 hs de marcha'] },
+        { n: '2', t: 'Cumbres de La Cadenita', d: 'Segunda jornada de trekking. Cumbres de 3.000 m. Retorno al refugio.', stats: ['7 km', '820 m desnivel', '4 hs de marcha'] },
+        { n: '3', t: 'Cumbres Adolfo Calle y Stepanek', d: 'Tercera jornada de trekking. Cumbres de más de 4.000 m. Retorno al refugio.', stats: ['13 km', '1.400 m desnivel', '5 hs de marcha'] },
+        { n: '4', t: 'Retorno a Mendoza', d: 'Desayuno y transfer a Mendoza.', stats: null },
+      ],
+      puedo: [{ k: 'Caminatas', v: 'Largas' }, { k: 'Clima', v: 'Cambiante' }, { k: 'Terreno', v: 'Variable' }, { k: 'Dificultad', v: 'Media' }, { k: 'Desniveles', v: 'Pronunciados, sin pasos técnicos' }],
+      ideal: ['Entrenás regularmente.', 'Disfrutás caminar.', 'Te sentís cómodo en la naturaleza.', 'Buscás un desafío físico real.'],
+      trabajamos: ['Grupos pequeños.', 'Atención personalizada, tanto antes como durante la travesía.'],
+      lologDesc: [
+        'Este recorrido, ubicado en la provincia de Neuquén, forma parte de la Huella Andina, un sendero de largo recorrido que une parajes del norte patagónico a través de la montaña.',
+        'El tramo conecta Lago Lolog con Laguna Verde, atravesando algunos de los paisajes más imponentes de la región. Une lagos, bosques y volcanes en un itinerario exigente pero profundamente gratificante.',
+        'La travesía recorre bosques puros de raulíes, ñires y lengas, cruza escoriales de lava del volcán Achen Ñiyeu y valles con vistas únicas del Lanín y el Villarrica.',
+        'Caminaremos por senderos poco transitados, durmiendo en carpa y viviendo la experiencia de autosuficiencia en la montaña.',
+        'Es un recorrido ideal para quienes buscan una experiencia auténtica, lejos de los circuitos turísticos clásicos, con la posibilidad de conocer la geografía, la ecología y la fuerza volcánica que da forma a este rincón único de la Patagonia.',
+      ],
+      lologStats: [{ pre: '', v: 44, suf: ' km', l: 'Distancia total' }, { pre: '+', v: 1900, suf: ' m', l: 'Desnivel positivo acumulado' }, { pre: '', v: 4, suf: ' días', l: 'De travesía' }, { pre: '', v: 3, suf: ' noches', l: 'En campamento' }],
+      itinerario: [
+        { offset: 0, dia: 'Día 0', tramo: 'Encuentro y revisión de equipo', img: 'assets/photos/IMG_2616.jpg', pos: 'center', dist: '', desn: '', textos: ['Encuentro en el centro de San Martín de los Andes. Presentación de los guías con el grupo y charla técnica: repaso del itinerario, expectativas y condiciones del terreno.', 'Revisión de equipo personal (calzado, abrigo, mochila) y distribución de equipo grupal (carpas, cocina, etc.).'] },
+        { offset: 14, dia: 'Día 1', tramo: 'Puerto Arturo – Auquinco', img: 'assets/photos/1.jpg', pos: 'center 75%', dist: '12 km', desn: '+570 m', textos: ['A las 9:00 partimos desde San Martín de los Andes en un transfer rumbo a Puerto Arturo, donde iniciamos la travesía.', 'Atravesamos un pintoresco bosque de raulíes, ñires y lengas hasta llegar a Auquinco, donde armamos nuestro primer campamento.'] },
+        { offset: 28, dia: 'Día 2', tramo: 'Auquinco – Rincón de los Pinos', img: 'assets/photos/IMG_2926.jpg', pos: 'center', dist: '11,3 km', desn: '+310 m', textos: ['Desde el Portezuelo de Auquinco, el sendero desciende entre lomadas y pequeños cañadones, con vistas abiertas del valle por donde corre el arroyo Auquinco.', 'Sobre el final avanzamos entre bosques de lengas y claros de pastizales hasta Rincón de los Pinos, ideal para el segundo campamento.'] },
+        { offset: 42, dia: 'Día 3', tramo: 'Rincón de los Pinos – Cazadores', img: 'assets/photos/IMG_2240.jpg', pos: 'center', dist: '10 km', desn: '+530 m', textos: ['Retomamos el sendero junto al arroyo Auquinco. El terreno asciende suavemente y deja ver el escorial del volcán Achen Ñiyeu, con vistas del Lanín y el Villarrica.', 'Llegamos al Refugio Cazadores, una construcción sencilla entre lengas, ideal para descansar antes de seguir rumbo a Laguna Verde.'] },
+        { offset: 56, dia: 'Día 4', tramo: 'Cazadores – Achen Ñiyeu – Laguna Verde', img: 'assets/photos/IMG_2923.jpg', pos: 'center 30%', dist: '8,8 km', desn: '+490 m', textos: ['Último día: bordeamos el escorial del Achen Ñiyeu, un inmenso mar de piedra negra que contrasta con el verde del bosque, con los volcanes Lanín y Villarrica de fondo.', 'Descendemos a Laguna Verde, donde nos espera el vehículo para regresar a San Martín de los Andes.'] },
+      ],
+      comidas: [{ n: 'Desayuno', img: 'assets/food-desayuno.png' }, { n: 'Almuerzo', img: 'assets/food-almuerzo.png' }, { n: 'Merienda', img: 'assets/food-merienda.png' }, { n: 'Cena', img: 'assets/food-cena.png' }],
+      tabCalleCls: tab === 'calle' ? 'btn-primary' : 'btn-ghost',
+      tabLologCls: tab === 'lolog' ? 'btn-primary' : 'btn-ghost',
+      showCalle: () => this.setState({ tab: 'calle' }),
+      showLolog: () => this.setState({ tab: 'lolog' }),
+      panels: [
+        { grupos: [G('Servicios incluidos', data.inc, dotB)] },
+        { grupos: [G('Traslados', data.tras, dotB), G('Servicios NO incluidos', data.no, dotX)] },
+        { grupos: [G('¿Qué necesito? · Ropa', data.ropa, dotA)] },
+        { grupos: [G('¿Qué necesito? · Equipo', data.equipo, dotA)] },
+      ],
+      equipo: [
+        { nombre: 'Lucas Chichizola', rol: 'Guía de Turismo Aventura, Senderos y Selva', handle: '@chichizolalucas', url: 'https://instagram.com/chichizolalucas', img: 'assets/team-lucas.png' },
+        { nombre: 'Andrés Gavilán', rol: 'Guía de Montaña y Guía de Selva', handle: '@andres.gavilan', url: 'https://instagram.com/andres.gavilan', img: 'assets/team-andres.png' },
+        { nombre: 'Luis Aguiar', rol: 'Guía · Calle & Stepanek', handle: '@luisaguuiar', url: 'https://instagram.com/luisaguuiar', img: 'assets/team-luis.png' },
+        { nombre: 'Estanislao Malic', rol: 'Guía · Calle & Stepanek', handle: '@estanislaomalic', url: 'https://instagram.com/estanislaomalic', img: 'assets/team-estanislao.png' },
+      ],
+      testimonios: T,
+      testimoniosLoop: T.concat(T),
+      pauseT: () => { this.tPaused = true; },
+      resumeT: () => { this.tPaused = false; },
+      prevT: () => this.goT(this.state.tIdx - 1),
+      nextT: () => this.goT(this.state.tIdx + 1),
+      tRef: this.tRef,
+      onTScroll: (e) => { const el = e.currentTarget, c = el.firstElementChild; if (!c) return; const i = Math.round(el.scrollLeft / (c.offsetWidth + 20)); if (i !== this.state.tIdx) this.setState({ tIdx: i }); },
+      tDots: T.map((t, i) => ({ label: 'Testimonio ' + (i + 1), go: () => this.goT(i), w: i === this.state.tIdx ? '28px' : '8px', bg: i === this.state.tIdx ? 'var(--color-accent-2)' : 'var(--color-neutral-300)' })),
+      gal1: [0, 1].flatMap(() => ['assets/photos/IMG_2903.jpg', 'assets/photos/IMG_20251125_110844038_HDR.jpg', 'assets/photos/IMG_3339.jpg', 'assets/photos/IMG_20251125_105621337_HDR.jpg', 'assets/photos/IMG_20260311_134556.jpg', 'assets/photos/IMG_2616.jpg']),
+      gal2: [0, 1].flatMap(() => ['assets/photos/IMG_20251125_122309240_HDR.jpg', 'assets/photos/IMG_20251125_080344703_HDR.jpg', 'assets/photos/IMG_2240.jpg', 'uploads/IMG_20251125_104854614%20(1).jpg', 'assets/photos/IMG_2926.jpg', 'assets/photos/IMG_2923.jpg']),
+    };
+  }
+}
+</script>
+</body>
+</html>

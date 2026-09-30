@@ -1,0 +1,51 @@
+/*
+  Cinta del hero — `dc.html:80-86`.
+  Girada 2° y agrandada un 4%: girada, las puntas de la banda quedan en
+  diagonal y dejarían triángulos vacíos contra los bordes de la pantalla; el
+  `scale` la estira lo justo para taparlos (lo que sobra lo recorta el
+  `overflow-x: clip` del body).
+*/
+.ribbon {
+  margin: 10px 0 0;
+  padding: 20px 0;
+  overflow: hidden;
+  background: var(--color-accent-2-800);
+  color: var(--color-accent-2-100);
+  transform: rotate(-2deg) scale(1.04);
+}
+
+/* El riel (`dc.html:81`; `display: flex; width: max-content` lo pone el organism `Marquee`). */
+.rail {
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 3.6vw, 48px);
+  white-space: nowrap;
+}
+
+/*
+  Palabra + punto (`dc.html:83`). El diseño separa los ítems con `gap: 38px` en el riel; acá
+  esos 38px van como `padding-inline-end` de cada ítem (visualmente es lo
+  mismo). La razón es el empalme del loop: el motor reinicia la cinta al
+  recorrer la mitad de su ancho, y con `gap` el riel tiene un hueco menos que
+  ítems (11 huecos para los 12 de las dos pasadas), así que la mitad cae 19px
+  (medio hueco) antes del principio de la copia y la cinta pega un salto en
+  cada vuelta.
+  Con el espacio dentro de cada ítem, las dos mitades miden exactamente lo mismo.
+*/
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 38px;
+  padding-inline-end: 38px;
+}
+
+/*
+  Impresión: la cinta no va. El print del diseño la saca entera
+  (`hoy-estoy-ooh-landing-print.dc.html:66`, donde estaba el marcado de
+  `dc.html:80-86`): es decorativa (`aria-hidden`) y quieta, girada y
+  recortada contra el borde de la hoja, solo repetiría palabras sueltas.
+*/
+@media print {
+  .ribbon {
+    display: none;
+  }
+}

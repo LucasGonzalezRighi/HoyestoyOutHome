@@ -1,0 +1,13 @@
+.section {
+  scroll-margin-top: var(--nav-height);
+}
+
+/* `padding: clamp(80px, 11vw, 140px) 0 0` de las secciones del diseño. */
+.spacingDefault {
+  padding-top: var(--section-space);
+}
+
+/* `padding: clamp(70px, 9vw, 120px) 0 0` de "05 Puedo". */
+.spacingCompact {
+  padding-top: var(--section-space-compact);
+}

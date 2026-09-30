@@ -1,0 +1,37 @@
+/*
+ * `height: 100%` para que todas las cards de una fila midan lo mismo: el
+ * envoltorio se estira con la grilla y la card lo llena.
+ *
+ * `background-color` y no `background`: el tilt escribe `background-image`
+ * inline (el brillo que sigue al cursor) y tiene que sumarse al color, no
+ * reemplazarlo.
+ */
+.card {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.toneSurface {
+  background-color: var(--color-surface);
+}
+
+.toneAccent100 {
+  background-color: var(--color-accent-100);
+}
+
+.toneAccentTwo100 {
+  background-color: var(--color-accent-2-100);
+}
+
+.toneAccentTwo800 {
+  background-color: var(--color-accent-2-800);
+  color: var(--color-accent-2-100);
+}
+
+.radiusLg {
+  border-radius: var(--radius-lg);
+}
+
+.radiusXl {
+  border-radius: var(--radius-xl);
+}

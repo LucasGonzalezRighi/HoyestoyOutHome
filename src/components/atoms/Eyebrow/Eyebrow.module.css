@@ -1,0 +1,10 @@
+/* El eyebrow que el diseño repite inline en cada sección. */
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--color-accent-2);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}

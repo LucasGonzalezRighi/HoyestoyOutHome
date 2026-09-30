@@ -1,0 +1,36 @@
+.dot {
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+}
+
+.size7 {
+  width: 7px;
+  height: 7px;
+}
+
+.size8 {
+  width: 8px;
+  height: 8px;
+}
+
+.size12 {
+  width: 12px;
+  height: 12px;
+}
+
+.accent {
+  background: var(--color-accent-500);
+}
+
+.accentTwo {
+  background: var(--color-accent-2);
+}
+
+.neutral {
+  background: var(--color-neutral-500);
+}
+
+.accent400 {
+  background: var(--color-accent-400);
+}

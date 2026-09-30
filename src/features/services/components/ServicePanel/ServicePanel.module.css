@@ -1,0 +1,27 @@
+/* Panel de "Servicios y equipo" — `docs/design/hoy-estoy-ooh-landing.dc.html:299-306`. */
+
+/*
+ * La card interna de `SurfaceCard` (la que se inclina): `border-radius: 30px;
+ * padding: 30px 28px` (`dc.html:299`). El radio pisa el `--radius-lg` que
+ * `SurfaceCard` pone por defecto: este módulo carga después.
+ */
+.card {
+  border-radius: var(--radius-panel);
+  padding: 30px 28px;
+}
+
+/*
+ * `dc.html:301`. El último grupo también lleva su margen: en el diseño la card
+ * termina con 22px + 30px de aire abajo, y así se mantiene.
+ */
+.group {
+  margin-bottom: 22px;
+}
+
+/* El `h4` del diseño (`dc.html:302`): Lexend 800 en vez de la serif de los títulos. */
+.groupTitle {
+  margin: 0 0 10px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 17px;
+}

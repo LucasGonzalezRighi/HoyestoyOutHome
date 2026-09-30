@@ -1,0 +1,100 @@
+/* Cronograma de Calle & Stepanek — `dc.html:161-177`. */
+
+/* "Cronograma" (`dc.html:161`) y su bajada "4 días, 3 noches" (`dc.html:162`). */
+.title {
+  margin: 0 0 4px;
+  font-size: clamp(30px, 3vw, 44px);
+}
+
+.subtitle {
+  margin: 0 0 30px;
+  color: var(--color-neutral-700);
+}
+
+/* Los 64px de la izquierda son la columna de los círculos de cada día (`dc.html:163`). */
+.timeline {
+  position: relative;
+  padding-left: 64px;
+}
+
+/*
+ * Riel gris (`dc.html:164`). `left: 21px` lo centra bajo los círculos:
+ * 21 + 3/2 = 22,5, la mitad de los 45px del círculo (borde incluido,
+ * `border-box`). El radio es el de pastilla: en una barra de 3px da lo mismo
+ * que los `border-radius: 3px` del diseño (el navegador lo recorta a la mitad
+ * del ancho), sin escribir un radio suelto.
+ */
+.rail {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 21px;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-300);
+}
+
+/* Arranca vacío: el motor escribe el `scaleY` en cada frame con scroll. */
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--color-accent-2), var(--color-accent-500));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.days {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cada día (`dc.html:166-169`). */
+.day {
+  position: relative;
+  margin-bottom: 34px;
+}
+
+/* Círculo con el número del día, montado sobre el riel (sale de la columna de 64px, `dc.html:167`). */
+.dayNumber {
+  position: absolute;
+  top: -4px;
+  left: -64px;
+  display: grid;
+  place-content: center;
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--color-accent-500);
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-accent-700);
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.dayTitle {
+  margin: 0 0 8px;
+  color: var(--color-accent-600);
+  font-size: 23px;
+}
+
+.dayText {
+  margin: 0 0 12px;
+  color: var(--color-neutral-800);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* El `Tag` outline trae el borde en `--color-accent`; el diseño lo aclara a 500 (`dc.html:172`). */
+.stat {
+  border-color: var(--color-accent-500);
+}

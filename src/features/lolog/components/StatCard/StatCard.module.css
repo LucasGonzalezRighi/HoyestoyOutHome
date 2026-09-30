@@ -1,0 +1,51 @@
+/*
+ * Stat verde de Lago Lolog (`dc.html:235-239`). El color de fondo, el del
+ * texto (`--color-accent-2-100`) y el radio (28px = `--radius-lg`) los pone
+ * `SurfaceCard` con `tone="accent-2-800"` y `radius="lg"`.
+ */
+
+/*
+ * Envoltorio de la entrada: `height: 100%` (`dc.html:235`). El `<li>` es el
+ * ítem de la grilla y se estira con la fila; el envoltorio lo llena.
+ */
+.wrapper {
+  height: 100%;
+}
+
+/*
+ * La card: `aspect-ratio: 5 / 4` (`dc.html:236`). `SurfaceCard` le pone
+ * `height: 100%` para igualar las cards de una fila; acá tiene que ser `auto`,
+ * porque con un alto fijo el navegador ignora el `aspect-ratio`.
+ */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  height: auto;
+  aspect-ratio: 5 / 4;
+  padding: 24px 20px;
+}
+
+/*
+ * El número (`dc.html:237`). `nowrap` también en mobile, a diferencia de los
+ * títulos: el tamaño tiene piso de 30px (no se achica con el viewport), así
+ * que no aplica la regla "Mobile legible", y partir "+1.900 m" dejaría la
+ * unidad sola en otro renglón. Si no entra, la grilla `1fr 1fr` de las stats
+ * ensancha esa columna en vez de sacar el número de la card (a 360px quedan
+ * columnas de 150 y 156px).
+ */
+.value {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-bg);
+}
+
+/* La bajada (`dc.html:238`). Hereda el verde claro de la card. */
+.label {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+}

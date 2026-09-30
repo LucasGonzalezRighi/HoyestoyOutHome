@@ -1,0 +1,37 @@
+{
+  "name": "hoy-estoy-ooh-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hoy Estoy Out Of Home — landing de trekkings y ascensos guiados. Next.js App Router + TypeScript estricto + CSS Modules sobre el design system Organic.",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "check": "npm run type-check && npm run lint && npm run test"
+  },
+  "dependencies": {
+    "lucide-react": "^1.49.0",
+    "next": "16.3.7",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.7",
+    "prettier": "^3.9.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.0.0",
+    "vitest": "^5.0.2"
+  }
+}

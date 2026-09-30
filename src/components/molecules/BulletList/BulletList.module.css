@@ -1,0 +1,35 @@
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Listas de "¿Es para mí?". */
+.sizeMd {
+  gap: 9px;
+}
+
+/* Listas de los paneles de servicios: `gap: 7px` y ítems a `15px / 1.5`. */
+.sizeSm {
+  gap: 7px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* "Ideal si:" / "Trabajamos con:": `font-weight: 600; color: var(--color-accent-2-700)`. */
+.emphasis {
+  color: var(--color-accent-2-700);
+  font-weight: 600;
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+/* Alineada a la línea base, la viñeta queda baja: el diseño la sube 2px. */
+.dot {
+  transform: translateY(-2px);
+}

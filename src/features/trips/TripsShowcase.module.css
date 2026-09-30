@@ -1,0 +1,137 @@
+/*
+ * Sección 03 "Próximos viajes" (`dc.html:107-139`).
+ *
+ * El alto de `.section` lo escribe el motor (`HorizontalScrollEffect`): el
+ * sobrante del riel más un viewport. Por eso el aire de arriba es margen y no
+ * padding: un padding sumaría al alto calculado y correría el pin.
+ */
+.section {
+  position: relative;
+  margin-top: var(--section-space);
+}
+
+/*
+ * La escena fija (`dc.html:108`): ocupa el viewport mientras dura la sección y
+ * centra el riel y la barra en vertical.
+ *
+ * `overflow: clip` después del `hidden` (que queda de respaldo para
+ * navegadores sin `clip`): recorta igual, pero no convierte a la escena en un
+ * contenedor de scroll. Con `hidden`, al enfocar con el teclado el botón de
+ * una card que está fuera de pantalla, el navegador desplazaría la escena
+ * (`scrollLeft`) para mostrarlo, y ese corrimiento quedaría sumado a la
+ * traslación del motor.
+ */
+.stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  overflow: clip;
+}
+
+/*
+ * El riel que traslada el motor (`dc.html:109`). `max-content` para que mida
+ * todo lo que lleva (el motor lee su `scrollWidth`); `stretch` iguala el alto
+ * de las cards.
+ */
+.track {
+  display: flex;
+  align-items: stretch;
+  gap: 26px;
+  width: max-content;
+  padding: 60px var(--layout-gutter) 0;
+}
+
+/* Primera columna del riel: eyebrow, título y bajada (`dc.html:110`). */
+.intro {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  width: min(80vw, 380px);
+}
+
+/* `dc.html:112`. */
+.title {
+  margin: 0 0 18px;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1;
+}
+
+/* `dc.html:113`. */
+.lead {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/*
+ * Las cards van en un `<ul>` que repite el `gap` del riel: se ve igual que si
+ * fueran hijas directas (como en el diseño) y el lector de pantalla las
+ * anuncia como lista. Se estira con el riel y a su vez estira cada `<li>`.
+ */
+.cards {
+  display: flex;
+  flex: none;
+  gap: 26px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* `display: flex` para que el `<article>` se estire a todo el alto del `<li>`. */
+.cardItem {
+  display: flex;
+}
+
+/* Margen final del riel: la última card no queda pegada al borde (`dc.html:135`). */
+.endSpacer {
+  flex: none;
+  width: var(--layout-gutter);
+}
+
+/* Riel de la barra de avance (`dc.html:137`). */
+.progress {
+  height: 3px;
+  margin: 28px var(--layout-gutter) 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--color-neutral-300);
+}
+
+/* El relleno: el motor lo escala en X de 0 a 1 con el avance del riel. */
+.progressFill {
+  height: 100%;
+  background: var(--color-accent-2);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/*
+ * Sin JS (CLAUDE.md §6.2: "sin JS la página se lee entera"). Nadie estira la
+ * sección ni traslada el riel, y la escena fija de un viewport recortaría las
+ * cards que no entran. Se desarma el pin y el riel pasa a scrollear en X a
+ * mano; la barra de avance, que no tendría quién la llene, se oculta. Con JS
+ * esta regla no aplica y la sección es la del diseño.
+ */
+@media (scripting: none) {
+  .stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .track {
+    width: auto;
+    overflow-x: auto;
+  }
+
+  .progress {
+    display: none;
+  }
+}

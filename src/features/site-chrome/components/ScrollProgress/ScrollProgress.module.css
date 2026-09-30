@@ -1,0 +1,14 @@
+/* Barra de progreso de lectura — `dc.html:37`. El motor escribe `transform: scaleX(…)`. */
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: var(--z-progress);
+  background: linear-gradient(90deg, var(--color-accent-2), var(--color-accent-500));
+  transform-origin: left;
+  transform: scaleX(0);
+  pointer-events: none;
+}

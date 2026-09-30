@@ -1,0 +1,44 @@
+/*
+ * `.card.elev-sm` del design system con los valores inline del diseño
+ * (`dc.html:335`): `margin: 0; padding: 28px 26px; border-radius: 28px;
+ * display: flex; flex-direction: column; gap: 14px`.
+ *
+ * `background-color` y no `background`: el tilt escribe `background-image`
+ * inline (el brillo que sigue al cursor) y tiene que sumarse al color, no
+ * reemplazarlo. La sombra de hover (`--shadow-lg`) también la pone el tilt.
+ */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 28px 26px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* `margin: 0; font-size: 15.5px; line-height: 1.65` (`dc.html:337`). */
+.quote {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+/*
+ * `margin-top: auto; font-size: 14px` (`dc.html:338`): el pie se pega abajo,
+ * así queda alineado en todas las cards de la cinta aunque la frase sea más
+ * corta. El color no se toca: el inline del diseño no lo pisa, así que queda
+ * el del `figcaption` del design system (texto al 55%, `styles.css:97-100`),
+ * que base.css ya pone. Solo el viaje va en verde musgo (`.trip`).
+ */
+.caption {
+  margin-top: auto;
+  font-size: 14px;
+}
+
+/* Nombre del viaje en verde musgo (`color: var(--color-accent-2-700)`, `dc.html:338`). */
+.trip {
+  color: var(--color-accent-2-700);
+}

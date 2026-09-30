@@ -1,0 +1,15 @@
+/* Card "¿Es para mí?" — `dc.html:197-209`. */
+
+/* "Ideal si:" / "Trabajamos con:" (`dc.html:201`, `:205`). */
+.listTitle {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+/*
+ * Aire entre la primera lista y el rótulo de la segunda (`margin: 0 0 22px`,
+ * `dc.html:202`); la última no lleva (`margin: 0`, `dc.html:206`).
+ */
+.list:not(:last-child) {
+  margin-bottom: 22px;
+}

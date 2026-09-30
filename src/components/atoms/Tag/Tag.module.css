@@ -1,0 +1,30 @@
+/* `.tag` del design system, con el "rounded frame": los controles chicos van en pastilla. */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.accent {
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+}
+
+.accentTwo {
+  background: var(--color-accent-2-100);
+  color: var(--color-accent-2-800);
+}
+
+.neutral {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-800);
+}
+
+.outline {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}

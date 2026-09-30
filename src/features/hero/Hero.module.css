@@ -1,0 +1,137 @@
+/*
+  Hero — `dc.html:54-78`.
+  Alto de pantalla menos el nav sticky: el hero entero entra en el primer
+  vistazo. `svh` (y no `vh`) para que en mobile no quede tapado por la barra
+  del navegador.
+*/
+.hero {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: calc(100svh - var(--nav-height));
+  overflow: hidden;
+}
+
+/*
+  Foto de fondo (`dc.html:56`; `WashedImage` ya recorta y aplica `--filter-vivid`).
+  Pisa el `position: relative` del marco: acá es una capa a sangre.
+*/
+.backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+  Degradé sobre la foto (`dc.html:59`): limpio en el tercio de arriba (el
+  cielo), marrón montaña hacia abajo para que el texto crema se lea, y crema
+  en el último borde para fundir la foto con la página.
+*/
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 30%,
+    color-mix(in srgb, var(--color-accent-900) 40%, transparent) 62%,
+    color-mix(in srgb, var(--color-accent-900) 55%, transparent) 90%,
+    var(--color-bg) 100%
+  );
+}
+
+/*
+  Texto calado "Out Of Home · Out Of Home" (`dc.html:61`): solo contorno, en
+  crema translúcido, más ancho que la pantalla. El motor lo corre en X con el
+  scroll (`drift`); lo que sale de la pantalla lo recorta el hero.
+*/
+.outline {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  font-family: var(--font-heading);
+  font-size: 21vw;
+  line-height: 1;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--color-bg) 85%, transparent);
+  pointer-events: none;
+}
+
+/*
+  Columna de texto (`dc.html:62`): ocupa todo el alto del hero y apila su
+  contenido contra el borde de abajo. Los paddings en `vh` achican el aire en
+  pantallas bajas (notebooks) sin tocar el de las altas.
+*/
+.content {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(22px, 4vh, 40px);
+  width: 100%;
+  padding: clamp(40px, 8vh, 96px) clamp(20px, 3.5vw, 56px) clamp(36px, 7vh, 72px);
+}
+
+/*
+  Bajada (`dc.html:72`): contra el borde derecho, dos renglones enteros, en
+  crema dorado con una sombra que la separa de la foto.
+*/
+.lead {
+  align-self: flex-end;
+  margin: 0;
+  color: var(--color-accent-100);
+  font-size: min(19px, 2.4vw);
+  line-height: 1.6;
+  text-align: right;
+  text-shadow: var(--shadow-text-hero-lead);
+}
+
+.leadLine {
+  display: block;
+  white-space: nowrap;
+}
+
+/* CTA (`dc.html:73`), centrados debajo de la bajada. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 13px;
+}
+
+/*
+  Mobile legible (CLAUDE.md §9): a 375px el `2.4vw` daría una bajada de 9px.
+  Debajo de 820px no baja de 16px (y no pasa de los 19px de escritorio), los
+  renglones pueden partirse y el bloque se alinea a la izquierda, con el
+  titular: un párrafo de varias líneas alineado a la derecha se lee a los saltos.
+*/
+@media (max-width: 820px) {
+  .lead {
+    align-self: flex-start;
+    font-size: clamp(16px, 2.4vw, 19px);
+    text-align: left;
+  }
+
+  .leadLine {
+    white-space: normal;
+  }
+}
+
+/*
+  Impresión (resto de la hoja en `design-system/print.css`).
+  - Alto fijo de 560px (`hoy-estoy-ooh-landing-print.dc.html:36`): en papel
+    `svh` se mide contra el alto de la hoja y el hero ocuparía una página
+    entera.
+  - Sin el texto calado: es un adorno que existe para deslizarse con el
+    scroll, y el print del diseño no lo tiene.
+*/
+@media print {
+  .hero {
+    min-height: 560px;
+  }
+
+  .outline {
+    display: none;
+  }
+}

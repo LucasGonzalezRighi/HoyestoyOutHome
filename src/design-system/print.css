@@ -1,0 +1,300 @@
+/*
+ * Hoja de impresión (y de "Guardar como PDF").
+ *
+ * Reproduce la variante para imprimir del diseño,
+ * `docs/design/hoy-estoy-ooh-landing-print.dc.html` (acá `print.dc.html`):
+ * la misma landing, sin las piezas fijas, con el motor apagado (`k() { return
+ * 0 }`, `print.dc.html:386`) y con las secciones que dependen del scroll
+ * desarmadas en flujo normal. Hoja blanca con 0,5in de margen, fondos y
+ * colores tal cual, cada bloque entero en una página.
+ *
+ * Por qué casi todo va con `!important`:
+ * - El motor escribe estilos **inline** (`transform`, `opacity`, `clip-path`,
+ *   `filter`, el `height` de la sección horizontal, el `background-color` del
+ *   fondo, el `display` del cursor). Al imprimir quedan congelados en la pose
+ *   del último frame: una aparición a medio entrar, una cinta corrida, la
+ *   sección de viajes estirada a miles de px. Un estilo inline solo se pisa
+ *   desde una hoja con `!important`: es la única forma.
+ * - Lo que no es inline vive en CSS Modules, que cargan después de esta hoja
+ *   (`globals.css` se importa primero en el layout) y pesan lo mismo que un
+ *   selector de atributo: sin `!important` ganarían por orden.
+ *
+ * Los selectores son los atributos del motor (`MOTION_ATTRIBUTES` de
+ * `src/motion/attributes.ts`: `data-reveal`, `data-parallax`, `data-marquee`,
+ * `data-hscroll`, `data-stack`…) y la estructura que garantizan sus
+ * componentes, nunca clases de módulo (vienen con hash). Lo que es propio del
+ * hero (cinta, texto calado, alto) está en los módulos del hero, que sí
+ * pueden nombrar sus clases.
+ *
+ * Qué no cubre: el texto de los contadores (`data-count`). El motor lo
+ * reescribe (arranca en 0 y sube al entrar en pantalla) y CSS no puede
+ * devolverle el valor final.
+ *
+ * Pestañas de Servicios: se imprime la pestaña activa (la que estaba elegida
+ * al imprimir; al cargar, la primera). Hay un solo `tabpanel` en el DOM
+ * (CLAUDE.md §9), así que no hay otros paneles que mostrar. La tira de
+ * pestañas queda, como en el diseño: dice de qué viaje es la lista.
+ */
+
+/* `<doc-page margin="0.5in">` (`print.dc.html:28`). */
+@page {
+  margin: 0.5in;
+}
+
+@media print {
+  /* ── Página ──────────────────────────────────────────────────────────── */
+
+  /*
+   * Hoja blanca: el print del diseño no tiene el envoltorio que cambia de
+   * color (`data-bgroot`) y `<doc-page>` imprime sobre papel blanco. Pisa
+   * también el verde que el motor le deja inline al fondo si se imprime
+   * desde el cierre.
+   */
+  html,
+  body,
+  [data-bg-root] {
+    background: none !important;
+  }
+
+  /*
+   * Fondos y colores exactos (`print.dc.html:22`): sin esto el navegador
+   * saltea los fondos (cards, bandas verdes, footer) y aclara los textos.
+   *
+   * Sin animaciones ni transiciones (`print.dc.html:23`): cada animación CSS
+   * salta a su último cuadro (demora negativa + relleno `both`) en vez de
+   * volver al primero, y las transiciones no dejan nada a mitad de camino.
+   * `backdrop-filter` se imprime rasterizado y borroso: afuera, como hace
+   * `<doc-page>`.
+   */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    animation-delay: -99s !important;
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    animation-fill-mode: both !important;
+    animation-play-state: running !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /*
+   * Cortes de página (`print.dc.html:24` + los que agrega `<doc-page>`): cada
+   * sección, card y figura entera en una página si entra; los títulos no
+   * quedan solos al pie; nada de renglones sueltos. Se suman las cards
+   * apilables (`[data-stack]`), que en flujo normal son bloques como
+   * cualquier otra card, y los ítems de lista: en el print del diseño la foto
+   * de un guía queda al pie de una hoja y su nombre en la siguiente.
+   */
+  section,
+  article,
+  figure,
+  blockquote,
+  img,
+  svg,
+  li,
+  [data-tilt],
+  [data-stack] {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+  }
+
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* ── Piezas fijas ────────────────────────────────────────────────────── */
+
+  /*
+   * Telón, cursor, barra de progreso, nav, WhatsApp flotante y "Saltar al
+   * contenido": el print del diseño no los tiene (`print.dc.html:28-34`). Un
+   * `position: fixed` se repetiría en cada hoja. El nav, el botón flotante
+   * (el único `magnet()`) y el skip link son hijos directos del fondo de la
+   * página (`app/layout.tsx`).
+   */
+  [data-curtain],
+  [data-cursor],
+  [data-scroll-progress],
+  [data-bg-root] > nav,
+  [data-bg-root] > [data-magnet],
+  [data-bg-root] > a:first-child {
+    display: none !important;
+  }
+
+  /* ── Motor: todo en su pose final ────────────────────────────────────── */
+
+  /*
+   * Apariciones: visibles, en su lugar y sin recorte, sin importar dónde
+   * estaba el scroll al imprimir. Es la pose con el motor apagado
+   * (`RevealEffect.clear`). El `clip-path` final redondea con el mismo radio
+   * que ya tiene el marco, así que sacarlo no cambia nada.
+   */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  /*
+   * Capas que el motor mueve con el scroll, el tiempo o el puntero: quietas
+   * en su lugar natural. El parallax vuelve al centro de su marco (la capa
+   * sobra por arriba y por abajo), las cintas a su comienzo, las cards
+   * derechas y sin zoom. El relleno de la línea de tiempo queda completo:
+   * es como se ve el cronograma una vez leído.
+   */
+  [data-parallax],
+  [data-drift],
+  [data-marquee],
+  [data-skew],
+  [data-tilt],
+  [data-tilt-zoom],
+  [data-magnet],
+  [data-timeline],
+  [data-stack] > * {
+    transform: none !important;
+  }
+
+  /* El brillo que sigue al cursor (inline, del tilt) y el oscurecido de la pila. */
+  [data-tilt] {
+    background-image: none !important;
+  }
+
+  [data-stack] > * {
+    filter: none !important;
+  }
+
+  /* ── 03 Próximos viajes: el riel en flujo normal ─────────────────────── */
+
+  /*
+   * Sin scroll horizontal (`print.dc.html:87-89`): la sección toma su alto
+   * natural (el motor le deja inline el alto del recorrido), la escena deja
+   * de ser un viewport fijo que recorta, y el riel parte en renglones y
+   * vuelve a su lugar (el motor lo deja corrido tanto como se haya
+   * scrolleado: impreso desde más abajo, las cards quedarían fuera de la hoja).
+   */
+  [data-hscroll] {
+    height: auto !important;
+  }
+
+  [data-hscroll] > * {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  [data-hscroll-track] {
+    width: auto !important;
+    flex-wrap: wrap !important;
+    transform: none !important;
+  }
+
+  /*
+   * En el diseño las cards son hijas directas del riel; acá van en un `<ul>`.
+   * `display: contents` las vuelve hijas del riel para el layout y parten
+   * renglón junto con la columna del título, como en el print.
+   */
+  [data-hscroll-track] > ul {
+    display: contents !important;
+  }
+
+  /* El margen final del riel (decorativo) y la barra de avance, que en papel no avanza. */
+  [data-hscroll-track] > [aria-hidden='true'],
+  [data-hscroll] :has(> [data-hscroll-bar]) {
+    display: none !important;
+  }
+
+  /*
+   * La foto de cada card: `height: 240px` fijo (`print.dc.html:97`) en vez de
+   * `46vh`, que en papel se mide contra el alto de la hoja. Es el marco de la
+   * imagen con zoom de la card (`tiltZoom()`).
+   */
+  [data-hscroll] :has(> [data-tilt-zoom]) {
+    height: 240px !important;
+    min-height: 0 !important;
+  }
+
+  /* ── 06 Banda "La montaña te espera." ───────────────────────────────── */
+
+  /*
+   * `height: 520px` (`print.dc.html:195`) en vez de `92vh`: casi una hoja
+   * entera de foto. Es el único `reveal('expand')` que enmarca una foto con
+   * parallax y zoom de intro.
+   */
+  [data-reveal='expand']:has(> * > [data-parallax-zoom]) {
+    height: 520px !important;
+    min-height: 0 !important;
+  }
+
+  /* ── 07 Lolog: la pila de cards en flujo normal ──────────────────────── */
+
+  /* `position: static` (`print.dc.html:229`): una card debajo de la otra. */
+  [data-stack] {
+    position: static !important;
+  }
+
+  /*
+   * A una columna, la foto de la card se ve entera con su proporción, y una
+   * vertical (días 1 y 4) la lleva a más de una hoja: la card se parte y la
+   * punta de la foto cae sola en la hoja siguiente (también en el print del
+   * diseño). Con un tope de 520px, el de la banda de la sección 06, cada día
+   * entra en una hoja; las apaisadas no llegan al tope y no cambian. El marco
+   * recorta (`WashedImage`) y la foto lo cubre.
+   */
+  [data-stack] > * > :has(> img) {
+    max-height: 520px;
+  }
+
+  /* ── 11 Testimonios y 12 Galería: cintas sin copia ───────────────────── */
+
+  /*
+   * Cada cinta muestra sus ítems una sola vez y parte en renglones
+   * (`print.dc.html:332-335`). La copia que hace el organism `Marquee` lleva
+   * `aria-hidden="true"` en la raíz de cada ítem: se oculta. El
+   * `padding-inline-end` que empalma la vuelta sobra.
+   */
+  [data-marquee] {
+    width: auto !important;
+    flex-wrap: wrap !important;
+    padding-inline-end: 0 !important;
+  }
+
+  [data-marquee] > [aria-hidden='true'] {
+    display: none !important;
+  }
+
+  /*
+   * La ventana de la cinta de testimonios se escapa del `Container` para ir
+   * de borde a borde; en papel vuelve a la columna del contenido, alineada
+   * con el título, como la grilla del print (`print.dc.html:312`). Sin
+   * recorte, para no cortar la sombra de las cards.
+   */
+  :has(> [data-marquee]) {
+    margin-inline: 0 !important;
+    overflow: visible !important;
+  }
+
+  /*
+   * Testimonios (la cinta de cards `tilt()`): grilla `repeat(auto-fit,
+   * minmax(260px, 1fr))` (`print.dc.html:312`). Con las cards de 340px de la
+   * cinta, dos no entran en el ancho útil de una A4 (698px) y quedaría una
+   * por renglón.
+   */
+  [data-marquee]:has(> * > [data-tilt]) {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}

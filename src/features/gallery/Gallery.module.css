@@ -1,0 +1,88 @@
+/*
+ * `overflow: hidden` (`dc.html:346`): las cintas son mucho más anchas que la
+ * pantalla y la sección las recorta. El aire de arriba lo pone `Section`.
+ */
+.gallery {
+  overflow: hidden;
+}
+
+/*
+ * Encabezado (`dc.html:347`): título a la izquierda y link a la derecha,
+ * alineados por la línea de base; en pantallas angostas el link baja solo
+ * (`flex-wrap`). Ancho y margen lateral los pone `Container`.
+ */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+/* "Postales del camino" — `font-size: clamp(34px, 4vw, 56px); margin: 0` (`dc.html:348`). */
+.title {
+  font-size: clamp(34px, 4vw, 56px);
+}
+
+/* "@chichizolalucas" — `font-weight: 600` (`dc.html:349`); color y subrayado, los de base.css. */
+.profileLink {
+  font-weight: 600;
+}
+
+/* Las dos filas, separadas `gap: 14px` (`dc.html:351`). */
+.rows {
+  display: grid;
+  gap: 14px;
+}
+
+/*
+ * `gap: 14px` de cada cinta (`dc.html:352`, `355`).
+ *
+ * `padding-inline-end` igual al gap: el motor vuelve a empezar la cinta cuando
+ * avanzó medio `scrollWidth`, y sin este padding esa mitad cae medio gap antes
+ * del comienzo de la copia (la cinta saltaría 7px en cada vuelta). Queda
+ * siempre fuera de la pantalla.
+ */
+.rail {
+  gap: 14px;
+  padding-inline-end: 14px;
+}
+
+/* Hacia dónde gira la foto en hover: acompaña el sentido de su fila (`dc.html:353`, `356`). */
+.railForward {
+  --gallery-hover-rotate: 1.5deg;
+}
+
+.railBackward {
+  --gallery-hover-rotate: -1.5deg;
+}
+
+/* El ítem de la cinta no se achica aunque la fila no entre en la pantalla (`flex: none`). */
+.tile {
+  flex: none;
+}
+
+/*
+ * Marco de cada foto (`dc.html:353`): `.washed` (lo pone `WashedImage`) con
+ * `width: clamp(220px, 26vw, 360px); height: clamp(170px, 20vw, 260px);
+ * border-radius: 26px`.
+ *
+ * `isolation: isolate`: sin esto, Safari deja de recortar con el radio a la
+ * foto mientras hace zoom, y se ven esquinas cuadradas.
+ */
+.photo {
+  width: clamp(220px, 26vw, 360px);
+  height: clamp(170px, 20vw, 260px);
+  border-radius: var(--radius-card-sm);
+  isolation: isolate;
+}
+
+/* Zoom con giro en hover: `transition: transform 1s cubic-bezier(.2,.7,.2,1)` (`dc.html:353`). */
+.photoImage {
+  transition: transform 1s var(--ease-zoom);
+}
+
+.photoImage:hover {
+  transform: scale(1.12) rotate(var(--gallery-hover-rotate));
+}

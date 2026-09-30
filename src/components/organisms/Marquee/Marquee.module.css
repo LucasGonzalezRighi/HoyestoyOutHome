@@ -1,0 +1,17 @@
+/*
+ * `display: flex; width: max-content` de los rieles `data-marquee` del diseño.
+ * Sin margen ni padding propios: el `gap` de cada cinta lo pone quien la usa.
+ *
+ * Si separa los ítems con `gap`, tiene que sumar `padding-inline-end` igual al
+ * gap. El motor reinicia la cinta al recorrer medio `scrollWidth`, y con `gap`
+ * solo hay un hueco menos que ítems: la mitad cae medio gap antes del comienzo
+ * de la copia y la cinta salta en cada vuelta (en el diseño, 19px en la del
+ * hero). El padding queda siempre fuera de la pantalla.
+ */
+.rail {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -1,0 +1,26 @@
+/* "¿Quiénes somos?" — `font-size: clamp(38px, 4.6vw, 64px); margin: 0 0 14px` (`dc.html:316`). */
+.title {
+  margin: 0 0 14px;
+  font-size: clamp(38px, 4.6vw, 64px);
+}
+
+/* Bajada — `font-size: 17px; line-height: 1.7; max-width: 58ch; margin: 0 0 46px` (`dc.html:317`). */
+.lead {
+  max-width: 58ch;
+  margin: 0 0 46px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/*
+ * Grilla de guías (`dc.html:318`): `auto-fit` con columnas de 220px como
+ * mínimo, así va perdiendo columnas sola (4 → 3 → 2 → 1) sin breakpoint.
+ */
+.guides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

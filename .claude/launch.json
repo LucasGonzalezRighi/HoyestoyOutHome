@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hoy-estoy-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "design-reference",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5510",
+        "--directory",
+        "C:\\Users\\lucas\\AppData\\Local\\Temp\\claude\\C--Users-lucas-Desktop-T-Python\\1aaa17d7-d4ff-4fc1-89dc-751e150f9d8b\\scratchpad\\design"
+      ],
+      "port": 5510
+    }
+  ]
+}

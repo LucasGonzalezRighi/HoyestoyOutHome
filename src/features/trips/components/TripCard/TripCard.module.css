@@ -1,0 +1,97 @@
+/*
+ * Card de viaje (`dc.html:116-133`): `.card.elev-md` del design system con los
+ * estilos inline del diseño encima.
+ */
+
+/*
+ * De `.card` (design system) quedan el fondo, la columna y el `gap` de
+ * `--space-2` entre la foto y el cuerpo (el inline del diseño no lo pisa);
+ * padding y radio los pisa el inline (`padding: 0`, `border-radius: 32px`).
+ * `.elev-md` es la sombra.
+ *
+ * `background-color` y no `background`: el tilt escribe `background-image`
+ * inline (el brillo que sigue al cursor) y se tiene que sumar al color.
+ * Mientras la card está inclinada, el tilt pone `--shadow-lg` inline; al
+ * soltarla vuelve esta.
+ */
+.card {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(80vw, 400px);
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+/* Marco de la foto: alto relativo al viewport con un piso (`dc.html:117`). */
+.photo {
+  height: 46vh;
+  min-height: 220px;
+}
+
+/* `dc.html:120`: `flex: 1` para que el pie quede abajo aunque el nombre ocupe menos líneas. */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 24px 26px;
+}
+
+/* `dc.html:121`. */
+.destination {
+  margin: 0;
+  color: var(--color-accent-2);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* `dc.html:122`. */
+.name {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+/* Tags en fila, pasan de línea si no entran (`dc.html:123`). Es un `<ul>`: sin formato de lista. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * En el diseño cada tag es hijo directo del `div` flex, así que es un flex
+ * item y mide lo que su contenido. Dentro de un `<li>` de bloque quedaría en
+ * una caja de línea con el `line-height` del body (15px × 1.55), que la
+ * estira un par de px y la baja. Con `display: flex` vuelve a ser flex item.
+ */
+.tagItem {
+  display: flex;
+}
+
+/* Precio y botón al pie de la card (`dc.html:128`). */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+/* `dc.html:129`. */
+.price {
+  margin: 0;
+  color: var(--color-accent-700);
+  font-family: var(--font-heading);
+  font-size: 22px;
+}

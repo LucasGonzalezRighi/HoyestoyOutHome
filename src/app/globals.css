@@ -1,0 +1,5 @@
+/* Estilos globales: solo el design system. Todo lo demás son CSS Modules. */
+@import '../design-system/tokens.css';
+@import '../design-system/base.css';
+/* Después de base.css: la hoja de impresión pisa estilos base e inline (ver el archivo). */
+@import '../design-system/print.css';

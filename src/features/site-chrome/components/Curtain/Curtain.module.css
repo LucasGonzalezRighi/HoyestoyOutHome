@@ -1,0 +1,97 @@
+/*
+  Telón de entrada — `dc.html:25-34`.
+  El motor (`CurtainController`) solo escribe la pose final (hojas giradas,
+  logo achicado, telón oculto); las duraciones y curvas viven acá.
+*/
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-curtain);
+  /* Profundidad del giro de las hojas: con menos, las puertas se deforman demasiado. */
+  perspective: 1800px;
+  pointer-events: auto;
+  /*
+    Failsafe: si el JS nunca llega (bloqueado, error de hidratación), el telón
+    no puede quedar tapando la página. A los 6 s se oculta solo.
+  */
+  animation: curtainFailsafe 0s linear 6s forwards;
+}
+
+/*
+  En cuanto el JS toma el control (`CurtainController` marca `<html>` con
+  `MOTION_STATE.curtainControlled`), el failsafe se cancela: la coreografía
+  (1300 + 2400 ms, `CURTAIN_TIMINGS`) la maneja el controlador aunque la
+  hidratación haya tardado. Sin esto, una hidratación de 3–6 s cortaba el giro
+  de las hojas a la mitad.
+*/
+:global(html[data-curtain-controlled]) .curtain {
+  animation: none;
+}
+
+@keyframes curtainFailsafe {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.leaf {
+  position: absolute;
+  top: 0;
+  /* 50.2%: las hojas se solapan 0,4% para que no se vea una línea de luz en el medio. */
+  width: 50.2%;
+  height: 100%;
+  transition:
+    transform 1.8s var(--ease-curtain),
+    filter 1.8s;
+}
+
+/* Cada hoja gira sobre su borde exterior, como una puerta. */
+.leafLeft {
+  left: 0;
+  background: linear-gradient(90deg, var(--color-accent-2-900), var(--color-accent-2-800));
+  transform-origin: left center;
+  box-shadow: var(--shadow-curtain-leaf-left);
+}
+
+.leafRight {
+  right: 0;
+  background: linear-gradient(270deg, var(--color-accent-2-900), var(--color-accent-2-800));
+  transform-origin: right center;
+  box-shadow: var(--shadow-curtain-leaf-right);
+}
+
+.brand {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  transition:
+    transform 1.1s var(--ease-curtain),
+    opacity 0.9s var(--ease-in-out);
+}
+
+/*
+  Caja crema de 132×152 que contiene el logo (`dc.html:29`). El `multiply` que
+  funde el fondo blanco del PNG con el crema ya lo trae `BrandLogo`.
+*/
+.logoFrame {
+  width: 132px;
+  height: 152px;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  display: grid;
+  place-content: center;
+  box-shadow: var(--shadow-curtain-logo);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--color-accent-2-100);
+  letter-spacing: 0.02em;
+}

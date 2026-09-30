@@ -1,0 +1,5 @@
+/* Solo resetea el margen de base.css: tamaño y aire de abajo los pone cada sección. */
+
+.title {
+  margin: 0;
+}

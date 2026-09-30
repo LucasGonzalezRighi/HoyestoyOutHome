@@ -1,0 +1,6 @@
+/* "09 Servicios y equipo" — `docs/design/hoy-estoy-ooh-landing.dc.html:285-312`. */
+
+/* `font-size: clamp(34px, 4vw, 56px)` (`dc.html:289`). El margen en 0 ya lo pone `SectionHeading`. */
+.title {
+  font-size: clamp(34px, 4vw, 56px);
+}

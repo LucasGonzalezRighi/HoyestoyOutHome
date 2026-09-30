@@ -1,0 +1,21 @@
+/*
+  WhatsApp flotante — `dc.html:386`.
+  La transición del `transform` la pone el motor (`MAGNET_TRANSITION`) y pisa
+  cualquier otra: por eso acá no se declara ninguna.
+*/
+
+.button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: var(--z-float);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-accent-2);
+  color: var(--color-accent-2-100);
+  display: grid;
+  place-content: center;
+  box-shadow: var(--shadow-lg);
+  text-decoration: none;
+}

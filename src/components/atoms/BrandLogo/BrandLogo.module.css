@@ -1,0 +1,5 @@
+.logo {
+  /* El alto acompaña al ancho: si quien lo usa cambia el ancho por CSS, no se deforma. */
+  height: auto;
+  mix-blend-mode: multiply;
+}

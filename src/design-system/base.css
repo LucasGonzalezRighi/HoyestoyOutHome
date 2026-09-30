@@ -1,0 +1,156 @@
+/*
+ * Estilos base: reset + estilos de elementos.
+ *
+ * Salen de dos lugares del diseño:
+ * - la capa de elementos de `docs/design/design-system/styles.css` (body,
+ *   títulos, párrafos, imágenes, foco, selección);
+ * - el `<helmet>` de `docs/design/hoy-estoy-ooh-landing.dc.html` (scroll suave,
+ *   `text-wrap: pretty`, `overflow-x: clip` y el color de los links).
+ *
+ * Todo va dentro de `:where(…)`, que tiene especificidad 0: cualquier clase de
+ * un CSS Module lo pisa sin pelear por especificidad ni por orden de carga.
+ * Las únicas excepciones son los pseudo-elementos (`::before`, `::selection`),
+ * que no pueden ir dentro de `:where()`, y la regla del cursor custom, que va a
+ * propósito con especificidad normal.
+ */
+
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+
+/* `*` ya pesa 0; los pseudo-elementos suman lo mínimo (0,0,1). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:where(html) {
+  scroll-behavior: smooth;
+}
+
+:where(body) {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  /* Evita viudas en los párrafos (helmet del diseño). */
+  text-wrap: pretty;
+  /*
+   * `clip` y no `hidden`: recorta lo que se sale en X (el texto calado del
+   * hero, la cinta girada) sin convertir al body en contenedor de scroll, que
+   * rompería el `position: sticky` del nav y de las secciones fijadas.
+   */
+  overflow-x: clip;
+}
+
+/* ── Tipografía ────────────────────────────────────────────────────────── */
+
+:where(h1, h2, h3, h4, h5, h6) {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+:where(h1) {
+  font-size: 42px;
+}
+
+:where(h2) {
+  font-size: 32px;
+}
+
+:where(h3) {
+  font-size: 25px;
+}
+
+:where(h4) {
+  font-size: 20px;
+}
+
+:where(h5) {
+  font-size: 16px;
+}
+
+:where(h6) {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:where(p) {
+  margin: 0 0 var(--space-3);
+}
+
+/*
+ * El diseño pinta los links de texto con --color-accent-700 y no con el acento
+ * base: el acento contra el crema llega a 3:1, que no alcanza para texto chico.
+ * Los botones-link tienen su propia clase, que pisa esto.
+ */
+:where(a) {
+  color: var(--color-accent-700);
+  text-underline-offset: 3px;
+}
+
+:where(a:hover) {
+  color: var(--color-accent-600);
+}
+
+/* ── Medios ────────────────────────────────────────────────────────────── */
+
+:where(img) {
+  display: block;
+  max-width: 100%;
+}
+
+:where(figure) {
+  margin: 0;
+}
+
+:where(figcaption) {
+  margin-top: var(--space-1);
+  font-size: 11px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+/* ── Estados ───────────────────────────────────────────────────────────── */
+
+/* Nunca el anillo azul del navegador: el foco de teclado es el del design system. */
+:where(:focus) {
+  outline: none;
+}
+
+:where(:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+/*
+ * Cursor custom (la montaña que sigue al mouse).
+ *
+ * El diseño oculta el cursor del sistema con `@media (pointer: fine)` siempre.
+ * Acá se oculta solo mientras el motor marca `<html>` con `data-cursor-active`
+ * (`MOTION_STATE.cursorActive` de `src/motion/attributes.ts`), o sea, solo si
+ * el cursor custom de verdad está andando: si el JS falla, el cursor normal
+ * sigue ahí. Especificidad normal a propósito (0,1,1): así le gana al
+ * `cursor: pointer` de una clase de módulo (0,1,0), como el de los botones.
+ */
+html[data-cursor-active],
+html[data-cursor-active] * {
+  cursor: none;
+}
+
+/* ── Movimiento reducido ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  :where(html) {
+    scroll-behavior: auto;
+  }
+}

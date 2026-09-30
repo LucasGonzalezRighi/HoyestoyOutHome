@@ -1,0 +1,75 @@
+/*
+ * Card de un guía (`dc.html:320-325`). El `<a>` es la card entera y pisa el
+ * color de los links de base.css: como `base.css` pesa 0 (`:where(a:hover)`),
+ * esta clase también gana en hover y el texto queda marrón, como en el diseño
+ * (ahí el color va inline y le gana a `a:hover`).
+ */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text);
+  text-align: center;
+  text-decoration: none;
+}
+
+/*
+ * Foto circular con aro dorado (`dc.html:321`): el borde crema de 4px separa
+ * la foto del aro de `box-shadow`. En hover se deforma en una mancha orgánica
+ * con rebote (`--ease-spring`, .7s) y el aro pasa a verde musgo y se engrosa.
+ *
+ * `isolation: isolate`: sin esto, Safari deja de recortar con el radio a la
+ * foto escalada mientras el marco transiciona, y se ven esquinas cuadradas.
+ */
+.avatar {
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  border: 4px solid var(--color-bg);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--color-accent-400);
+  isolation: isolate;
+  transition:
+    border-radius 0.7s var(--ease-spring),
+    transform 0.7s var(--ease-spring),
+    box-shadow 0.4s;
+}
+
+/*
+ * En el diseño el `style-hover` está en el marco, pero el marco llena casi
+ * toda la card: se engancha al hover del link (y a su foco de teclado, para
+ * que navegar con Tab dé la misma respuesta que el mouse).
+ */
+.card:hover .avatar,
+.card:focus-visible .avatar {
+  border-radius: 38% 62% 54% 46% / 48% 40% 60% 52%;
+  box-shadow: 0 0 0 6px var(--color-accent-2-400);
+  transform: rotate(-4deg) scale(1.05);
+}
+
+/*
+ * `transform: scale(1.1)` de la `<img>` (`dc.html:321`): los PNG del equipo ya
+ * vienen recortados en círculo sobre blanco, y el zoom esconde el canto del
+ * recorte debajo del marco.
+ */
+.avatarImage {
+  transform: scale(1.1);
+}
+
+/* `font-family: var(--font-heading); font-size: 22px` (`dc.html:322`). */
+.name {
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+/* `font-size: 13.5px; color: var(--color-neutral-700); max-width: 26ch` (`dc.html:323`). */
+.role {
+  max-width: 26ch;
+  color: var(--color-neutral-700);
+  font-size: 13.5px;
+}
+
+/* `.tag.tag-neutral` subrayado (`dc.html:324`): se lee como link aunque la card no lo parezca. */
+.handle {
+  text-decoration: underline;
+}

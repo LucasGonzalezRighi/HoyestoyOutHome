@@ -1,0 +1,34 @@
+/* Cursor montaña — `dc.html:36`. El motor escribe `display` y `transform`. */
+
+.cursor {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 24px;
+  /* Corre el dibujo para que la punta del cerro (12, 3) quede justo en el mouse. */
+  margin: -3px 0 0 -12px;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  filter: drop-shadow(var(--shadow-cursor));
+}
+
+.icon {
+  display: block;
+}
+
+.sun {
+  fill: var(--color-accent-400);
+}
+
+.peak {
+  fill: var(--color-accent-2);
+  stroke: var(--color-bg);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.snow {
+  fill: var(--color-bg);
+}

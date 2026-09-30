@@ -1,0 +1,36 @@
+/*
+ * Envoltorio de toda la página (`data-bgroot` del diseño). El motor le cambia
+ * el `background-color` inline mientras una sección con `backgroundShift()`
+ * cruza el centro del viewport (el cierre pasa a verde musgo); la transición
+ * de 1s es la que suaviza ese cambio.
+ */
+.backgroundRoot {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  transition: background-color 1s var(--ease-in-out);
+}
+
+/*
+ * "Saltar al contenido": el primer foco de la página. Queda fuera de pantalla
+ * hasta que alguien llega con Tab, y ahí aparece arriba de todo, incluso del
+ * telón de entrada. Tiene la forma del botón primario (pastilla dorada).
+ */
+.skipLink {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: calc(var(--z-curtain) + 1);
+  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-600);
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  line-height: 1.2;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-4) - var(--space-4)));
+}
+
+.skipLink:focus {
+  transform: none;
+}

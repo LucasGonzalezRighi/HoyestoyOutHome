@@ -1,0 +1,26 @@
+/* Card de "¿Puedo?" / "¿Es para mí?" — `dc.html:183-185` y `dc.html:198-200`. */
+
+/* Fondo, radio, alto y tilt los pone `SurfaceCard`; acá solo el aire interno. */
+.card {
+  padding: clamp(28px, 4vw, 44px);
+}
+
+/* La pregunta (`dc.html:184`, `:199`) y su respuesta (`dc.html:185`, `:200`). */
+.title {
+  margin: 0 0 14px;
+  font-size: clamp(38px, 4vw, 56px);
+}
+
+.titleAccent {
+  color: var(--color-accent-600);
+}
+
+.titleAccentTwo {
+  color: var(--color-accent-2-700);
+}
+
+.lead {
+  margin: 0 0 26px;
+  font-size: 16.5px;
+  line-height: 1.65;
+}

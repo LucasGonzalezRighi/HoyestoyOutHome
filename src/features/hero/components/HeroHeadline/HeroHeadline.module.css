@@ -1,0 +1,72 @@
+/*
+  Titular del hero — `dc.html:63-71`.
+  Crema sobre la foto, con una sombra difusa que lo despega del cielo claro.
+*/
+.headline {
+  display: grid;
+  gap: 0.04em;
+  margin: 0;
+  color: var(--color-bg);
+  /* `min(72px, 5.3vw)` + `nowrap`: en escritorio cada renglón entra entero en una línea. */
+  font-size: min(72px, 5.3vw);
+  line-height: 1.04;
+  white-space: nowrap;
+  text-shadow: var(--shadow-text-hero-headline);
+}
+
+/* Un renglón (`dc.html:65`): las palabras en fila, separadas por un cuarto de em. */
+.line {
+  display: flex;
+  flex-wrap: nowrap;
+  column-gap: 0.24em;
+}
+
+/*
+  Máscara de cada palabra: recorta la palabra mientras sube desde abajo.
+  El padding deja lugar a los acentos arriba y a las colas abajo (la "p" de
+  "experiencias") para que no se corten con la palabra ya en su lugar; el
+  margen negativo devuelve ese aire de abajo para que los renglones no se
+  separen (`dc.html:67`).
+*/
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.04em 0.02em 0.14em;
+  margin-bottom: -0.1em;
+}
+
+/* Lo que mueve el motor (`reveal('word')`): tiene que ser una caja para aceptar `transform`. */
+.word {
+  display: inline-block;
+}
+
+/*
+  Mobile legible (CLAUDE.md §9): a 375px el `5.3vw` daría un titular de 20px.
+  Debajo de 820px el tamaño no baja de 34px. `max(34px, 5.3vw)` empalma con
+  escritorio en 820px (43,5px de los dos lados), así que el salto de
+  breakpoint no se nota.
+
+  A ese tamaño los dos renglones del diseño ya no entran enteros. Si cada uno
+  partiera por su cuenta quedarían cuatro renglones desparejos ("…en la /
+  montaña / para reconectar con lo / esencial."), con un corte forzado a mitad
+  de la frase. Por eso los renglones se disuelven (`display: contents`: sus
+  máscaras pasan a ser hijas directas del `<h1>`) y la frase fluye como un
+  solo párrafo, cortando donde caiga. Cada palabra sigue en su máscara con su
+  `reveal('word')` y su escalón: la animación no cambia. El `column-gap` es el
+  mismo cuarto de em entre palabras y el `row-gap`, el `gap` de escritorio
+  entre renglones.
+*/
+@media (max-width: 820px) {
+  .headline {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.24em;
+    row-gap: 0.04em;
+    font-size: max(34px, 5.3vw);
+    white-space: normal;
+  }
+
+  .line {
+    display: contents;
+  }
+}

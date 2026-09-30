@@ -1,0 +1,58 @@
+/*
+ * Sección 06 — banda "La montaña te espera." (`dc.html:214-222`).
+ * El aire de arriba (`padding-top: clamp(80px, 11vw, 140px)`) lo pone `Section`.
+ */
+
+/*
+ * Marco de la banda (`dc.html:215`). Recorta la foto y su parallax con el
+ * radio más grande de la landing. El `transform` y la `opacity` los escribe
+ * el motor (`reveal('expand')`).
+ */
+.frame {
+  position: relative;
+  height: 92vh;
+  min-height: 460px;
+  margin: 0 clamp(10px, 2vw, 24px);
+  overflow: hidden;
+  border-radius: var(--radius-3xl);
+}
+
+/* El `.washed` del diseño va `position: absolute; inset: 0` (`dc.html:216`): pisa el `relative` de `WashedImage`. */
+.photo {
+  position: absolute;
+  inset: 0;
+}
+
+/* Degradé que oscurece la mitad de abajo para que la frase crema se lea sobre la foto (`dc.html:217`). */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 30%,
+    color-mix(in srgb, var(--color-accent-2-900) 78%, transparent) 100%
+  );
+}
+
+/* `dc.html:218`. */
+.caption {
+  position: absolute;
+  right: clamp(22px, 5vw, 72px);
+  bottom: clamp(28px, 6vw, 72px);
+  left: clamp(22px, 5vw, 72px);
+}
+
+/*
+ * La frase (`dc.html:219`). `transform-origin` abajo a la izquierda: el
+ * `reveal('zoom')` la hace crecer desde el 55% y así crece desde su esquina,
+ * pegada al borde del marco, en vez de desde el centro.
+ */
+.phrase {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 7vw, 110px);
+  font-style: italic;
+  line-height: 0.98;
+  color: var(--color-bg);
+  transform-origin: left bottom;
+}

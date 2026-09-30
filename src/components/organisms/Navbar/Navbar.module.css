@@ -1,0 +1,127 @@
+/* `<nav class="nav">` del diseño (líneas 39–52 de hoy-estoy-ooh-landing.dc.html). */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: var(--space-3) var(--space-4);
+  /* Vidrio esmerilado: el contenido se ve pasar por debajo, desenfocado. */
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Marca ─────────────────────────────────────────────────────────────── */
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 10px;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Caja de 34 × 40 con `contain`: el logo (149 × 172) queda entero y centrado. */
+.logo {
+  width: 34px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brandName {
+  font-size: 18px;
+}
+
+.brandTagline {
+  color: var(--color-accent-2);
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── Links ─────────────────────────────────────────────────────────────── */
+
+.links {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: block;
+  padding: 8px 14px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  text-decoration: none;
+  transition: color 0.4s;
+}
+
+.link:hover {
+  color: var(--color-accent-600);
+}
+
+/* Ventana de una línea (20px = el line-height del link) que recorta la pila. */
+.labelWindow {
+  display: block;
+  height: 20px;
+  overflow: hidden;
+}
+
+.labelStack {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.55s var(--ease-swap);
+}
+
+.link:hover .labelStack {
+  transform: translateY(-20px);
+}
+
+.label,
+.labelHover {
+  height: 20px;
+  white-space: nowrap;
+}
+
+.labelHover {
+  color: var(--color-accent-600);
+}
+
+/* ── CTA ───────────────────────────────────────────────────────────────── */
+
+/*
+ * Columna 3 explícita: en mobile los links desaparecen y, sin esto, el botón
+ * caería en la columna del medio (la `auto`) y quedaría centrado.
+ */
+.cta {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* El único breakpoint del diseño. */
+@media (max-width: 820px) {
+  .links {
+    display: none;
+  }
+}

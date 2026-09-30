@@ -1,0 +1,58 @@
+/*
+ * Footer — `dc.html:374-382`.
+ *
+ * En el diseño es un hijo de la sección 13 con `margin-top: 50px`, y el
+ * `padding-bottom: clamp(60px, 8vw, 100px)` y los márgenes laterales los
+ * ponía la sección (dc.html:361). Acá es un elemento aparte, así que ese aire
+ * pasa a ser su propio padding: el resultado en pantalla es el mismo.
+ */
+.footer {
+  padding: 50px var(--layout-gutter) clamp(60px, 8vw, 100px);
+  /* El mismo verde al que cambia el fondo de la página: sin JS el texto claro sigue legible (CLAUDE.md §9). */
+  background-color: var(--color-accent-2-900);
+  color: var(--color-accent-2-200);
+  font-size: 13.5px;
+}
+
+/* dc.html:374. */
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--layout-narrow);
+  margin: 0 auto;
+}
+
+/* "Hoy Estoy Out Of Home" (dc.html:375). */
+.brand {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 18px;
+  color: var(--color-bg);
+}
+
+/* dc.html:376. */
+.links {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * dc.html:377-379. En el diseño el color es inline y le gana al hover dorado
+ * de los links del `<helmet>`: el link no cambia de color al pasar el cursor
+ * (queda el subrayado). Esta clase le gana igual al `:where(a:hover)` de base.css.
+ */
+.link {
+  color: var(--color-accent-2-100);
+}
+
+/* "Turismo Aventura · Argentina · 2026" (dc.html:381). */
+.note {
+  margin: 0;
+}

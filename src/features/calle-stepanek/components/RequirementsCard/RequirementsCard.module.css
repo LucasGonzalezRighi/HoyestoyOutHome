@@ -1,0 +1,49 @@
+/* Card "¿Puedo?" — `dc.html:182-196`. */
+
+/*
+ * Solo "¿Puedo?" abre el espaciado de letras; "¿Es para mí?" queda con el de
+ * los títulos (`dc.html:184` vs `:199`).
+ */
+.title {
+  letter-spacing: 0.02em;
+}
+
+/*
+ * Separador decorativo entre la respuesta y los datos (`dc.html:186`). Radio
+ * de pastilla: en una barra de 3px de alto da lo mismo que el
+ * `border-radius: 3px` del diseño.
+ */
+.rule {
+  height: 3px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-400);
+}
+
+/*
+ * Grilla de datos (`dc.html:187`). `minmax(0, 1fr)` en vez del `1fr 1fr` del
+ * diseño: "Pronunciados, sin pasos técnicos" parte en renglones en vez de
+ * ensanchar su columna.
+ */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 18px;
+  margin: 0;
+}
+
+/* Etiqueta y valor de cada dato (`dc.html:190-191`). */
+.label {
+  margin: 0;
+  color: var(--color-accent-600);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* `margin` explícito: el `<dd>` trae 40px de sangría del navegador. */
+.value {
+  margin: 2px 0 0;
+  font-size: 17px;
+}

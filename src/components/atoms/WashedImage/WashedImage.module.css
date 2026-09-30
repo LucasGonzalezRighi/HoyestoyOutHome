@@ -1,0 +1,40 @@
+/*
+ * El marco recorta: es el `.washed` del diseño, el contenedor con
+ * `overflow: hidden` que lleva el filtro. La foto (o su capa de parallax) se
+ * mueve adentro. Si el marco tiene que ser absoluto (fondo del hero), la clase
+ * de quien lo usa pisa `position`: su módulo carga después que este.
+ */
+.frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.washed {
+  filter: var(--filter-washed);
+}
+
+.vivid {
+  filter: var(--filter-vivid);
+}
+
+/*
+ * Capa de parallax: más alta que el marco, con el overscan que decide quien
+ * la usa. El motor mide al padre de esta capa (el marco) y la traslada en Y.
+ */
+.parallaxLayer {
+  position: absolute;
+  top: var(--parallax-overscan-top);
+  left: 0;
+  width: 100%;
+  height: var(--parallax-overscan-height);
+}
+
+/* `next/image` con `fill` ya pone la imagen absoluta al 100% del padre. */
+.image {
+  object-fit: cover;
+}
+
+/* Zoom de la foto de la card de viaje al inclinarse: `transform 1.2s cubic-bezier(.2,.7,.2,1)`. */
+.tiltZoom {
+  transition: transform 1.2s var(--ease-zoom);
+}

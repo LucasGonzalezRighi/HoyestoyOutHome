@@ -1,0 +1,123 @@
+/*
+ * Secciones 04 "Calle & Stepanek" (`dc.html:142-179`) y 05 "¿Puedo? / ¿Es
+ * para mí?" (`dc.html:181-211`). El aire de arriba de cada una lo pone
+ * `Section` (`--section-space` y `--section-space-compact`).
+ */
+
+/* ── 04 · Calle & Stepanek ─────────────────────────────────────────────── */
+
+/*
+ * Grilla 5/7 (`.lc-split`, `dc.html:142`): foto a la izquierda, texto a la
+ * derecha. `align-items: start` es lo que deja trabajar al sticky: la columna
+ * de la foto mide lo suyo y no se estira al alto de la columna de texto.
+ */
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+}
+
+/*
+ * `.lc-sticky` del diseño (`dc.html:143`): la foto queda fija mientras se lee
+ * la columna derecha. `top: 96px` literal, como el `top: 100px` de Lolog: es
+ * una medida del diseño, no una derivada del alto del nav.
+ */
+.media {
+  position: sticky;
+  top: 96px;
+}
+
+/* El marco que recibe el reveal `clip`: redondea y recorta la foto y su zoom. */
+.photoFrame {
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+/* `WashedImage` recorta; acá solo la proporción del marco (`dc.html:145`). */
+.photo {
+  aspect-ratio: 4 / 5;
+}
+
+/* Tags debajo de la foto (`dc.html:147`). */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* En una línea en escritorio, como en el diseño (`min(64px, 4.4vw)`, `dc.html:155`). */
+.title {
+  font-size: min(64px, 4.4vw);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.titleAccent {
+  color: var(--color-accent-500);
+}
+
+/* "Tu primer 4mil": bajada en la fuente de títulos, no un encabezado (`dc.html:156`). */
+.subtitle {
+  margin: 14px 0 22px;
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 2.6vw, 38px);
+}
+
+/* Los dos párrafos de presentación (`dc.html:157-158`). */
+.paragraph {
+  max-width: 56ch;
+  margin: 0 0 14px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* Cierre de la presentación; los 50px de abajo lo separan del cronograma (`dc.html:159`). */
+.highlight {
+  max-width: 44ch;
+  margin: 0 0 50px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* ── 05 · ¿Puedo? / ¿Es para mí? ───────────────────────────────────────── */
+
+/*
+ * Dos cards lado a lado que pasan a una columna solas cuando no entran
+ * (`repeat(auto-fit, minmax(300px, 1fr))`, `dc.html:181`). El `min(…, 100%)`
+ * evita que, en un teléfono de menos de 340px, la columna mínima de 300px
+ * desborde el contenedor.
+ */
+.fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 22px;
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 820px) {
+  /* `.lc-split` y `.lc-sticky` del diseño (`dc.html:20`): una columna y la foto en el flujo. */
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .media {
+    position: static;
+  }
+
+  /*
+   * Mobile legible (CLAUDE.md §9): en una línea a 4.4vw, a 375px el título
+   * mediría 16px. Parte renglones con piso de 30px; a 820px vale lo mismo que
+   * el diseño (4.4vw ≈ 36px), así que no salta al cruzar el breakpoint. Es la
+   * misma regla que el h2 de Lolog, que tiene el mismo tamaño en el diseño.
+   */
+  .title {
+    font-size: max(30px, 4.4vw);
+    white-space: normal;
+  }
+}

@@ -1,0 +1,106 @@
+/*
+ * Sección 07 — "Lago Lolog a Laguna Verde" (`dc.html:224-269`).
+ * El aire de arriba (`padding-top: clamp(80px, 11vw, 140px)`) lo pone `Section`;
+ * el eyebrow ya trae su estilo (`Eyebrow`).
+ */
+
+/* Título (`dc.html:227`): en una línea, con un tamaño que acompaña al viewport. */
+.title {
+  margin: 0 0 12px;
+  font-size: min(64px, 4.4vw);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Bajada en itálica dorada (`dc.html:228`). */
+.subtitle {
+  margin: 0 0 40px;
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-style: italic;
+  color: var(--color-accent-600);
+}
+
+/* `.lc-split` del diseño (`dc.html:229`): descripción ancha a la izquierda, stats a la derecha. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+}
+
+/* `dc.html:230`. */
+.description {
+  display: grid;
+  gap: 16px;
+}
+
+/* `dc.html:231`. */
+.paragraph {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.75;
+}
+
+/*
+ * `.lc-sticky` del diseño (`dc.html:233`): las stats quedan fijas mientras se
+ * lee la descripción. En el diseño stats y nota comparten una sola grilla de
+ * dos columnas; acá las stats son una lista propia (`.stats`) y la nota va
+ * abajo, con el mismo gap: se ve igual.
+ */
+.aside {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  gap: 14px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nota de modalidad (`dc.html:242`). */
+.modality {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-neutral-700);
+}
+
+/* "Itinerario" (`dc.html:246`). */
+.itineraryTitle {
+  margin: clamp(70px, 9vw, 110px) 0 30px;
+  font-size: clamp(34px, 3.6vw, 52px);
+}
+
+/* La pila de cards (`dc.html:247`): los `<li>` son los envoltorios sticky. */
+.stages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 820px) {
+  /*
+   * "Mobile legible" (CLAUDE.md §9): a 375px, `4.4vw` daría un título de ≈16px
+   * en una línea. Se parte en renglones con piso de 30px; a 820px vale lo
+   * mismo que el diseño (4.4vw ≈ 36px), así que no hay salto.
+   */
+  .title {
+    font-size: max(30px, 4.4vw);
+    white-space: normal;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    position: static;
+  }
+}
