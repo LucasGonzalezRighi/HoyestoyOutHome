@@ -19,7 +19,12 @@ export function buildTrip(overrides: Partial<TripParams> = {}): Trip {
     difficulty: 'media',
     distanceKm: 24,
     price: Price.of(690000),
-    photo: new Photo({ src: '/images/photos/calle.jpg', alt: 'Cartel de cumbre' }),
+    photo: new Photo({
+      src: '/images/photos/calle.jpg',
+      alt: 'Cartel de cumbre',
+      width: 1200,
+      height: 1600,
+    }),
     detailAnchor: '#calle',
     ...overrides,
   });

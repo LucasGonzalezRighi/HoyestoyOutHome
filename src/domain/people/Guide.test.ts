@@ -8,7 +8,12 @@ const params: GuideParams = {
   name: 'Andrés Gavilán',
   role: 'Guía de Montaña y Guía de Selva',
   instagramHandle: 'andres.gavilan',
-  photo: new Photo({ src: '/images/team/andres.png', alt: 'Andrés Gavilán' }),
+  photo: new Photo({
+    src: '/images/team/andres.png',
+    alt: 'Andrés Gavilán',
+    width: 232,
+    height: 232,
+  }),
 };
 
 describe('Guide', () => {

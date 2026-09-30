@@ -4,7 +4,12 @@ import { Photo } from '../shared/Photo';
 
 import { ItineraryStage, type ItineraryStageParams } from './ItineraryStage';
 
-const photo = new Photo({ src: '/images/photos/lolog.jpg', alt: 'Bosque' });
+const photo = new Photo({
+  src: '/images/photos/lolog.jpg',
+  alt: 'Bosque',
+  width: 1400,
+  height: 933,
+});
 
 const secondDay: ItineraryStageParams = {
   day: 2,
