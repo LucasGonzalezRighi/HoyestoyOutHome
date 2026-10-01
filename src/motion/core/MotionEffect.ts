@@ -14,9 +14,10 @@ import type { FrameState, MotionSettings } from './FrameState';
  * Fases de un frame, en orden:
  *
  * 1. `collect` — solo si el DOM cambió: re-escanear los elementos.
- * 2. `tick` — cada frame, sin mirar el scroll.
- * 3. `measure` — solo si el scroll/viewport/intro cambió, y durante la ventana
- *    de asentamiento que sigue (`SETTLE_MS`): **leer** el layout.
+ * 2. `measure` — solo si el frame toca layout (cambió el scroll, el viewport,
+ *    la intro, la intensidad o la velocidad redondeada, o sigue abierta la
+ *    ventana de asentamiento, `SETTLE_MS`): **leer** el layout.
+ * 3. `tick` — cada frame, sin mirar el scroll.
  * 4. `apply` — igual que `measure`: **escribir** estilos. Nunca se lee acá.
  *
  * Fuera del loop: `onPointerMove` en cada `pointermove`, y `dispose` al desmontar.
@@ -64,11 +65,12 @@ export abstract class FrameEffect extends MotionEffect {
 /**
  * Efecto atado al scroll: corre solo en los frames en que cambió algo (scroll,
  * viewport, intro, intensidad o velocidad) y en los de la ventana de
- * asentamiento que sigue a cada cambio (`SETTLE_MS`). Mide en `measure` y
- * escribe en `apply`; los que no necesitan medir (drift, skew) dejan `measure`
- * vacío. Como `apply` puede correr varias veces con la misma entrada, tiene
- * que dar lo mismo cada vez (escribir con `StyleWriter` evita las escrituras
- * repetidas).
+ * asentamiento que abre cada cambio de scroll, viewport, intro o intensidad
+ * (`SETTLE_MS`; un cambio de velocidad mide ese frame pero no la abre). Mide
+ * en `measure` y escribe en `apply`; los que no necesitan medir (drift, skew)
+ * dejan `measure` vacío. Como `apply` puede correr varias veces con la misma
+ * entrada, tiene que dar lo mismo cada vez (escribir con `StyleWriter` evita
+ * las escrituras repetidas).
  */
 export abstract class ScrollEffect extends MotionEffect {
   abstract override apply(frame: FrameState): void;

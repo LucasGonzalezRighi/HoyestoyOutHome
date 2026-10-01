@@ -21,9 +21,9 @@
 /*
   En cuanto el JS toma el control (`CurtainController` marca `<html>` con
   `MOTION_STATE.curtainControlled`), el failsafe se cancela: la coreografía
-  (1300 + 2400 ms, `CURTAIN_TIMINGS`) la maneja el controlador aunque la
-  hidratación haya tardado. Sin esto, una hidratación de 3–6 s cortaba el giro
-  de las hojas a la mitad.
+  (1300 ms desde el primer pintado + 2400 ms, `CURTAIN_TIMINGS`) la maneja el
+  controlador aunque la hidratación haya tardado. Sin esto, una hidratación de
+  3–6 s cortaba el giro de las hojas a la mitad.
 */
 :global(html[data-curtain-controlled]) .curtain {
   animation: none;
@@ -94,4 +94,17 @@
   font-size: 22px;
   color: var(--color-accent-2-100);
   letter-spacing: 0.02em;
+}
+
+/*
+  Respaldo de CLAUDE.md §6.2: con reduced motion, `CurtainController` oculta el
+  telón de una vez al hidratar, sin escribir las poses del logo ni de las
+  hojas. Si algo igual las escribiera, el telón salta a la pose final sin el
+  giro 3D a pantalla completa, que es lo que molesta con sensibilidad vestibular.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .leaf,
+  .brand {
+    transition: none;
+  }
 }

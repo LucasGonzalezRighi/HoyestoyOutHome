@@ -4,6 +4,7 @@ import { BrandLogo } from '@/components/atoms/BrandLogo';
 import { LinkButton } from '@/components/atoms/Button';
 import { ChatIcon } from '@/components/atoms/ChatIcon';
 import { Section } from '@/components/atoms/Section';
+import { VisuallyHidden } from '@/components/atoms/VisuallyHidden';
 import { SECTION_IDS } from '@/constants/sections';
 import type { ContactContent } from '@/content/sections/contact';
 import { formatNumber } from '@/domain';
@@ -33,6 +34,9 @@ const LOGO_WIDTH = 74;
 /** Lado del ícono del CTA (`dc.html:371`: `<svg width="20">`). */
 const CTA_ICON_SIZE = 20;
 
+/** `id` del título: le da nombre accesible a la sección (`aria-labelledby`). */
+const TITLE_ID = `${SECTION_IDS.contact}-titulo`;
+
 /** Props de `Contact`: solo su slice de contenido. */
 export type ContactProps = {
   /** `landingContent.contact`. */
@@ -50,6 +54,10 @@ export type ContactProps = {
  *
  * El padding de abajo no está acá: lo pone `SiteFooter`, que en el diseño
  * vivía adentro de esta sección y ahora es el `<footer>` de la página.
+ *
+ * La sección toma su nombre del `h2` (`aria-labelledby`), como Próximos
+ * viajes: el precio va antes del título, y así quien navega por regiones entra
+ * a la sección antes del precio, no después.
  */
 export function Contact({ content }: ContactProps) {
   const { logoAlt, kicker, price, note, titleLines, cta } = content;
@@ -57,6 +65,7 @@ export function Contact({ content }: ContactProps) {
   return (
     <Section
       id={SECTION_IDS.contact}
+      aria-labelledby={TITLE_ID}
       spacing="none"
       className={styles.section}
       {...backgroundShift(CLOSING_BACKGROUND)}
@@ -80,21 +89,27 @@ export function Contact({ content }: ContactProps) {
             {kicker}
           </p>
           <p className={styles.price} {...reveal('zoom', { delay: 2 })}>
-            {price.symbol}
             {/*
               El servidor renderiza el monto final ("690.000"): es lo que se
-              lee sin JS y con el movimiento apagado. El motor lo reescribe
+              ve sin JS y con el movimiento apagado. El motor lo reescribe
               contando en miles (`thousands` le pega el ".000"), igual que el
-              `data-count-fmt="k"` del diseño.
+              `data-count-fmt="k"` del diseño. Lo visible va con `aria-hidden`
+              y el lector de pantalla lee el precio final en texto oculto: el
+              motor pone el contador en 0 al cargar, y se oía "$0.000" o un
+              monto a mitad de camino (CLAUDE.md §9, "Contadores accesibles").
             */}
-            <span {...counter(price.value.inThousands(), 'thousands')}>
-              {formatNumber(price.value.amount)}
+            <span aria-hidden="true">
+              {price.symbol}
+              <span {...counter(price.value.inThousands(), 'thousands')}>
+                {formatNumber(price.value.amount)}
+              </span>
             </span>
+            <VisuallyHidden>{price.value.label()}</VisuallyHidden>
           </p>
           <p className={styles.note} {...reveal('up', { delay: 3 })}>
             {note}
           </p>
-          <h2 className={styles.title} {...reveal('up', { delay: 4 })}>
+          <h2 id={TITLE_ID} className={styles.title} {...reveal('up', { delay: 4 })}>
             {/* Los renglones van separados con `<br>`, como en el diseño: el corte es parte del copy. */}
             {titleLines.map((line, index) => (
               <Fragment key={line}>

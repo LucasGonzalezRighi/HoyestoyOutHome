@@ -62,14 +62,21 @@
   transform: scale(1.12);
 }
 
-/* Solo el tamaño (`dc.html:278`): margen y color siguen siendo los del `figcaption` del design system. */
+/*
+ * Solo el tamaño (`dc.html:278`): margen y color siguen siendo los del
+ * `figcaption` de `base.css` (`--color-neutral-700`, oscurecido para AA).
+ */
 .caption {
   font-size: 17px;
 }
 
-/* Nota del asterisco (`dc.html:282`). */
+/*
+ * Nota del asterisco (`dc.html:282`). Un paso más oscura que el
+ * `--color-neutral-600` del diseño (CLAUDE.md §9): a 13px daba 3,9:1 sobre el
+ * crema, y el 700 da 6:1.
+ */
 .footnote {
   margin: 26px 0 0;
-  color: var(--color-neutral-600);
+  color: var(--color-neutral-700);
   font-size: 13px;
 }

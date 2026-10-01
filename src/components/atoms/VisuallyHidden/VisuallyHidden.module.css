@@ -1,0 +1,21 @@
+/*
+ * El patrón "visually hidden" de siempre: fuera de la pantalla y del flujo,
+ * pero en el árbol de accesibilidad. No `display: none` ni `visibility:
+ * hidden`, que lo sacarían también del árbol.
+ *
+ * `position: absolute` lo saca del layout del padre (en un botón flex no suma
+ * `gap`), y `nowrap` evita que un texto largo, apretado en 1px, se lea con las
+ * palabras pegadas. `clip` queda de respaldo de `clip-path`.
+ */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

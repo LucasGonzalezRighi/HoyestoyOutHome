@@ -21,7 +21,7 @@ Desde afuera se importa **solo del barrel**: `import { Trip, Price } from '@/dom
 | `trips/TripCatalog.ts` | El catálogo ordenado | `all()`, `get(slug)` (tira si no está), `find(slug)`. Slugs únicos |
 | `itinerary/ScheduleDay.ts` | Día del cronograma de Calle & Stepanek | `statLabels()` → `["4 km", "280 m desnivel", "2 hs de marcha"]`, `dayLabel()` |
 | `itinerary/ItineraryStage.ts` | Etapa del itinerario de Lolog | `dayLabel()` → `Día 0`, `distanceLabel()` → `11,3 km`, `elevationLabel()` → `+570 m`. Distancia y desnivel van juntos o ninguno |
-| `metrics/Metric.ts` | Stat con contador | `format()` → `+1.900 m`, `formattedValue()` → `1.900` (texto sin JS). Valor finito ≥ 0 |
+| `metrics/Metric.ts` | Stat con contador | `format()` → `+1.900 m`, `formattedValue()` → `1.900` (texto sin JS). Valor entero ≥ 0: el contador anima enteros |
 | `services/ServiceChecklist.ts` | Qué incluye / qué llevar | `groups()` → cinco grupos planos en orden fijo. Ningún grupo vacío |
 | `people/Guide.ts` | Guía del equipo | `instagramUrl`, `handleLabel` → `@usuario`. Usuario sin `@` |
 | `people/Testimonial.ts` | Testimonio | `stars()` → `★★★★★`, `ratingLabel()` → `5 estrellas`, `quotedText()` → `“…”`. Rating entero 1–5 |

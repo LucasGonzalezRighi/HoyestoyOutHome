@@ -30,13 +30,15 @@ export type SectionProps = {
 /**
  * Banda vertical de la landing: pone el ritmo vertical entre secciones.
  *
- * Lleva `scroll-margin-top` con el alto del nav: como el nav es sticky, sin
- * esto un salto por ancla (`#calle`) deja el principio de la sección debajo
- * de la barra.
+ * No lleva `scroll-margin-top`: que un salto por ancla (`#calle`) no deje el
+ * principio de la sección debajo del nav sticky lo resuelve el
+ * `scroll-padding-top` del `<html>` (`design-system/base.css`), que vale para
+ * todas las anclas y para el foco. Un `scroll-margin` acá se le sumaría y el
+ * salto quedaría corrido el doble.
  */
 export function Section({ spacing = 'default', className, children, ...rest }: SectionProps) {
   return (
-    <section className={cn(styles.section, SPACING_CLASSES[spacing], className)} {...rest}>
+    <section className={cn(SPACING_CLASSES[spacing], className)} {...rest}>
       {children}
     </section>
   );

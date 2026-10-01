@@ -19,8 +19,19 @@ describe('Metric', () => {
   });
 
   it('tira con valores negativos o no finitos, o sin bajada', () => {
-    expect(() => new Metric({ value: -1, label: 'x' })).toThrow('≥ 0');
+    expect(() => new Metric({ value: -1, label: 'x' })).toThrow('entero mayor o igual a 0');
     expect(() => new Metric({ value: Number.NaN, label: 'x' })).toThrow();
+    expect(() => new Metric({ value: Number.POSITIVE_INFINITY, label: 'x' })).toThrow();
     expect(() => new Metric({ value: 1, label: '' })).toThrow('La bajada de la métrica');
+  });
+
+  it('tira con decimales: el contador anima enteros y mostraría "11 km" en vez de "11,3 km"', () => {
+    expect(() => new Metric({ value: 11.3, suffix: ' km', label: 'Distancia total' })).toThrow(
+      'El valor de la métrica "Distancia total" tiene que ser un número entero',
+    );
+  });
+
+  it('acepta el 0 (el contador arranca y termina ahí)', () => {
+    expect(new Metric({ value: 0, label: 'Noches' }).format()).toBe('0');
   });
 });

@@ -86,3 +86,16 @@
 .photoImage:hover {
   transform: scale(1.12) rotate(var(--gallery-hover-rotate));
 }
+
+/*
+ * Fila del botón que pausa las dos cintas (no está en el diseño: CLAUDE.md §9).
+ * Las cintas van de borde a borde, fuera del `Container`; el botón se alinea
+ * con el gutter del contenido, con el mismo ancho y margen lateral que el
+ * `Container` del encabezado. Separado de las fotos lo mismo que las filas
+ * entre sí (`gap: 14px`, `dc.html:351`).
+ */
+.controls {
+  max-width: var(--layout-max);
+  margin: 14px auto 0;
+  padding-inline: var(--layout-gutter);
+}

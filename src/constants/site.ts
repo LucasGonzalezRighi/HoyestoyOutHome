@@ -4,6 +4,9 @@
  *
  * Acá vive lo que **configura** la marca (teléfono, perfiles, flags). Los
  * textos que se leen en pantalla viven en `src/content/`.
+ *
+ * Este módulo también corre en el cliente (lo importan `content/` y el motor),
+ * así que no lee variables de entorno: la URL pública vive en `siteUrl.ts`.
  */
 export const SITE = {
   name: 'Hoy Estoy Out Of Home',
@@ -15,23 +18,6 @@ export const SITE = {
   /** Locale de Open Graph (usa guion bajo, no guion medio). */
   ogLocale: 'es_AR',
 } as const;
-
-/** URL de desarrollo: la que usa `npm run dev` si no hay `.env.local`. */
-const FALLBACK_SITE_URL = 'http://localhost:3000';
-
-/**
- * URL pública del sitio, desde `NEXT_PUBLIC_APP_URL`.
- *
- * La usan la metadata (base de las URLs absolutas de Open Graph y del
- * canonical), `robots.ts` y `sitemap.ts`: vive en un solo lugar para que las
- * tres coincidan.
- *
- * Con `||` y no `??`: una variable definida pero vacía (`NEXT_PUBLIC_APP_URL=`,
- * como queda al copiar un `.env` a medio completar) también cae al fallback.
- * Si la variable trae algo que no es una URL, `new URL` tira en el build:
- * mejor enterarse ahí que publicar links rotos.
- */
-export const SITE_URL = new URL(process.env.NEXT_PUBLIC_APP_URL || FALLBACK_SITE_URL);
 
 /**
  * WhatsApp es el único canal de contacto: no hay formulario ni backend.

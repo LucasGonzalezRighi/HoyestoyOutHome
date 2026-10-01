@@ -1,9 +1,9 @@
 import { formatNumber } from '../shared/formatters';
-import { assertText } from '../shared/invariants';
+import { assertInteger, assertText } from '../shared/invariants';
 
 /** Datos para crear una `Metric`. */
 export type MetricParams = {
-  /** El número (lo anima el contador). */
+  /** El número: un entero ≥ 0 (lo anima el contador, que muestra enteros). */
   value: number;
   /** Texto pegado antes del número: `'+'`. */
   prefix?: string;
@@ -19,17 +19,18 @@ export type MetricParams = {
  *
  * El valor se guarda como número y no como texto porque el contador lo anima
  * de 0 a `value`: el prefijo y el sufijo quedan quietos alrededor del número
- * que sube. Invariante: `value` es finito y ≥ 0 (el contador siempre sube).
+ * que sube.
+ *
+ * Invariante: `value` es un entero ≥ 0, porque el contador anima enteros.
+ * Siempre sube (de 0 a `value`) y redondea cada paso al entero, también el
+ * último: una stat de `11.3` se leería "11,3 km" sin JS y "11 km" con el
+ * motor. La clase promete solo lo que la UI puede mostrar igual en los dos casos.
  */
 export class Metric {
   private readonly props: Readonly<Required<MetricParams>>;
 
   constructor({ value, prefix = '', suffix = '', label }: MetricParams) {
-    if (!Number.isFinite(value) || value < 0) {
-      throw new Error(
-        `El valor de la métrica "${label}" tiene que ser un número ≥ 0 (llegó ${value}).`,
-      );
-    }
+    assertInteger(value, `El valor de la métrica "${label}"`, { min: 0 });
     assertText(label, 'La bajada de la métrica');
     this.props = Object.freeze({ value, prefix, suffix, label });
   }

@@ -29,13 +29,20 @@ import { TimelineEffect } from './effects/TimelineEffect';
  * (abierto/cerrado).
  *
  * **El orden importa.** El motor recorre esta lista en cada fase, así que el
- * orden de la lista es el orden de cada fase, y reproduce el del `frame()`
- * original:
+ * orden de la lista es el orden de cada fase:
  *
- * - `tick` (cada frame): cursor → cintas → imanes (`dc.html:483-511`).
- * - `apply` (escritura con el scroll): progreso → fondo → horizontal → stack →
- *   timeline → contadores → parallax → drift → cintas (solo su reseteo si el
- *   movimiento está apagado) → skew → reveals (`dc.html:528-597`).
+ * - `tick` (cada frame): imanes → cursor → cintas. **Se aparta del original**,
+ *   que corría cursor → cintas → imanes (`dc.html:483-511`): el imán es el
+ *   único `tick` que lee layout (`getBoundingClientRect` de cada botón), y
+ *   después de las escrituras de `transform` del cursor y las cintas esa
+ *   lectura obligaba al navegador a recalcular estilos en el momento. Primero,
+ *   lee con el estilo limpio. Los tres escriben elementos distintos, así que
+ *   la pose de cada uno no cambia.
+ * - `apply` (escritura con el scroll): reproduce el del original: progreso →
+ *   fondo → horizontal → stack → timeline → contadores → parallax → drift →
+ *   cintas (solo su reseteo si el movimiento está apagado) → skew → reveals
+ *   (`dc.html:528-597`). El imán no tiene `measure` ni `apply`, así que
+ *   ponerlo primero no cambia el orden de esas fases.
  *
  * Solo va en `window`: se llama desde el `useEffect` de `MotionRuntime`.
  *
@@ -47,6 +54,7 @@ export function createMotionEngine(level: MotionLevel): MotionEngine {
   const pointer = new PointerTracker(window);
 
   const effects: readonly MotionEffect[] = [
+    new MagnetEffect(styles),
     new CursorEffect(),
     new ScrollProgressEffect(),
     new BackgroundShiftEffect(styles),
@@ -57,7 +65,6 @@ export function createMotionEngine(level: MotionLevel): MotionEngine {
     new ParallaxEffect(styles),
     new DriftEffect(styles),
     new MarqueeEffect(),
-    new MagnetEffect(styles),
     new SkewEffect(styles, pointer),
     new RevealEffect(styles),
     new TiltEffect(pointer),

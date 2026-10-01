@@ -6,7 +6,3 @@
   margin-inline: auto;
   padding-inline: var(--layout-gutter);
 }
-
-.narrow {
-  max-width: var(--layout-narrow);
-}

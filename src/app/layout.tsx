@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import { Navbar } from '@/components/organisms/Navbar';
+import { SHARE_IMAGE_ASSET } from '@/constants/assets';
 import { anchorTo } from '@/constants/sections';
-import { FEATURE_FLAGS, SITE, SITE_URL } from '@/constants/site';
-import { PHOTOS } from '@/content/media';
+import { FEATURE_FLAGS, SITE } from '@/constants/site';
+import { SITE_URL } from '@/constants/siteUrl';
 import { siteContent } from '@/content/sections/site';
 import { whatsapp } from '@/content/whatsapp';
 import { fontVariables } from '@/design-system/fonts';
@@ -17,9 +18,18 @@ import styles from './layout.module.css';
 
 /**
  * Imagen para compartir (Open Graph y Twitter): la foto del hero, que es la
- * primera impresión de la marca. Relativa: `metadataBase` la vuelve absoluta.
+ * primera impresión de la marca, recortada a 1200×630 (`SHARE_IMAGE_ASSET`).
+ * Ancho, alto y tipo salen como `og:image:width`, `og:image:height` y
+ * `og:image:type`: WhatsApp y las redes arman la tarjeta sin medir la imagen.
+ * Relativa: `metadataBase` la vuelve absoluta.
  */
-const SHARE_IMAGE = { url: PHOTOS.heroRange.src, alt: siteContent.meta.ogImageAlt };
+const SHARE_IMAGE = {
+  url: SHARE_IMAGE_ASSET.src,
+  width: SHARE_IMAGE_ASSET.width,
+  height: SHARE_IMAGE_ASSET.height,
+  type: SHARE_IMAGE_ASSET.type,
+  alt: siteContent.meta.ogImageAlt,
+};
 
 /**
  * Metadata de la página (título, description, Open Graph, Twitter). Sale de
@@ -27,6 +37,9 @@ const SHARE_IMAGE = { url: PHOTOS.heroRange.src, alt: siteContent.meta.ogImageAl
  * las URLs relativas (imagen, canonical).
  */
 export const metadata: Metadata = {
+  // why: un `metadataBase` explícito anula el fallback de Next a
+  // `VERCEL_PROJECT_PRODUCTION_URL`; por eso `SITE_URL` ya lo incluye en su
+  // orden de resolución (`constants/siteUrl.ts`).
   metadataBase: SITE_URL,
   title: {
     default: siteContent.meta.title,
@@ -97,6 +110,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             <FloatingWhatsApp
               href={whatsappHref}
               ariaLabel={siteContent.floatingWhatsApp.ariaLabel}
+              regionLabel={siteContent.floatingWhatsApp.regionLabel}
             />
           )}
         </div>

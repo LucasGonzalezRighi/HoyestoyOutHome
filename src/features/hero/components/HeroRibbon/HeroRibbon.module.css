@@ -2,8 +2,10 @@
   Cinta del hero — `dc.html:80-86`.
   Girada 2° y agrandada un 4%: girada, las puntas de la banda quedan en
   diagonal y dejarían triángulos vacíos contra los bordes de la pantalla; el
-  `scale` la estira lo justo para taparlos (lo que sobra lo recorta el
-  `overflow-x: clip` del body).
+  `scale` la estira lo justo para taparlos. Lo que sobra lo recorta el
+  `overflow-x: clip` del body, que recorta porque el html también lleva
+  `clip` (ver `design-system/base.css`): si no, el valor del body pasaría al
+  viewport y la cinta ensancharía el documento.
 */
 .ribbon {
   margin: 10px 0 0;

@@ -113,13 +113,21 @@
 }
 
 /*
- * Sin JS (CLAUDE.md §6.2: "sin JS la página se lee entera"). Nadie estira la
- * sección ni traslada el riel, y la escena fija de un viewport recortaría las
- * cards que no entran. Se desarma el pin y el riel pasa a scrollear en X a
- * mano; la barra de avance, que no tendría quién la llene, se oculta. Con JS
- * esta regla no aplica y la sección es la del diseño.
+ * La escena sin fijar: el riel scrollea en X a mano y la barra de avance, que
+ * no tendría quién la llene, se oculta. Aplica en dos casos (CLAUDE.md §9):
+ *
+ * - Sin JS (§6.2: "sin JS la página se lee entera"). Nadie estira la sección
+ *   ni traslada el riel, y la escena fija de un viewport recortaría las cards
+ *   que no entran.
+ * - Con menos de 500px de alto (teléfono apaisado, una notebook con zoom del
+ *   200%). La card mide `max(220px, 46vh)` de foto más ~233–262px de cuerpo, y
+ *   la escena suma 60px de padding arriba y 31px de barra: debajo de ~460px el
+ *   precio y el CTA quedan cortados por la escena de 100vh, en cualquier punto
+ *   del scroll. El motor ve que la escena dejó de ser sticky y no estira la
+ *   sección ni traslada nada (`HorizontalScrollEffect`). Un iPhone SE vertical
+ *   (~548px) y las notebooks (650px o más) siguen con el pin del diseño.
  */
-@media (scripting: none) {
+@media (scripting: none), (max-height: 500px) {
   .stage {
     position: static;
     height: auto;

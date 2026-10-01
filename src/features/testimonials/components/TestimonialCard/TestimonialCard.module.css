@@ -11,7 +11,6 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-sizing: border-box;
   margin: 0;
   padding: 28px 26px;
   border-radius: var(--radius-lg);
@@ -29,9 +28,10 @@
 /*
  * `margin-top: auto; font-size: 14px` (`dc.html:338`): el pie se pega abajo,
  * así queda alineado en todas las cards de la cinta aunque la frase sea más
- * corta. El color no se toca: el inline del diseño no lo pisa, así que queda
- * el del `figcaption` del design system (texto al 55%, `styles.css:97-100`),
- * que base.css ya pone. Solo el viaje va en verde musgo (`.trip`).
+ * corta. El color no se toca: es el del `figcaption` de base.css, que pasa
+ * del texto al 55% del design system (`styles.css:97-100`, ~3:1 sobre la
+ * card) a `--color-neutral-700` (5,3:1) para llegar a AA (CLAUDE.md §9).
+ * Solo el viaje va en verde musgo (`.trip`).
  */
 .caption {
   margin-top: auto;

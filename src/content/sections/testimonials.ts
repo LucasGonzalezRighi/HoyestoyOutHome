@@ -17,6 +17,10 @@ export type TestimonialsContent = SectionHeadingContent & {
   readonly captionSeparator: string;
   /** Los testimonios, en el orden del diseño. */
   readonly testimonials: readonly Testimonial[];
+  /** Texto del botón que pausa la cinta (no está en el diseño: WCAG 2.2.2, CLAUDE.md §9). */
+  readonly marqueePauseLabel: string;
+  /** Texto del mismo botón con la cinta en pausa. */
+  readonly marqueeResumeLabel: string;
 };
 
 /** Los testimonios nombran el viaje por su nombre corto: sale del catálogo para que no se desfase. */
@@ -28,6 +32,8 @@ export const testimonialsContent: TestimonialsContent = {
   ariaLabel: 'Testimonios',
   title: 'Lo que se traen de la montaña',
   captionSeparator: ' · ',
+  marqueePauseLabel: 'Pausar testimonios',
+  marqueeResumeLabel: 'Reanudar testimonios',
   testimonials: [
     new Testimonial({
       quote:

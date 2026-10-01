@@ -123,3 +123,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+/*
+ * Sin apilar en mobile y en pantallas bajas (CLAUDE.md §9; en el diseño siguen
+ * sticky). Con la foto debajo del texto la card mide más que la pantalla (el
+ * Día 1 mide 1140px a 768×1024); con menos de 600px de alto (un teléfono
+ * apaisado) tampoco entra en dos columnas: mide 420px como mínimo y se fija a
+ * 90px del borde. Fijadas, la card siguiente tapaba desde abajo lo que no
+ * entraba, y eso no se veía nunca (con zoom del 400%, de los párrafos de las
+ * etapas 3 y 4 se llegaba a ver el 10% y el 0%). Sin el sticky se leen
+ * enteras, una debajo de la otra; el motor ve que no están fijadas y no las
+ * achica ni las oscurece (`StackEffect`).
+ */
+@media (max-width: 820px), (max-height: 600px) {
+  .wrapper {
+    position: relative;
+    top: auto;
+  }
+}

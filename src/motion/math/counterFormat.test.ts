@@ -1,24 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatCounter, parseCounterFormat } from './counterFormat';
+import { counterValue, formatCounterValue, parseCounterFormat } from './counterFormat';
 
-describe('formatCounter', () => {
+describe('formatCounterValue', () => {
   it('thousands agrega .000 al valor en miles (precio de Calle & Stepanek)', () => {
-    expect(formatCounter(690, 1, 'thousands')).toBe('690.000');
+    expect(formatCounterValue(690, 'thousands')).toBe('690.000');
   });
 
   it('plain usa el separador de miles de es-AR (desnivel de Lolog)', () => {
-    expect(formatCounter(1900, 1, 'plain')).toBe('1.900');
+    expect(formatCounterValue(1900, 'plain')).toBe('1.900');
   });
 
+  it('da lo mismo que toLocaleString, que es lo que usaba el original', () => {
+    for (const value of [0, 3, 44, 950, 1900, 12345, 690000]) {
+      expect(formatCounterValue(value, 'plain')).toBe(value.toLocaleString('es-AR'));
+    }
+  });
+});
+
+describe('counterValue', () => {
   it('redondea al entero mientras sube', () => {
-    expect(formatCounter(1900, 0.5, 'plain')).toBe('950');
-    expect(formatCounter(44, 0.51, 'plain')).toBe('22');
-    expect(formatCounter(690, 0.2, 'thousands')).toBe('138.000');
+    expect(counterValue(1900, 0.5)).toBe(950);
+    expect(counterValue(44, 0.51)).toBe(22);
+    expect(counterValue(690, 0.2)).toBe(138);
   });
 
-  it('arranca en 0', () => {
-    expect(formatCounter(44, 0, 'plain')).toBe('0');
+  it('arranca en 0 y termina en el valor final', () => {
+    expect(counterValue(44, 0)).toBe(0);
+    expect(counterValue(44, 1)).toBe(44);
+  });
+
+  it('con el formateo, arma el texto de mitad de camino', () => {
+    expect(formatCounterValue(counterValue(690, 0.2), 'thousands')).toBe('138.000');
   });
 });
 

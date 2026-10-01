@@ -15,9 +15,17 @@
  *   del último frame: una aparición a medio entrar, una cinta corrida, la
  *   sección de viajes estirada a miles de px. Un estilo inline solo se pisa
  *   desde una hoja con `!important`: es la única forma.
- * - Lo que no es inline vive en CSS Modules, que cargan después de esta hoja
- *   (`globals.css` se importa primero en el layout) y pesan lo mismo que un
- *   selector de atributo: sin `!important` ganarían por orden.
+ * - Lo que no es inline vive en CSS Modules, y una clase de módulo pesa lo
+ *   mismo que un selector de atributo: sin `!important`, ganaría la que cargue
+ *   después. Ese orden no es confiable: `app/layout.tsx` importa los
+ *   componentes antes que `./globals.css`, y tanto en dev como en el build de
+ *   producción la hoja de los módulos va antes que la global. Con
+ *   `!important` esta hoja gana igual, cargue donde cargue.
+ *
+ * Los módulos no le ganan al resto del CSS global por orden de carga, sino
+ * porque `base.css` va entero dentro de `:where()` (especificidad 0). Ojo: una
+ * regla global nueva sin `:where()` que pese lo mismo que una clase le ganaría
+ * a los módulos en producción, porque la global carga después.
  *
  * Los selectores son los atributos del motor (`MOTION_ATTRIBUTES` de
  * `src/motion/attributes.ts`: `data-reveal`, `data-parallax`, `data-marquee`,
@@ -28,7 +36,9 @@
  *
  * Qué no cubre: el texto de los contadores (`data-count`). El motor lo
  * reescribe (arranca en 0 y sube al entrar en pantalla) y CSS no puede
- * devolverle el valor final.
+ * devolverle el valor final: lo hace el motor, que en `beforeprint` escribe
+ * la pose final de todo (`handleBeforePrint` de
+ * `src/motion/core/MotionEngine.ts`).
  *
  * Pestañas de Servicios: se imprime la pestaña activa (la que estaba elegida
  * al imprimir; al cargar, la primera). Hay un solo `tabpanel` en el DOM
@@ -122,15 +132,16 @@
   /*
    * Telón, cursor, barra de progreso, nav, WhatsApp flotante y "Saltar al
    * contenido": el print del diseño no los tiene (`print.dc.html:28-34`). Un
-   * `position: fixed` se repetiría en cada hoja. El nav, el botón flotante
-   * (el único `magnet()`) y el skip link son hijos directos del fondo de la
-   * página (`app/layout.tsx`).
+   * `position: fixed` se repetiría en cada hoja. El nav y el skip link son
+   * hijos directos del fondo de la página (`app/layout.tsx`); el botón
+   * flotante (el único `magnet()`) va dentro de su `<aside>`, que también es
+   * hijo directo (`FloatingWhatsApp`).
    */
   [data-curtain],
   [data-cursor],
   [data-scroll-progress],
   [data-bg-root] > nav,
-  [data-bg-root] > [data-magnet],
+  [data-bg-root] > aside > [data-magnet],
   [data-bg-root] > a:first-child {
     display: none !important;
   }

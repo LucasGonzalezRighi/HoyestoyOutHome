@@ -1,0 +1,27 @@
+/*
+ * La fila del botón de pausa, debajo de las cintas. El margen y la alineación
+ * con el contenido los pone quien lo usa (`controlsClassName`).
+ *
+ * `padding-block`: aire para el anillo de foco (2px + 2px de offset), que de
+ * otro modo recortaría el `overflow: hidden` de la galería.
+ */
+.controls {
+  display: flex;
+  padding-block: var(--space-1);
+}
+
+/*
+ * Sin JS el botón no haría nada (no hay hidratación), y las cintas tampoco
+ * se mueven: se oculta. En papel tampoco tiene sentido.
+ */
+@media (scripting: none) {
+  .controls {
+    display: none;
+  }
+}
+
+@media print {
+  .controls {
+    display: none;
+  }
+}

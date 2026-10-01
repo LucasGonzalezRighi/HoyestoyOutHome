@@ -122,16 +122,40 @@
   color: var(--color-bg);
 }
 
+/*
+ * El `text-shadow` es un agregado (CLAUDE.md §9): el secundario no tiene
+ * fondo, y en el hero cae donde el degradé vuelve al crema, así que el texto
+ * crema se perdía contra la foto (hasta 1,5:1). Es la misma sombra de la
+ * bajada del hero; un fondo o un velo cambiarían el diseño.
+ */
 .inverse.secondary,
 .inverse.secondary:hover {
   border-color: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  text-shadow: var(--shadow-text-hero-lead);
 }
 
 /* ── Estados ───────────────────────────────────────────────────────────── */
 
+/*
+ * El anillo dorado del design system más un aro crema en el hueco del
+ * `outline-offset` (`--shadow-focus-gap`, CLAUDE.md §9). Sobre el crema el aro
+ * no se ve y queda igual que el DS; sobre el verde del cierre el dorado solo
+ * daba 2,7:1 (WCAG 1.4.11 pide 3:1) y el aro crema da 9,7:1. El
+ * `overflow: hidden` del botón recorta su contenido, no su propia sombra.
+ */
 .button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  box-shadow: var(--shadow-focus-gap);
+}
+
+/*
+ * Sobre foto (solo el hero) el anillo cae sobre lo que haya en la imagen. Con
+ * el color del texto afuera y el aro crema adentro (10,9:1 entre sí), uno de
+ * los dos contrasta 3:1 o más con cualquier fondo.
+ */
+.inverse:focus-visible {
+  outline-color: var(--color-text);
 }
 
 .button:disabled {

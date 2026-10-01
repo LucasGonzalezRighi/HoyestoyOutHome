@@ -7,13 +7,21 @@ import { StackEffect } from './StackEffect';
 
 type FakeCard = { style: { transform?: string; filter?: string } };
 
-/** Envoltorio sticky falso: su primer hijo es la card; su `top` es lo único que se mide. */
-function wrapper(top: number, card: FakeCard | null) {
-  return { firstElementChild: card, getBoundingClientRect: () => ({ top }) };
+/**
+ * Envoltorio falso: su primer hijo es la card; su `top` y su `position`
+ * computado (sticky, salvo que se diga otra cosa) es lo único que se mide.
+ */
+function wrapper(top: number, card: FakeCard | null, position = 'sticky') {
+  return { firstElementChild: card, position, getBoundingClientRect: () => ({ top }) };
 }
 
-function stackDocument(wrappers: ReturnType<typeof wrapper>[]): Document {
-  return { querySelectorAll: () => wrappers } as unknown as Document;
+type FakeWrapper = ReturnType<typeof wrapper>;
+
+function stackDocument(wrappers: FakeWrapper[]): Document {
+  return {
+    defaultView: { getComputedStyle: (element: FakeWrapper) => ({ position: element.position }) },
+    querySelectorAll: () => wrappers,
+  } as unknown as Document;
 }
 
 function frame(off = false): FrameState {
@@ -30,7 +38,7 @@ function frame(off = false): FrameState {
   };
 }
 
-function run(wrappers: ReturnType<typeof wrapper>[], off = false): void {
+function run(wrappers: FakeWrapper[], off = false): void {
   const effect = new StackEffect(new StyleWriter());
   effect.collect(stackDocument(wrappers));
   effect.measure();
@@ -71,5 +79,18 @@ describe('StackEffect', () => {
     const covered: FakeCard = { style: {} };
     run([wrapper(90, covered), wrapper(90, { style: {} })], true);
     expect(covered.style).toEqual({ transform: '', filter: '' });
+  });
+
+  it('con los envoltorios sin fijar (mobile, pantallas bajas), ninguna card se achica ni se oscurece', () => {
+    const first: FakeCard = { style: {} };
+    const second: FakeCard = { style: {} };
+    // Las mismas posiciones que en el primer test: fijadas, la primera estaría tapada a medias.
+    run([
+      wrapper(90, first, 'relative'),
+      wrapper(445, second, 'relative'),
+      wrapper(700, null, 'relative'),
+    ]);
+    expect(first.style).toEqual({ transform: '', filter: '' });
+    expect(second.style).toEqual({ transform: '', filter: '' });
   });
 });

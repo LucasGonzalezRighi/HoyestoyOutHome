@@ -37,7 +37,11 @@ export class ParallaxEffect extends ScrollEffect {
 
   override apply(frame: FrameState): void {
     if (frame.off) {
-      for (const layer of this.layers) layer.style.transform = '';
+      // El original escribía directo (`dc.html:558`). Acá va por la caché: si
+      // no, la caché seguiría con la pose de antes y, al volver el movimiento
+      // (después de imprimir, o al apagar reduced motion), la misma pose
+      // recalculada se saltearía y la capa quedaría sin transform.
+      for (const layer of this.layers) this.styles.set(layer, 'transform', '');
       return;
     }
     const { intensity: k, intro } = frame;

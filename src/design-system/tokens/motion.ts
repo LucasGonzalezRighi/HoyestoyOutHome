@@ -109,8 +109,12 @@ export const TILT_TRANSITION = 'transform .5s var(--ease-reveal), box-shadow .5s
  * scroll en las stats de Lolog: "3 días / 2 noches" en vez de "4 / 3", igual
  * en el diseño que en el port).
  *
- * Por eso, después del último cambio de firma el motor sigue midiendo y
- * escribiendo durante esta ventana, y recién después vuelve a ahorrar frames.
+ * Por eso, después del último cambio de scroll, viewport, intro o intensidad
+ * el motor sigue midiendo y escribiendo durante esta ventana, y recién después
+ * vuelve a ahorrar frames. Un cambio de la velocidad redondeada mide ese frame
+ * pero **no** extiende la ventana: la velocidad suavizada tarda ~0,6 s en
+ * llegar a 0 después de cada scroll, y si la extendiera serían ~1,7 s de
+ * frames completos en vez de 1,1.
  * Tiene que durar **al menos la transición más larga de `REVEAL_TRANSITION`**
  * (el `clip-path` de 1 s) más unos frames de margen (100 ms ≈ 6 frames a 60 Hz),
  * para que la última lectura sea con todo quieto. Si se alarga esa transición,
@@ -124,7 +128,12 @@ export const SETTLE_MS = 1100;
 
 /** Tiempos de la coreografía del telón (`lift()`, `dc.html:429-443`) y de la intro. */
 export const CURTAIN_TIMINGS = {
-  /** Espera antes de levantar el telón: el logo se lee un rato (`dc.html:443`). 0 si el movimiento está apagado. */
+  /**
+   * Espera antes de levantar el telón: el logo se lee un rato (`dc.html:442`).
+   * Se cuenta desde el First Contentful Paint (`CurtainController` descuenta
+   * lo ya pintado). Con el movimiento apagado no se usa: el telón se oculta de
+   * una vez.
+   */
   liftDelayMs: 1300,
   /** Del fundido del logo a la apertura de las hojas (`dc.html:440`). */
   leavesDelayMs: 450,
@@ -203,6 +212,18 @@ export const MARQUEE = {
   minIntensity: 1,
   /** Inclinación en grados por px/frame de velocidad del scroll. */
   skewDeg: 0.18,
+  /**
+   * Margen (px) arriba y abajo del viewport dentro del cual una cinta cuenta
+   * como visible y sigue avanzando. **No está en el diseño** (CLAUDE.md §9): el
+   * original movía las cuatro cintas en cada frame aunque no se vieran.
+   *
+   * La visibilidad se mide en la fase de lectura, con el scroll del frame;
+   * pero el navegador scrollea en el compositor y puede mostrar unos px más de
+   * lo que el motor midió. Con el margen, la cinta ya está corriendo (y
+   * escribiendo su skew) unos frames antes de asomar, y no se la ve quieta en
+   * el borde. 200 px son cuatro frames de un scroll rápido (50 px/frame).
+   */
+  visibilityMarginPx: 200,
 } as const;
 
 /** Cards apilables del itinerario (`dc.html:545-547`). */

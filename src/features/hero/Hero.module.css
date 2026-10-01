@@ -116,6 +116,17 @@
   .leadLine {
     white-space: normal;
   }
+
+  /*
+    Mobile legible (CLAUDE.md §9): en mobile el titular ocupa cuatro
+    renglones y en un teléfono bajo (320×640, 375×667: las barras del
+    navegador comen alto) sube hasta cruzarse con el texto calado del 18%
+    (50px de solape a 320×640). Arriba de todo, el borde de abajo de los
+    glifos queda antes del titular en todos los tamaños medidos.
+  */
+  .outline {
+    top: 2%;
+  }
 }
 
 /*

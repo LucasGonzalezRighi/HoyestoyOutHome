@@ -12,14 +12,21 @@ export type SiteContent = {
   meta: { title: string; description: string; keywords: readonly string[]; ogImageAlt: string };
   /** Link "Saltar al contenido" para teclado y lectores de pantalla. */
   skipLink: string;
-  /** La marca del nav: nombre en dos renglones + alt del logo. */
-  brand: { name: string; tagline: string; logoAlt: string };
+  /**
+   * La marca del nav: el nombre en dos renglones. Sin alt del logo: en el nav el
+   * logo es decorativo (`alt=""`), porque el link ya dice la marca al lado.
+   */
+  brand: { name: string; tagline: string };
   /** El nav: su nombre accesible, los links a las secciones y el texto del CTA de WhatsApp. */
   nav: { ariaLabel: string; links: readonly NavLinkContent[]; cta: string };
   /** Telón de entrada: el logo y el nombre que se ven antes de que se abra. */
   curtain: { title: string; logoAlt: string };
-  /** Botón flotante de WhatsApp: es solo un ícono, así que su nombre va en `aria-label`. */
-  floatingWhatsApp: { ariaLabel: string };
+  /**
+   * Botón flotante de WhatsApp: es solo un ícono, así que su nombre va en
+   * `aria-label`. `regionLabel` nombra el `<aside>` que lo contiene: está fuera
+   * del nav, del main y del footer, y sin landmark propio quedaría suelto.
+   */
+  floatingWhatsApp: { ariaLabel: string; regionLabel: string };
 };
 
 /**
@@ -58,7 +65,6 @@ export const siteContent: SiteContent = {
   brand: {
     name: 'Hoy Estoy',
     tagline: 'Out Of Home',
-    logoAlt: `Logo ${SITE.shortName}`,
   },
   nav: {
     ariaLabel: 'Navegación principal',
@@ -76,5 +82,6 @@ export const siteContent: SiteContent = {
   },
   floatingWhatsApp: {
     ariaLabel: 'Escribinos por WhatsApp',
+    regionLabel: 'Contacto rápido',
   },
 };

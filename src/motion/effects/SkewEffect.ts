@@ -32,7 +32,8 @@ export class SkewEffect extends ScrollEffect {
 
   override apply(frame: FrameState): void {
     if (frame.off) {
-      for (const element of this.elements) element.style.transform = '';
+      // Por la caché y no directo como el original (`dc.html:558`): ver ParallaxEffect.
+      for (const element of this.elements) this.styles.set(element, 'transform', '');
       return;
     }
     const { velocity, intensity: k } = frame;

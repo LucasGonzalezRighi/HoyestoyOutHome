@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { SITE_URL } from '@/constants/site';
+import { SITE_URL } from '@/constants/siteUrl';
 
 /**
  * `/sitemap.xml`: una sola URL, la landing. Las secciones son anclas de la

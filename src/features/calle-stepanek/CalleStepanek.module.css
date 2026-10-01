@@ -56,8 +56,13 @@
   white-space: nowrap;
 }
 
+/*
+ * "Calle &" en dorado. El diseño usa `--color-accent-500`, que sobre el crema
+ * da 2,8:1, debajo del 3:1 que pide un texto grande. El acento base es de la
+ * misma familia y da 3,5:1 (CLAUDE.md §9).
+ */
 .titleAccent {
-  color: var(--color-accent-500);
+  color: var(--color-accent);
 }
 
 /* "Tu primer 4mil": bajada en la fuente de títulos, no un encabezado (`dc.html:156`). */

@@ -25,6 +25,28 @@
 
 :where(html) {
   scroll-behavior: smooth;
+  /*
+   * Desvío del diseño (CLAUDE.md §9), que pone el `clip` solo en el body
+   * (`dc.html:15`). El `overflow` del `<html>` es el que pasa al viewport; si
+   * el html queda en `visible`, el navegador toma el del body en su lugar y el
+   * body deja de recortar. Entonces los reveals que entran desde la derecha y
+   * la cinta del hero ensanchan el documento: en un teléfono de 390px el
+   * viewport de layout pasaba a 543px (el WhatsApp flotante quedaba fuera de
+   * pantalla). Con el html en `clip`, ese es el valor del viewport y el body
+   * recorta de verdad. `clip` no crea un contenedor de scroll: el sticky sigue
+   * andando.
+   */
+  overflow-x: clip;
+  /*
+   * Desvío del diseño (CLAUDE.md §9): el nav sticky tapa los primeros 66px del
+   * viewport. Con esto el navegador los descuenta al llevar algo a la vista,
+   * tanto un salto por ancla como el foco con Tab o Shift+Tab: sin él, una
+   * pestaña de Servicios quedaba enfocada entera debajo del nav, porque para el
+   * navegador ya estaba en pantalla (WCAG 2.4.11). El `--space-4` deja aire
+   * entre el nav y lo que llega. No afecta los `window.scrollTo` con
+   * coordenadas del motor.
+   */
+  scroll-padding-top: calc(var(--nav-height) + var(--space-4));
 }
 
 :where(body) {
@@ -39,8 +61,11 @@
   text-wrap: pretty;
   /*
    * `clip` y no `hidden`: recorta lo que se sale en X (el texto calado del
-   * hero, la cinta girada) sin convertir al body en contenedor de scroll, que
-   * rompería el `position: sticky` del nav y de las secciones fijadas.
+   * hero, la cinta girada, los reveals que entran desde la derecha) sin
+   * convertir al body en contenedor de scroll, que rompería el
+   * `position: sticky` del nav y de las secciones fijadas. Recorta porque el
+   * html también lleva `clip` (arriba): si no, el valor del body se propagaría
+   * al viewport y el body no recortaría nada.
    */
   overflow-x: clip;
 }
@@ -110,10 +135,17 @@
   margin: 0;
 }
 
+/*
+ * Desvío del design system (CLAUDE.md §9), que pinta el epígrafe con el texto
+ * al 55% (`styles.css:97-100`): sobre el crema da ~3:1, y los epígrafes de
+ * Pensión (17px) y el pie de los testimonios (14px) quedaban debajo de AA.
+ * `--color-neutral-700` es el gris de la misma rampa que ya usan los textos
+ * secundarios: 6:1 sobre el crema y 5,3:1 sobre `--color-surface`.
+ */
 :where(figcaption) {
   margin-top: var(--space-1);
   font-size: 11px;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: var(--color-neutral-700);
 }
 
 /* ── Estados ───────────────────────────────────────────────────────────── */

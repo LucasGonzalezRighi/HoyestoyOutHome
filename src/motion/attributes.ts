@@ -38,6 +38,12 @@ export const MOTION_ATTRIBUTES = {
   marquee: 'data-marquee',
   /** Velocidad base de la cinta en px/frame. Por defecto 0.7. */
   marqueeSpeed: 'data-marquee-speed',
+  /**
+   * Las cintas de adentro están en pausa (el botón de `MarqueePauseGroup`).
+   * Va en un **ancestro** de los rieles: el motor lo busca con `closest()` en
+   * cada frame, porque el `MutationObserver` no re-escanea por atributos.
+   */
+  marqueePaused: 'data-marquee-paused',
   /** Sección con scroll horizontal fijado (el alto lo calcula el motor). */
   horizontalScroll: 'data-hscroll',
   /** El riel que se traslada dentro de la sección horizontal. */
@@ -209,6 +215,21 @@ export function marquee(options: MarqueeOptions = {}): MotionAttributes {
   if (options.speed !== undefined)
     attributes[MOTION_ATTRIBUTES.marqueeSpeed] = String(options.speed);
   return attributes as MotionAttributes;
+}
+
+/**
+ * Pausa de las cintas que contiene el elemento: con `paused`, el motor deja de
+ * avanzarlas (como con el mouse encima; el skew por el scroll sigue). Va en un
+ * envoltorio de las cintas, no en el riel. Devuelve el atributo **solo si está
+ * en pausa**: sin pausa, el elemento queda sin atributo.
+ *
+ * Cambia en vivo: lo maneja el estado de un Client Component
+ * (`MarqueePauseGroup`, en el organism `Marquee`).
+ *
+ * @example <div {...marqueePause(paused)}>…cintas…</div>
+ */
+export function marqueePause(paused: boolean): MotionAttributes {
+  return paused ? { [MOTION_ATTRIBUTES.marqueePaused]: '' } : {};
 }
 
 /** Sección con scroll horizontal fijado: la sección, su riel y su barra de progreso. */

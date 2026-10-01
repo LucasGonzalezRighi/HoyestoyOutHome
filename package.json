@@ -4,7 +4,7 @@
   "private": true,
   "description": "Hoy Estoy Out Of Home — landing de trekkings y ascensos guiados. Next.js App Router + TypeScript estricto + CSS Modules sobre el design system Organic.",
   "engines": {
-    "node": ">=20.9.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",

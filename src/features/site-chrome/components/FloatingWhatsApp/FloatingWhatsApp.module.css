@@ -19,3 +19,16 @@
   box-shadow: var(--shadow-lg);
   text-decoration: none;
 }
+
+/*
+ * Foco (CLAUDE.md §9): el botón flota sobre cualquier sección, así que el
+ * anillo dorado del design system caía sobre lo que hubiera debajo (sobre
+ * las stats verdes de Lolog, 2,7:1). Va del color del texto con el aro crema
+ * de `--shadow-focus-gap` adentro: uno de los dos contrasta 3:1 o más con
+ * cualquier fondo. Conserva la sombra del botón.
+ */
+.button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-focus-gap), var(--shadow-lg);
+}

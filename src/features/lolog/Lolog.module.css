@@ -96,11 +96,35 @@
     white-space: normal;
   }
 
+  /* `minmax(0, …)` y no `1fr`: si no, la columna se estira al mínimo de las stats y desborda (CLAUDE.md §9). */
   .split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .aside {
     position: static;
+  }
+
+  /*
+   * Mobile legible (CLAUDE.md §9): el número de cada stat no parte renglón
+   * (piso de 30px, ver `StatCard`) y "+1.900 m" pide 156px de card. Dos
+   * columnas `1fr 1fr` necesitan ~292px, y debajo de ~330px de pantalla las
+   * stats desbordaban el contenedor. En flex con `wrap` pasan de renglón
+   * cuando no entran.
+   *
+   * La base de un tercio hace dos cosas: nunca entran tres por renglón (en
+   * tablet siguen de a dos, como en el diseño), y en un teléfono queda por
+   * debajo del ancho mínimo de cada card, así que manda ese mínimo, como en
+   * la grilla. Resultado: dos por renglón desde 331px (a 360px, 150 y 156px,
+   * igual que antes) y una hasta 325px. Entre 326 y 330px la segunda y la
+   * tercera comparten renglón (sus mínimos son los que suman menos).
+   */
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .stats > li {
+    flex: 1 1 calc(100% / 3);
   }
 }

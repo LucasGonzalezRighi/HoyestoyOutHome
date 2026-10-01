@@ -103,8 +103,8 @@ export function CalleStepanek({ content }: CalleStepanekProps) {
             eyebrow={overview.eyebrow}
             title={
               <>
-                <span className={styles.titleAccent}>{overview.title.accent}</span>{' '}
-                {overview.title.rest}
+                <span className={styles.titleAccent}>{overview.title.accent}</span>
+                {` ${overview.title.rest}`}
               </>
             }
             titleClassName={styles.title}

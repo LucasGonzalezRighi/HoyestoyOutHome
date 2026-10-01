@@ -2,7 +2,7 @@ import { Container } from '@/components/atoms/Container';
 import { Section } from '@/components/atoms/Section';
 import { WashedImage } from '@/components/atoms/WashedImage';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { Marquee } from '@/components/organisms/Marquee';
+import { Marquee, MarqueePauseGroup } from '@/components/organisms/Marquee';
 import { EXTERNAL_LINK_PROPS } from '@/constants/links';
 import type { GalleryContent } from '@/content/sections/gallery';
 import { reveal } from '@/motion/attributes';
@@ -31,6 +31,9 @@ export type GalleryProps = {
  * Las filas alternan: la primera corre hacia la izquierda y sus fotos giran en
  * sentido horario en hover; la segunda, al revés (`data-marquee="1"` / `"-1"`
  * y `rotate(1.5deg)` / `rotate(-1.5deg)`, `dc.html:352-357`).
+ *
+ * Un solo botón, debajo, pausa las dos filas (`MarqueePauseGroup`; no está en
+ * el diseño, CLAUDE.md §9, WCAG 2.2.2).
  */
 export function Gallery({ content }: GalleryProps) {
   const { profileLink } = content;
@@ -52,32 +55,38 @@ export function Gallery({ content }: GalleryProps) {
           {profileLink.label}
         </a>
       </Container>
-      <div className={styles.rows}>
-        {content.rows.map((photos, rowIndex) => {
-          const isForward = rowIndex % 2 === 0;
-          return (
-            <Marquee
-              // Las filas son fijas y no se reordenan: el índice es una clave estable.
-              key={rowIndex}
-              as="ul"
-              items={photos}
-              direction={isForward ? 1 : -1}
-              className={cn(styles.rail, isForward ? styles.railForward : styles.railBackward)}
-              renderItem={(photo, { isClone }) => (
-                // La copia de la cinta no se lee: el lector de pantalla ya leyó la original.
-                <li className={styles.tile} aria-hidden={isClone || undefined}>
-                  <WashedImage
-                    photo={photo}
-                    sizes={PHOTO_SIZES}
-                    className={styles.photo}
-                    imageClassName={styles.photoImage}
-                  />
-                </li>
-              )}
-            />
-          );
-        })}
-      </div>
+      <MarqueePauseGroup
+        pauseLabel={content.marqueePauseLabel}
+        resumeLabel={content.marqueeResumeLabel}
+        controlsClassName={styles.controls}
+      >
+        <div className={styles.rows}>
+          {content.rows.map((photos, rowIndex) => {
+            const isForward = rowIndex % 2 === 0;
+            return (
+              <Marquee
+                // Las filas son fijas y no se reordenan: el índice es una clave estable.
+                key={rowIndex}
+                as="ul"
+                items={photos}
+                direction={isForward ? 1 : -1}
+                className={cn(styles.rail, isForward ? styles.railForward : styles.railBackward)}
+                renderItem={(photo, { isClone }) => (
+                  // La copia de la cinta no se lee: el lector de pantalla ya leyó la original.
+                  <li className={styles.tile} aria-hidden={isClone || undefined}>
+                    <WashedImage
+                      photo={photo}
+                      sizes={PHOTO_SIZES}
+                      className={styles.photo}
+                      imageClassName={styles.photoImage}
+                    />
+                  </li>
+                )}
+              />
+            );
+          })}
+        </div>
+      </MarqueePauseGroup>
     </Section>
   );
 }

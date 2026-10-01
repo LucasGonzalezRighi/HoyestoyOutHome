@@ -5,7 +5,7 @@ import { queryAll, readNumber } from '../core/dom';
 import type { FrameState } from '../core/FrameState';
 import { ScrollEffect } from '../core/MotionEffect';
 import { clamp01 } from '../math/clamp';
-import { formatCounter, parseCounterFormat } from '../math/counterFormat';
+import { counterValue, formatCounterValue, parseCounterFormat } from '../math/counterFormat';
 import { easeInOutCubic } from '../math/easing';
 
 /**
@@ -18,8 +18,13 @@ import { easeInOutCubic } from '../math/easing';
 export class CounterEffect extends ScrollEffect {
   private counters: HTMLElement[] = [];
   private tops: number[] = [];
-  /** Último texto escrito por elemento (`el._txt` del original): no se toca el DOM si no cambió. */
-  private readonly texts = new WeakMap<HTMLElement, string>();
+  /**
+   * Último entero mostrado por elemento. Cumple el papel de `el._txt` del
+   * original (no tocar el DOM si no cambió), pero compara antes de formatear:
+   * en la mayoría de los frames de scroll el número no se mueve, y así no se
+   * formatea ni se arma el texto.
+   */
+  private readonly values = new WeakMap<HTMLElement, number>();
 
   override collect(doc: Document): void {
     this.counters = queryAll(doc, MOTION_SELECTORS.count);
@@ -37,14 +42,13 @@ export class CounterEffect extends ScrollEffect {
       const progress = frame.off
         ? 1
         : easeInOutCubic(clamp01((viewportHeight - top) / (viewportHeight * COUNTER.span)));
-      const text = formatCounter(
-        readNumber(counter, MOTION_ATTRIBUTES.count),
-        progress,
+      const value = counterValue(readNumber(counter, MOTION_ATTRIBUTES.count), progress);
+      if (this.values.get(counter) === value) return;
+      this.values.set(counter, value);
+      counter.textContent = formatCounterValue(
+        value,
         parseCounterFormat(counter.getAttribute(MOTION_ATTRIBUTES.countFormat)),
       );
-      if (this.texts.get(counter) === text) return;
-      this.texts.set(counter, text);
-      counter.textContent = text;
     });
   }
 }

@@ -1,5 +1,6 @@
 import { LinkButton } from '@/components/atoms/Button';
 import { Tag } from '@/components/atoms/Tag';
+import { VisuallyHidden } from '@/components/atoms/VisuallyHidden';
 import { WashedImage } from '@/components/atoms/WashedImage';
 import type { TripCardContent } from '@/content/sections/trips';
 import { skew, tilt } from '@/motion/attributes';
@@ -29,6 +30,12 @@ export type TripCardProps = {
  *
  * Los textos salen del viaje (`Trip`): duración, dificultad, distancia y precio
  * se formatean en el dominio, no acá.
+ *
+ * El CTA suma el nombre del viaje en texto oculto ("Ver viaje Calle & Stepanek
+ * — Tu primer 4mil"): "Ver viaje" y "Consultar" se repiten en cards que llevan
+ * a destinos distintos, y en la lista de links de un lector de pantalla no se
+ * distinguirían. Lo visible va primero, así el nombre accesible empieza con lo
+ * que se lee en el botón (WCAG 2.5.3).
  */
 export function TripCard({ card }: TripCardProps) {
   const { trip, cta } = card;
@@ -54,6 +61,7 @@ export function TripCard({ card }: TripCardProps) {
           <p className={styles.price}>{trip.price.label()}</p>
           <LinkButton variant="primary" href={cta.href} external={cta.external}>
             {cta.label}
+            <VisuallyHidden>{` ${trip.name}`}</VisuallyHidden>
           </LinkButton>
         </div>
       </div>

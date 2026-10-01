@@ -24,6 +24,37 @@
 }
 
 /*
+ * Alto contraste (`forced-colors: active`): la pestaña activa se distingue
+ * solo por el fondo dorado del botón primario, y el modo forzado lo borra
+ * (activa e inactiva quedaban iguales). Se pinta con los colores de selección
+ * del sistema; `forced-color-adjust: none` evita que el navegador los
+ * reemplace.
+ *
+ * Ese `none` se hereda: el relleno verde del hover (el `::before` del botón)
+ * y el anillo de foco quedarían con los colores de la marca. El relleno no
+ * va (pasaría por detrás del `HighlightText` y le bajaría el contraste) y el
+ * anillo toma el color del texto del sistema, como el resto de los focos en
+ * este modo, que tampoco tiene sombras.
+ */
+@media (forced-colors: active) {
+  .tablist [aria-selected='true'] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .tablist [aria-selected='true']::before {
+    display: none;
+  }
+
+  .tablist [aria-selected='true']:focus-visible {
+    outline-color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/*
  * Grilla de paneles (`dc.html:296`): hasta cuatro columnas (entran justo con el
  * ancho máximo del contenido), una en mobile.
  */

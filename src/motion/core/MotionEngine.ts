@@ -45,15 +45,25 @@ function changesElements(record: MutationRecord): boolean {
  * Cada frame:
  *
  * 1. Si el DOM cambió, cada efecto re-escanea (`collect`).
- * 2. Arma el `FrameState` (scroll, velocidad, viewport, intro, puntero).
- * 3. `tick` de todos: el trabajo de cada frame (cursor, cintas, imanes).
- * 4. Firma del frame: si scroll, viewport, intro, intensidad y velocidad son
- *    los mismos que en el frame anterior **y ya pasó la ventana de
- *    asentamiento** (`SETTLE_MS` desde el último cambio), termina acá. Con la
- *    página quieta el motor no lee ni escribe layout.
- * 5. `measure` de todos (solo lecturas) y después `apply` de todos (solo
- *    escrituras). Mezclarlas obligaría al navegador a recalcular el layout en
- *    el medio, una vez por elemento.
+ * 2. Lee la configuración (`settings`) y el scroll (`ScrollTracker.sample`).
+ * 3. Arma el `FrameState` (scroll, velocidad, viewport, intro, puntero).
+ * 4. Decide si el frame toca layout (`needsLayout`): sí si cambió la firma de
+ *    layout (scroll, viewport, intro, intensidad) o la velocidad redondeada,
+ *    si hubo re-escaneo, o si sigue abierta la ventana de asentamiento
+ *    (`SETTLE_MS` desde el último cambio de layout). Con la página quieta, no.
+ * 5. Si toca layout, `measure` de todos: **solo lecturas**.
+ * 6. `tick` de todos, en cada frame: el trabajo que no depende del scroll
+ *    (imanes, cursor, cintas).
+ * 7. Si toca layout, `apply` de todos: solo escrituras.
+ *
+ * El orden de 5 y 6 está dado vuelta respecto del original, que corría el
+ * cursor y las cintas antes de medir (`dc.html:483-525`): sus escrituras de
+ * `transform` dejaban el estilo sucio y la primera lectura de layout
+ * (`scrollHeight` de la barra de progreso, los rects de los imanes) obligaba
+ * al navegador a recalcularlo en el momento, en cada frame de scroll. Ningún
+ * `tick` depende de lo que escribe un `apply` del mismo frame, y lo que lee
+ * un `tick` de lo medido (la visibilidad de las cintas) sale más fresco así.
+ * No cambia ningún valor: solo cuándo se lee.
  *
  * La ventana de asentamiento no está en el original (CLAUDE.md §9): sin ella,
  * lo que se mide mientras una transición CSS todavía corre queda congelado en
@@ -76,9 +86,14 @@ export class MotionEngine {
   private dirty = true;
   /** Hubo re-escaneo: el próximo frame mide y escribe aunque la firma no haya cambiado. */
   private force = false;
-  private signature: string | null = null;
+  /** Firma de layout del último frame: scroll, viewport, intro e intensidad. */
+  private layoutSignature: string | null = null;
+  /** Velocidad redondeada del último frame (la otra mitad de la firma del original). */
+  private velocityKey: number | null = null;
   /** Hasta cuándo (timestamp del frame) se sigue midiendo aunque la firma no cambie. */
   private settleUntil = Number.NEGATIVE_INFINITY;
+  /** Se está imprimiendo: entre `beforeprint` y `afterprint` el movimiento cuenta como apagado. */
+  private printing = false;
 
   /**
    * @param config  Intensidad y política de reduced motion.
@@ -118,6 +133,8 @@ export class MotionEngine {
     this.observer = new MutationObserver(this.handleMutations);
     this.observer.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('beforeprint', this.handleBeforePrint);
+    window.addEventListener('afterprint', this.handleAfterPrint);
     this.frameId = requestAnimationFrame(this.loop);
   }
 
@@ -134,6 +151,9 @@ export class MotionEngine {
     this.observer?.disconnect();
     this.observer = null;
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('beforeprint', this.handleBeforePrint);
+    window.removeEventListener('afterprint', this.handleAfterPrint);
+    this.printing = false;
     for (const effect of this.effects) effect.dispose();
   }
 
@@ -171,6 +191,28 @@ export class MotionEngine {
   };
 
   /**
+   * Antes de imprimir, un frame **sincrónico** con el movimiento apagado: cada
+   * efecto escribe su pose final, como con reduced motion. `print.css` ya pisa
+   * transforms y opacidades con `!important`, pero el texto de los contadores
+   * solo lo puede escribir el motor: sin esto, un contador al que nunca se
+   * llegó scrolleando se imprimía en 0 ("$0.000", "0 km").
+   *
+   * No se espera al próximo `requestAnimationFrame` porque el navegador arma la
+   * vista de impresión apenas termina de despachar `beforeprint`.
+   */
+  private readonly handleBeforePrint = (): void => {
+    this.printing = true;
+    this.force = true;
+    this.frame(performance.now());
+  };
+
+  /** Después de imprimir, el próximo frame vuelve a medir y escribe el estado real del scroll. */
+  private readonly handleAfterPrint = (): void => {
+    this.printing = false;
+    this.force = true;
+  };
+
+  /**
    * La media query de reduced motion, creada la primera vez que se pide (nunca
    * en el servidor: solo la piden `motionOff` y el loop). `matches` es en vivo,
    * como el `window.matchMedia(…)` que el original evaluaba en cada `off()`.
@@ -181,7 +223,7 @@ export class MotionEngine {
   }
 
   private settings(): MotionSettings {
-    return { intensity: this.config.intensity, off: this.motionOff };
+    return { intensity: this.config.intensity, off: this.printing || this.motionOff };
   }
 
   private collect(): void {
@@ -211,21 +253,29 @@ export class MotionEngine {
       pointer: this.pointer.snapshot(),
     };
 
-    for (const effect of this.effects) effect.tick(frame);
-
     // La firma no incluye `off` a propósito, igual que el original: si cambia
     // la preferencia del sistema, se aplica en el próximo frame que se mueva algo.
-    const signature = `${scrollY}|${viewportWidth}|${viewportHeight}|${intro}|${intensity}|${Math.round(velocity)}`;
-    if (!this.needsLayout(signature, time)) return;
+    // Es la del original (`dc.html:514`) partida en dos: la velocidad va aparte
+    // porque no abre la ventana de asentamiento (ver `needsLayout`).
+    const layoutSignature = `${scrollY}|${viewportWidth}|${viewportHeight}|${intro}|${intensity}`;
+    const layout = this.needsLayout(layoutSignature, Math.round(velocity), time);
 
-    for (const effect of this.effects) effect.measure(frame);
-    for (const effect of this.effects) effect.apply(frame);
+    if (layout) for (const effect of this.effects) effect.measure(frame);
+    for (const effect of this.effects) effect.tick(frame);
+    if (layout) for (const effect of this.effects) effect.apply(frame);
   }
 
   /**
-   * Si este frame mide y escribe. Sí cuando cambió la firma o hubo re-escaneo
-   * (como en el original, `dc.html:514-516`), y cada uno de esos frames abre
-   * una ventana de `SETTLE_MS` en la que se sigue midiendo con la firma quieta.
+   * Si este frame mide y escribe:
+   *
+   * - **Re-escaneo o cambio de la firma de layout** (scroll, viewport, intro,
+   *   intensidad): sí, y abre una ventana de `SETTLE_MS` en la que se sigue
+   *   midiendo con todo quieto.
+   * - **Cambio de la velocidad redondeada**: sí, pero **no** extiende la
+   *   ventana. El skew de las cards y el de las cintas dependen de la
+   *   velocidad, así que esos frames se miden y escriben como en el original
+   *   (`dc.html:514-516`, donde la velocidad era parte de la firma).
+   * - **Nada cambió**: solo si la ventana sigue abierta.
    *
    * Por qué la ventana: los efectos leen posiciones que una transición CSS
    * todavía está moviendo (un contador dentro de un reveal que termina de
@@ -234,14 +284,23 @@ export class MotionEngine {
    * el layout se asentó, con las mismas fórmulas: durante la ventana corre el
    * mismo frame que el original corre, por ejemplo, durante la intro con el
    * scroll quieto.
+   *
+   * Por qué la velocidad no la extiende: después de un scroll, la velocidad
+   * suavizada tarda ~0,6 s en llegar a 0 (más después de un salto), y cada
+   * entero que cruza cambiaba la firma. Si reabriera la ventana, el motor
+   * seguiría midiendo 1,1 s **después de que la velocidad se quedó quieta**:
+   * ~1,7 s de frames completos por cada scroll, sin que nada del layout se
+   * esté moviendo por la velocidad.
    */
-  private needsLayout(signature: string, time: number): boolean {
-    if (this.force || signature !== this.signature) {
-      this.signature = signature;
+  private needsLayout(layoutSignature: string, velocityKey: number, time: number): boolean {
+    const velocityChanged = velocityKey !== this.velocityKey;
+    this.velocityKey = velocityKey;
+    if (this.force || layoutSignature !== this.layoutSignature) {
+      this.layoutSignature = layoutSignature;
       this.force = false;
       this.settleUntil = time + SETTLE_MS;
       return true;
     }
-    return time < this.settleUntil;
+    return velocityChanged || time < this.settleUntil;
   }
 }

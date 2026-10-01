@@ -1,7 +1,7 @@
 import { Container } from '@/components/atoms/Container';
 import { Section } from '@/components/atoms/Section';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { Marquee } from '@/components/organisms/Marquee';
+import { Marquee, MarqueePauseGroup } from '@/components/organisms/Marquee';
 import type { TestimonialsContent } from '@/content/sections/testimonials';
 import { reveal } from '@/motion/attributes';
 
@@ -25,6 +25,10 @@ export type TestimonialsProps = {
  * Sección 11, "Lo que se traen de la montaña" (`dc.html:330-343`): los
  * testimonios en una cinta infinita que ocupa todo el ancho de la pantalla.
  *
+ * Debajo de la cinta, un botón para pausarla (`MarqueePauseGroup`): son
+ * frases para leer que se mueven solas, y en el diseño solo se frenan con el
+ * mouse encima (CLAUDE.md §9, WCAG 2.2.2).
+ *
  * El diseño trae además un carrusel por intervalo (`tRef`, `goT`, `tDots`)
  * que su marcado no usa; no se portó (CLAUDE.md §9).
  */
@@ -37,24 +41,31 @@ export function Testimonials({ content }: TestimonialsProps) {
           title={content.title}
           titleClassName={styles.title}
         />
-        <div className={styles.viewport} {...reveal('up', { delay: 1 })}>
-          <Marquee
-            as="ul"
-            items={content.testimonials}
-            direction={TESTIMONIALS_MARQUEE.direction}
-            speed={TESTIMONIALS_MARQUEE.speed}
-            className={styles.rail}
-            renderItem={(testimonial, { isClone }) => (
-              // La copia de la cinta no se lee: el lector de pantalla ya leyó la original.
-              <li className={styles.item} aria-hidden={isClone || undefined}>
-                <TestimonialCard
-                  testimonial={testimonial}
-                  captionSeparator={content.captionSeparator}
-                />
-              </li>
-            )}
-          />
-        </div>
+        {/* El botón queda adentro del `Container`, alineado con el título; lo
+            separa de las cards el padding de abajo de `.viewport`. */}
+        <MarqueePauseGroup
+          pauseLabel={content.marqueePauseLabel}
+          resumeLabel={content.marqueeResumeLabel}
+        >
+          <div className={styles.viewport} {...reveal('up', { delay: 1 })}>
+            <Marquee
+              as="ul"
+              items={content.testimonials}
+              direction={TESTIMONIALS_MARQUEE.direction}
+              speed={TESTIMONIALS_MARQUEE.speed}
+              className={styles.rail}
+              renderItem={(testimonial, { isClone }) => (
+                // La copia de la cinta no se lee: el lector de pantalla ya leyó la original.
+                <li className={styles.item} aria-hidden={isClone || undefined}>
+                  <TestimonialCard
+                    testimonial={testimonial}
+                    captionSeparator={content.captionSeparator}
+                  />
+                </li>
+              )}
+            />
+          </div>
+        </MarqueePauseGroup>
       </Container>
     </Section>
   );

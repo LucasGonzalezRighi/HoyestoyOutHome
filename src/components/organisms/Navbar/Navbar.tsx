@@ -16,13 +16,15 @@ export type NavbarLink = {
   href: string;
 };
 
-/** Marca a la izquierda del nav. */
+/**
+ * Marca a la izquierda del nav. No lleva alt del logo: el logo es decorativo,
+ * porque el nombre del link ya es el texto de al lado.
+ */
 export type NavbarBrand = {
   /** Primera línea, en la fuente de títulos ("Hoy Estoy"). */
   name: string;
   /** Segunda línea, en mayúsculas espaciadas ("Out Of Home"). */
   tagline: string;
-  logoAlt: string;
   /** Destino del clic en la marca: el principio de la página. */
   href: string;
 };
@@ -50,7 +52,11 @@ export function Navbar({ brand, links, cta, ariaLabel, className, ...rest }: Nav
   return (
     <nav aria-label={ariaLabel} className={cn(styles.nav, className)} {...rest}>
       <a href={brand.href} className={styles.brand}>
-        <BrandLogo width={NAV_LOGO_WIDTH} alt={brand.logoAlt} className={styles.logo} />
+        {/*
+          Alt vacío: el texto de al lado ya nombra la marca. Con alt, el nombre
+          del link repetiría la marca ("Logo Hoy Estoy OOH Hoy Estoy Out Of Home").
+        */}
+        <BrandLogo width={NAV_LOGO_WIDTH} alt="" className={styles.logo} />
         <span className={styles.brandText}>
           <span className={styles.brandName}>{brand.name}</span>
           <span className={styles.brandTagline}>{brand.tagline}</span>

@@ -17,6 +17,10 @@ export type GalleryContent = SectionHeadingContent & {
   readonly profileLink: CallToAction;
   /** Las dos filas de fotos, en el orden del diseño (`gal1`, `gal2`). */
   readonly rows: readonly [readonly Photo[], readonly Photo[]];
+  /** Texto del botón que pausa las dos filas (no está en el diseño: WCAG 2.2.2, CLAUDE.md §9). */
+  readonly marqueePauseLabel: string;
+  /** Texto del mismo botón con las filas en pausa. */
+  readonly marqueeResumeLabel: string;
 };
 
 const { instagram } = SOCIAL_PROFILES;
@@ -36,6 +40,8 @@ export const galleryContent: GalleryContent = {
     href: instagram.url,
     external: true,
   },
+  marqueePauseLabel: 'Pausar fotos',
+  marqueeResumeLabel: 'Reanudar fotos',
   rows: [
     [
       PHOTOS.volcanicTrailAscent,

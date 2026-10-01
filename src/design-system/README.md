@@ -42,6 +42,8 @@ Se edita **`tokens.css`** y nada más: todo el sitio lee de ahí. Un solo valor 
 
 Las rampas 100–900 se generaron en OKLCH sobre una escala de luminosidad compartida. Si cambia un color base, hay que regenerar su rampa entera (no retocar un paso suelto), o el mismo paso deja de pesar lo mismo en las tres rampas.
 
+La única excepción es `--color-accent-600`: `#886130` en vez del `#8c6433` de la rampa, un pelo más oscuro para que el texto crema de los botones primarios llegue a AA (4,67:1 en vez de 4,46:1; ver CLAUDE.md §9). Si se regenera la rampa del acento, hay que volver a oscurecer ese paso hasta pasar 4,5:1 con `--color-bg`.
+
 ## Tokens
 
 ### Color
@@ -92,6 +94,7 @@ Escala de títulos de `base.css`: h1 42 · h2 32 · h3 25 · h4 20 · h5 16 · h
 | `--radius-4xl`                                                    | 44px                                     | Tarjeta de precio del cierre                                         |
 | `--radius-pill`                                                   | 999px                                    | Botones, tags, pestañas                                              |
 | `--shadow-sm` / `-md` / `-lg`                                     | sombras teñidas                          | Elevación; nunca un `box-shadow` inventado                           |
+| `--shadow-focus-gap`                                              | aro crema de 2px                         | Llena el hueco del `outline-offset` del foco de botones (contraste)  |
 | `--shadow-curtain-leaf-left` / `-right` · `--shadow-curtain-logo` | negro 45% / 50%                          | Telón de entrada (sobre verde musgo oscuro, donde la tinta no se ve) |
 | `--shadow-cursor`                                                 | negro 25%                                | Cursor montaña, dentro de `drop-shadow()`                            |
 | `--shadow-text-hero-headline` / `-lead`                           | negro 25% / 30%                          | `text-shadow` del titular y la bajada del hero, sobre la foto        |
@@ -148,9 +151,11 @@ El ancho útil de la hoja (720px en carta, 698px en A4, con 0,5in de margen) que
 | Cortes             | `break-inside: avoid` en secciones, cards, figuras, ítems de lista y cards apilables; títulos pegados a lo que sigue; `orphans`/`widows` en 3.                                                                                                         |
 | Hero               | En su módulo: alto fijo de 560px (en vez de `100svh`), sin el texto calado "Out Of Home" ni la cinta verde (el print del diseño no los tiene).                                                                                                         |
 
-Por qué casi todo va con `!important`: el motor deja estilos **inline** (`transform`, `opacity`, `clip-path`, el alto de la sección horizontal, el color del fondo) congelados en la pose del último frame, y un estilo inline solo se pisa con `!important`. Lo que no es inline vive en CSS Modules, que cargan después de `globals.css` y pesan lo mismo que un selector de atributo.
+Por qué casi todo va con `!important`: el motor deja estilos **inline** (`transform`, `opacity`, `clip-path`, el alto de la sección horizontal, el color del fondo) congelados en la pose del último frame, y un estilo inline solo se pisa con `!important`. Lo que no es inline vive en CSS Modules, y una clase de módulo pesa lo mismo que un selector de atributo: sin `!important` ganaría la que cargue después, y ese orden no es confiable. `app/layout.tsx` importa los componentes antes que `./globals.css`, y tanto en dev como en el build de producción la hoja de los módulos va **antes** que la global.
 
-Límite conocido: el **texto de los contadores** (`data-count`: stats de Lolog y precio del cierre) lo escribe el motor y CSS no lo puede tocar. Si se imprime sin haber scrolleado hasta ellos, salen en 0. Lo resuelve el motor, no esta hoja.
+Por eso los módulos no le ganan a `base.css` por orden de carga sino por especificidad: `base.css` va entero dentro de `:where()` (pesa 0). **Ojo:** una regla global nueva sin `:where()` que pese lo mismo que una clase le ganaría a los módulos en producción, porque la global carga después.
+
+Los **contadores** (`data-count`: stats de Lolog y precio del cierre) no los puede tocar esta hoja: su texto lo escribe el motor. Para que no se impriman en 0 cuando no se scrolleó hasta ellos, el motor corre un frame con el movimiento apagado en `beforeprint` (`handleBeforePrint` de `src/motion/core/MotionEngine.ts`), que escribe la pose final de todo, valor de los contadores incluido.
 
 ## Relación con Organic (Claude Design)
 
@@ -173,7 +178,7 @@ El design system original está en `docs/design/design-system/` (`styles.css` + 
 - Formas blandas —círculos, manchas— como decoración y como máscara de imágenes.
 - Usar la rampa verde musgo (`--color-accent-2-*`) como segunda voz de verdad, no solo como resaltado.
 - Lavar las fotos (`WashedImage`) y redondearles los bordes.
-- Estados temáticos: hover y presionado desde la rampa del acento, foco `2px solid var(--color-accent)` con `:focus-visible`, deshabilitado al 45%.
+- Estados temáticos: hover y presionado desde la rampa del acento, foco `2px solid var(--color-accent)` con `:focus-visible`, deshabilitado al 45%. Los botones le suman al foco el aro crema de `--shadow-focus-gap` para contrastar sobre fondos oscuros, y sobre foto el anillo va del color del texto (CLAUDE.md §9).
 
 ### Qué no (Don't)
 
