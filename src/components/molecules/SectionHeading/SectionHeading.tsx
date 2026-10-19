@@ -14,6 +14,11 @@ export type SectionHeadingProps = {
   title: ReactNode;
   /** Nivel del título. Por defecto `h2`. */
   as?: 'h2' | 'h3';
+  /**
+   * `id` del título, para que la sección (o una lista) tome su nombre de él
+   * con `aria-labelledby`.
+   */
+  titleId?: string;
   className?: string;
   eyebrowClassName?: string;
   /** El tamaño y el margen de abajo del título los pone quien lo usa: cambian en cada sección. */
@@ -40,6 +45,7 @@ export function SectionHeading({
   eyebrow,
   title,
   as: Title = 'h2',
+  titleId,
   className,
   eyebrowClassName,
   titleClassName,
@@ -54,6 +60,7 @@ export function SectionHeading({
         </Eyebrow>
       ) : null}
       <Title
+        id={titleId}
         className={cn(styles.title, titleClassName)}
         {...(shouldReveal ? reveal('up', eyebrow ? { delay: 1 } : {}) : {})}
       >

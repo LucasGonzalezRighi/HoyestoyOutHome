@@ -43,7 +43,7 @@ export function scrollExitProgress(bottom: number, viewportHeight: number): numb
 }
 
 /**
- * Progreso de un reveal manejado por la intro del telón en vez del scroll
+ * Progreso de un reveal manejado por la intro en vez del scroll
  * (titular y bajada del hero). Corre más rápido que la intro y escalona por `delay`.
  */
 export function introRevealProgress(intro: number, delay: number): number {

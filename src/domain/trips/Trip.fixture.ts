@@ -5,9 +5,9 @@ import { Trip, type TripParams } from './Trip';
 import { TripDuration } from './TripDuration';
 
 /**
- * Fábrica de viajes para los tests de `trips/`: un viaje válido por defecto
- * al que cada test le pisa solo lo que le importa. Así un test que prueba la
- * dificultad no depende de acordarse de la foto o el precio.
+ * Fábrica de viajes para los tests del dominio: un viaje válido por defecto
+ * (Calle & Stepanek) al que cada test le pisa solo lo que le importa. Así un
+ * test que prueba la dificultad no depende de acordarse de la foto o el precio.
  */
 export function buildTrip(overrides: Partial<TripParams> = {}): Trip {
   return new Trip({
@@ -25,7 +25,7 @@ export function buildTrip(overrides: Partial<TripParams> = {}): Trip {
       width: 1200,
       height: 1600,
     }),
-    detailAnchor: '#calle',
+    summitElevationM: 4290,
     ...overrides,
   });
 }

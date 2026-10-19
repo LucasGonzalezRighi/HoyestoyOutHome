@@ -5,9 +5,9 @@ import { TripCatalog } from './TripCatalog';
 
 const calle = buildTrip();
 const lolog = buildTrip({
-  slug: 'lolog',
+  slug: 'lago-lolog-laguna-verde',
   name: 'Lago Lolog a Laguna Verde',
-  detailAnchor: '#lolog',
+  summitElevationM: undefined,
 });
 const catalog = new TripCatalog([calle, lolog]);
 
@@ -22,7 +22,7 @@ describe('TripCatalog', () => {
   });
 
   it('get devuelve el viaje por slug', () => {
-    expect(catalog.get('lolog')).toBe(lolog);
+    expect(catalog.get('lago-lolog-laguna-verde')).toBe(lolog);
   });
 
   it('get tira si el viaje no está en el catálogo', () => {
@@ -38,7 +38,9 @@ describe('TripCatalog', () => {
   });
 
   it('tira si hay slugs repetidos', () => {
-    const duplicate = buildTrip({ slug: 'lolog' });
-    expect(() => new TripCatalog([lolog, duplicate])).toThrow('"lolog" está repetido');
+    const duplicate = buildTrip({ slug: 'lago-lolog-laguna-verde' });
+    expect(() => new TripCatalog([lolog, duplicate])).toThrow(
+      '"lago-lolog-laguna-verde" está repetido',
+    );
   });
 });

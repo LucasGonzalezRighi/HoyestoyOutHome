@@ -1,18 +1,17 @@
-import { anchorTo } from '@/constants/sections';
 import { PHOTOS } from '@/content/media';
 import { Price, Trip, TripCatalog, TripDuration } from '@/domain';
 
 /**
  * El catálogo de viajes: los cuatro del diseño (array `trips` del script de
- * `docs/design/hoy-estoy-ooh-landing.dc.html`), en el orden de la sección
- * "Próximos viajes".
+ * `docs/design/hoy-estoy-ooh-landing.dc.html`), en el orden del carrusel de
+ * viajes del home.
  *
- * Es la única fuente de datos de cada viaje: la card, la sección propia y el
- * cierre leen de acá (`tripCatalog.get('calle-stepanek').price`), así un
- * precio o una distancia se cambia en un solo lugar.
+ * Es la única fuente de datos de cada viaje: la card del carrusel, la página
+ * del viaje y el calendario leen de acá (`tripCatalog.get('calle-stepanek').price`),
+ * así un precio o una distancia se cambia en un solo lugar.
  *
- * Los que tienen sección propia llevan `detailAnchor`; el resto se consulta
- * por WhatsApp (`trip.callToAction(whatsapp)` decide a dónde va el botón).
+ * Todos los viajes tienen página propia (`/viajes/<slug>`): la ruta la arma
+ * `tripPath(trip.slug)` de `constants/routes.ts`, no el catálogo.
  */
 export const tripCatalog = new TripCatalog([
   new Trip({
@@ -24,12 +23,13 @@ export const tripCatalog = new TripCatalog([
     difficulty: 'media',
     distanceKm: 24,
     price: Price.of(690000),
-    // La card la encuadra más abajo que la foto sticky de la sección 04 (`pos: 'center 62%'`).
+    // La card la encuadra más abajo que el registro (`pos: 'center 62%'` en el diseño).
     photo: PHOTOS.calleSummitSign.withPosition('center 62%'),
-    detailAnchor: anchorTo('calleStepanek'),
+    // El Cerro Adolfo Calle: la altura del cartel de la foto ("4.290 m s.n.m.").
+    summitElevationM: 4290,
   }),
   new Trip({
-    slug: 'lolog',
+    slug: 'lago-lolog-laguna-verde',
     name: 'Lago Lolog a Laguna Verde',
     shortName: 'Lago Lolog',
     destination: 'Neuquén · Huella Andina',
@@ -38,7 +38,6 @@ export const tripCatalog = new TripCatalog([
     distanceKm: 44,
     price: Price.onRequest(),
     photo: PHOTOS.volcanicPlain,
-    detailAnchor: anchorTo('lolog'),
   }),
   new Trip({
     slug: 'laguna-negra',
@@ -68,4 +67,4 @@ export const tripCatalog = new TripCatalog([
  * Los tipos para leer el catálogo desde un slice sin ir a buscarlos al
  * dominio: `(slug: TripSlug) => tripCatalog.get(slug)`.
  */
-export type { Trip, TripCallToAction, TripSlug } from '@/domain';
+export type { Trip, TripSlug } from '@/domain';

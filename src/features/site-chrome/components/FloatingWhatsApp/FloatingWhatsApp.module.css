@@ -1,7 +1,10 @@
 /*
-  WhatsApp flotante — `dc.html:386`.
-  La transición del `transform` la pone el motor (`MAGNET_TRANSITION`) y pisa
-  cualquier otra: por eso acá no se declara ninguna.
+  WhatsApp flotante — `dc.html:386`, con el logo de WhatsApp en lugar del globo.
+
+  El motor escribe inline la transición del botón (`MAGNET_TRANSITION`, solo
+  `transform`) y esa pisa cualquier otra que se declare acá. Por eso el botón no
+  anima nada propio: el hover oscurece con una capa (`::before`) y el clic
+  hunde el logo, que son elementos que el motor no toca.
 */
 
 .button {
@@ -15,9 +18,47 @@
   background: var(--color-accent-2);
   color: var(--color-accent-2-100);
   display: grid;
-  place-content: center;
+  place-items: center;
   box-shadow: var(--shadow-lg);
   text-decoration: none;
+}
+
+/*
+ * Capa del hover: el paso siguiente de la rampa (el hover del design system),
+ * que aparece por opacidad. El imán ya agranda el botón cuando el cursor se
+ * acerca; esto solo confirma que estás encima.
+ */
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-accent-2-700);
+  opacity: 0;
+  transition: opacity 180ms var(--ease-reveal);
+}
+
+/* Solo con puntero fino: en un teléfono el hover queda pegado después del toque. */
+@media (hover: hover) {
+  .button:hover::before {
+    opacity: 1;
+  }
+}
+
+/*
+ * El logo es un `<svg>` suelto: como ítem de la grilla queda centrado en los
+ * dos ejes, sin el hueco de línea base que deja un elemento en línea. Va
+ * `relative` para pintarse encima de la capa del hover.
+ */
+.icon {
+  position: relative;
+  display: block;
+  transition: transform 160ms var(--ease-reveal);
+}
+
+/* Pressed: el logo se hunde apenas, como respuesta inmediata al clic o al toque. */
+.button:active .icon {
+  transform: scale(0.9);
 }
 
 /*
@@ -31,4 +72,11 @@
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
   box-shadow: var(--shadow-focus-gap), var(--shadow-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button::before,
+  .icon {
+    transition: none;
+  }
 }

@@ -14,7 +14,7 @@ import type { Photo } from '@/domain';
  */
 export type HeroHeadlineLine = readonly string[];
 
-/** El titular del hero (el único `<h1>` de la página). */
+/** El titular del hero (el único `<h1>` del home). */
 export type HeroHeadlineContent = {
   /**
    * La frase entera, de corrido. Es el nombre accesible del `<h1>`: las
@@ -33,11 +33,6 @@ export type HeroHeadlineContent = {
 export type HeroContent = {
   /** Foto de fondo, con su alt (la del diseño: "Cordón de montañas en Mendoza"). */
   readonly photo: Photo;
-  /**
-   * Texto calado gigante que se desliza de costado con el scroll. Es
-   * decorativo (`aria-hidden`): repite la marca, no agrega información.
-   */
-  readonly outlineText: string;
   /**
    * Titular "Creo experiencias en la montaña / para reconectar con lo
    * esencial.": dos renglones que entran palabra por palabra con la intro.
@@ -75,7 +70,6 @@ const HEADLINE_LINES = [
  */
 export const heroContent: HeroContent = {
   photo: PHOTOS.heroRange,
-  outlineText: 'Out Of Home · Out Of Home',
   headline: {
     text: HEADLINE_LINES.map((line) => line.join(' ')).join(' '),
     lines: HEADLINE_LINES,

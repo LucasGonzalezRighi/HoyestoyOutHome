@@ -5,10 +5,11 @@ import type { ButtonProps } from './Button.types';
  * Botón de acción (`<button>`), con el `.btn` del design system y el relleno
  * verde musgo de la marca.
  *
- * `type="button"` por defecto: la landing no tiene formularios, y un
- * `<button>` sin tipo dentro de uno lo enviaría sin querer.
+ * `type="button"` por defecto: un `<button>` sin tipo dentro de un
+ * formulario lo enviaría sin querer. El de enviar del formulario de Contacto
+ * lo pide explícito (`type="submit"`).
  *
- * Para navegar (anclas, WhatsApp) usar `LinkButton`.
+ * Para navegar (anclas, páginas de viaje, WhatsApp) usar `LinkButton`.
  */
 export function Button({
   variant = 'primary',

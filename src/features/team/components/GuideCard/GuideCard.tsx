@@ -10,8 +10,8 @@ import styles from './GuideCard.module.css';
 
 /**
  * `sizes` de la foto: el marco mide `min(220px, 100%)` y la columna de la
- * grilla nunca baja de 220px (`minmax(220px, 1fr)`, `dc.html:318`), así que
- * siempre ocupa 220px.
+ * grilla solo baja de 220px en pantallas de menos de 260px (ver
+ * `Team.module.css`), así que ocupa 220px.
  */
 const AVATAR_SIZES = '220px';
 

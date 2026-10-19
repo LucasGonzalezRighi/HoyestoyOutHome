@@ -1,0 +1,51 @@
+/* "Próximas salidas": fichas de fecha que se acomodan en filas. */
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px 14px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* Día y mes de salida en un círculo verde musgo, como el número de los días del cronograma. */
+.marker {
+  display: grid;
+  flex: none;
+  place-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-accent-2-800);
+  color: var(--color-bg);
+  text-align: center;
+}
+
+.markerDay {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.markerMonth {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.range {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}

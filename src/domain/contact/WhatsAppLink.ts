@@ -11,12 +11,13 @@ const WA_ME = 'https://wa.me';
 const PHONE_PATTERN = /^\d{8,15}$/;
 
 /**
- * El link de WhatsApp, que es el único canal de contacto de la landing (no hay
- * formulario ni backend).
+ * El link de WhatsApp, el canal principal de contacto del sitio (el otro es el
+ * formulario de Contacto, que arma un `mailto:`; no hay backend).
  *
  * Encapsula las dos formas que usa el diseño:
- * - `href()` abre el chat con un mensaje ya escrito (nav, hero, cierre, botón flotante).
- * - `chatHref()` abre el chat vacío (los "Consultar" de los viajes sin página propia).
+ * - `href()` abre el chat con un mensaje ya escrito: el por defecto (nav, hero,
+ *   botón flotante) u otro (el "Consultar" de la página de cada viaje).
+ * - `chatHref()` abre el chat vacío.
  */
 export class WhatsAppLink {
   private readonly props: Readonly<{ phone: string; defaultMessage: string }>;

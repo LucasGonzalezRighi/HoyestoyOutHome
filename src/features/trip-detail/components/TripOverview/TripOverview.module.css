@@ -1,0 +1,91 @@
+/* "Sobre el viaje" — la presentación de Lago Lolog del diseño (`dc.html:229-243`). */
+
+/* `.lc-split`: texto ancho a la izquierda, stats a la derecha. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+}
+
+.text {
+  display: grid;
+  gap: 16px;
+  max-width: 62ch;
+}
+
+/* `dc.html:231`. */
+.paragraph {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.75;
+}
+
+/* Cierre en negrita de la presentación de Calle & Stepanek (`dc.html:159`). */
+.highlight {
+  max-width: 44ch;
+  margin: 6px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.aside {
+  display: grid;
+  gap: 14px;
+}
+
+/* `.lc-sticky` (`dc.html:233`): las stats quedan fijas mientras se lee el texto. */
+.asideSticky {
+  position: sticky;
+  top: 100px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Sin texto al lado: una fila de hasta cuatro stats. */
+.statsRow {
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  max-width: 920px;
+}
+
+/* Nota de modalidad (`dc.html:242`). */
+.modality {
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 820px) {
+  /* `minmax(0, …)` y no `1fr`: si no, la columna se estira al mínimo de las stats y desborda. */
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .asideSticky {
+    position: static;
+  }
+
+  /*
+   * El número de cada stat no parte renglón (piso de 30px) y "+1.900 m" pide
+   * 156px de card: dos columnas `1fr 1fr` desbordaban debajo de ~330px. En
+   * flex con `wrap` pasan de renglón cuando no entran; la base de un tercio
+   * hace que nunca entren tres por renglón (es la regla de las stats de Lolog).
+   */
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .stats > li {
+    flex: 1 1 calc(100% / 3);
+  }
+}

@@ -1,6 +1,6 @@
 # Hoy Estoy Out Of Home
 
-Landing de **Hoy Estoy Out Of Home**: trekkings y ascensos guiados por Mendoza y la Patagonia. Una sola página con anclas; el contacto es por **WhatsApp** (no hay formulario, pagos ni backend).
+Sitio de **Hoy Estoy Out Of Home**: trekkings y ascensos guiados por Mendoza y la Patagonia. Un **home** con la información general (una sola página con anclas: viajes, calendario, quiénes somos, preguntas frecuentes, contacto…) y **una página por viaje** (`/viajes/<slug>`) con su cronograma, qué incluye, salidas y precio. El contacto es por **WhatsApp** y por un formulario breve que arma un `mailto:` (no hay pagos ni backend).
 
 Next.js 16 (App Router) · React 19 · TypeScript estricto · CSS Modules sobre un design system propio · motor de animación propio, orientado a objetos.
 
@@ -34,7 +34,7 @@ Las variables de `.env.example`:
 | `npm run start` | Sirve el build |
 | `npm run lint` | ESLint |
 | `npm run type-check` | `tsc --noEmit` |
-| `npm run test` | Vitest: la lógica pura (dominio, motor de animación, URL pública) |
+| `npm run test` | Vitest: la lógica pura (dominio, motor de animación, URL pública y funciones puras de contenido y features) |
 | `npm run check` | `type-check` + `lint` + `test` |
 | `npm run format` | Prettier sobre `ts`, `tsx` y `css` de `src/` |
 
@@ -44,13 +44,13 @@ Antes de pushear: `npm run check` y `npm run build`. Vercel corre el build en ca
 
 ```
 src/
-├── app/              # layout, página, metadata, robots, sitemap, iconos
+├── app/              # layout, home, páginas de viaje (viajes/[slug]), metadata, robots, sitemap, iconos
 ├── components/       # atoms / molecules / organisms (presentacionales)
-├── constants/        # marca, URL pública, IDs de secciones, rutas de assets
+├── constants/        # marca, URL pública, rutas de páginas, IDs de secciones, rutas de assets
 ├── content/          # todo el texto visible + las instancias del dominio
-├── design-system/    # tokens.css, base.css, print.css, fuentes, tokens de movimiento
+├── design-system/    # tokens.css, base.css, intro.css, print.css, fuentes, tokens de movimiento
 ├── domain/           # clases del negocio (Trip, Price, WhatsAppLink…), con tests
-├── features/         # una carpeta por sección de la landing (+ site-chrome)
+├── features/         # una carpeta por sección del home, la página de viaje (trip-detail) y site-chrome
 ├── motion/           # motor de animación (clases) + atributos data-*
 └── utils/            # cn()
 docs/design/          # el diseño exportado de Claude Design (no se compila)
@@ -77,6 +77,6 @@ Next fija la variable en el build: para cambiarla hay que volver a buildear (o r
 
 El diseño —copys, paleta, tipografía y animaciones— está en **Claude Design** (archivo `Hoy Estoy OOH Landing.dc.html`, design system **Organic**). Una copia exportada vive en `docs/design/`: la landing con su motor original, la variante para imprimir y el design system.
 
-Todos los valores visuales viven en `src/design-system/` (cero hexcodes fuera de `tokens.css`). Lo que se aparta del diseño a propósito (accesibilidad, mobile, rendimiento, impresión) está listado en `CLAUDE.md` §9.
+Todos los valores visuales viven en `src/design-system/` (cero hexcodes fuera de `tokens.css`). El diseño es una landing única; en octubre de 2026 el cliente pidió separar el home de las páginas de viaje y sumar Calendario, Preguntas frecuentes y el formulario de Contacto. Lo que se aparta del diseño a propósito (accesibilidad, mobile, rendimiento, impresión y esa reestructuración) está listado en `CLAUDE.md` §9.
 
 Ver [`CLAUDE.md`](./CLAUDE.md) para la arquitectura completa y las convenciones.

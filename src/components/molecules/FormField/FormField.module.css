@@ -1,0 +1,180 @@
+/*
+ * Campos de formulario — `.field` + `.input` del design system Organic
+ * (`docs/design/design-system/styles.css:138-151`) con su "rounded frame"
+ * (`styles.css:253-256`: inputs en pastilla, `padding-inline: 14px`).
+ *
+ * Desvíos del design system, todos por legibilidad o accesibilidad:
+ * - Label de 14px en `--color-neutral-700`, 6:1 sobre el crema (el DS: 12px
+ *   con el texto al 70%, 4,6:1: en el límite de AA y con letra chica).
+ * - Control de 48px de alto y texto de 16px (el DS: 36px y 14px). 48px es un
+ *   blanco táctil cómodo, y con menos de 16px Safari en iOS hace zoom al
+ *   enfocar el campo.
+ * - Borde `--color-neutral-600` (3,9:1 contra el crema y 3,5:1 contra el
+ *   surface) en vez de `--color-divider` (1,3:1): el borde es lo que marca
+ *   dónde está el campo (WCAG 1.4.11).
+ * - El `<textarea>` va con el radio de contenedor (`--radius-lg`) y no en
+ *   pastilla: con 999px y 130px de alto, las esquinas se comerían el texto.
+ *
+ * Los colores que cambian con el tono viven en custom properties del
+ * envoltorio (`.field` / `.inverse`), así los estados del control (hover,
+ * error, foco) se escriben una sola vez y no pelean por especificidad.
+ */
+
+.field {
+  --field-fill: var(--color-surface);
+  --field-border: var(--color-neutral-600);
+  --field-border-hover: var(--color-neutral-800);
+  --field-label: var(--color-neutral-700);
+  --field-error: var(--color-accent-800);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: start;
+}
+
+/*
+ * Sobre un fondo oscuro (la tarjeta verde del cierre). El campo pasa a crema:
+ * su borde contra el verde es el propio relleno (9,7:1), y el borde de 1px
+ * queda como un filete sutil adentro. Label en `--color-accent-2-100` (10:1
+ * sobre el verde de la tarjeta) y error en `--color-accent-200` (8,5:1).
+ */
+.inverse {
+  --field-fill: var(--color-bg);
+  --field-border: var(--color-divider);
+  --field-border-hover: var(--color-neutral-600);
+  --field-label: var(--color-accent-2-100);
+  --field-error: var(--color-accent-200);
+}
+
+.label {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--field-label);
+}
+
+/* ── Control ───────────────────────────────────────────────────────────── */
+
+.control {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 18px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-pill);
+  background: var(--field-fill);
+  color: var(--color-text);
+  caret-color: var(--color-accent);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* `--color-neutral-700`: 6:1 sobre el crema y 5,3:1 sobre el surface (AA). Firefox le baja la opacidad: se fija en 1. */
+.control::placeholder {
+  color: var(--color-neutral-700);
+  opacity: 1;
+}
+
+.control:hover {
+  border-color: var(--field-border-hover);
+}
+
+/*
+ * Inválido: el borde engrosado a 2px (1px de borde + 1px de sombra interior,
+ * así el campo no cambia de tamaño) en `--color-accent-700`, 6,4:1 contra el
+ * crema. No es lo único que lo marca: abajo va el mensaje con su ícono.
+ */
+.control[aria-invalid='true'] {
+  border-color: var(--color-accent-700);
+  box-shadow: inset 0 0 0 1px var(--color-accent-700);
+}
+
+/*
+ * Foco: el anillo dorado de 2px del design system más el aro crema en el
+ * hueco del `outline-offset` (`--shadow-focus-gap`), igual que los botones
+ * (CLAUDE.md §9.2), y el borde pasa a dorado. Sobre el crema de la página el
+ * aro no se nota; sobre el verde del cierre el dorado solo da 2,7:1 contra el
+ * fondo, pero queda entre el aro crema y el verde, y contra el crema da 3,5:1
+ * (WCAG 1.4.11). Un campo de texto muestra el foco también con el mouse: es
+ * donde va a aparecer lo que se escriba.
+ */
+.control:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-focus-gap);
+}
+
+/* Inválido y enfocado: el aro del foco se suma al borde engrosado, no lo reemplaza. */
+.control[aria-invalid='true']:focus-visible {
+  border-color: var(--color-accent-700);
+  box-shadow:
+    var(--shadow-focus-gap),
+    inset 0 0 0 1px var(--color-accent-700);
+}
+
+/* ── Textarea ──────────────────────────────────────────────────────────── */
+
+/* `textarea.input` del DS (`min-height: 90px; resize: vertical`), con aire para un mensaje breve. */
+.textarea {
+  min-height: 132px;
+  padding-block: 12px;
+  border-radius: var(--radius-lg);
+  resize: vertical;
+}
+
+/* ── Select ────────────────────────────────────────────────────────────── */
+
+/* Ancla de la flecha dibujada. */
+.selectFrame {
+  position: relative;
+  display: block;
+}
+
+/* Sin la flecha del navegador; el `padding` de la derecha deja lugar a la de Lucide. */
+.select {
+  appearance: none;
+  padding-inline-end: 48px;
+  cursor: pointer;
+}
+
+/*
+ * Con la opción vacía elegida ("Elegí un viaje") y `required`, el select es
+ * inválido: se ve con el color de un placeholder. Las opciones de la lista
+ * vuelven al color del texto (en Windows heredan el del select).
+ */
+.select:invalid {
+  color: var(--color-neutral-700);
+}
+
+.select option {
+  color: var(--color-text);
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  color: var(--color-text);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ── Error ─────────────────────────────────────────────────────────────── */
+
+.error {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--field-error);
+}
+
+/* Centrado con el primer renglón del mensaje (14px × 1.4 ≈ 20px de alto de línea). */
+.errorIcon {
+  flex: none;
+  margin-top: 2px;
+}

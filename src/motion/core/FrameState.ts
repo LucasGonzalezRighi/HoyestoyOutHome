@@ -44,7 +44,7 @@ export type FrameState = MotionSettings & {
    * ±60 (ver `SCROLL` en los tokens). Negativa al subir.
    */
   readonly velocity: number;
-  /** Progreso de la intro del telón, 0–1. Queda en 0 hasta que se abre el telón. */
+  /** Progreso de la intro, 0–1. Arranca en el primer frame del motor; con el movimiento apagado, ya en 1. */
   readonly intro: number;
   readonly pointer: PointerSnapshot;
 };

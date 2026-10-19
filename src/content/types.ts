@@ -23,11 +23,15 @@ export type CallToAction = {
   readonly external?: boolean;
 };
 
-/** Un link del nav: siempre es un ancla a una sección de la landing (`anchorTo(…)`). */
+/**
+ * Un link del nav: siempre lleva a una sección del home, y el nav se ve en
+ * todas las páginas, así que el destino es `/#id` (`homeAnchorTo(…)`) y no un
+ * ancla suelta `#id`, que desde una página de viaje no encontraría la sección.
+ */
 export type NavLinkContent = {
   /** Texto del link. */
   readonly label: string;
-  /** Ancla a la sección (`anchorTo(…)`). */
+  /** Ruta a la sección del home (`homeAnchorTo(…)`). */
   readonly href: string;
 };
 

@@ -1,57 +1,112 @@
-import { tripCatalog, type Trip, type TripCallToAction } from '@/content/catalog/trips';
+import { tripPath } from '@/constants/routes';
+import { tripCatalog, type Trip, type TripSlug } from '@/content/catalog/trips';
 import type { CallToAction, SectionHeadingContent } from '@/content/types';
-import { whatsapp } from '@/content/whatsapp';
+import type { Photo } from '@/domain';
 
 /**
- * Una card de "Próximos viajes", ya resuelta: el viaje y el botón con su
- * texto y su destino.
+ * Un panel del abanico de "Próximos viajes", ya resuelto: el viaje, el botón a
+ * su página y lo que se anuncia cuando una flecha lo abre.
  *
- * El viaje va como instancia de `Trip` (tiene comportamiento: `price.label()`,
- * `distanceLabel()`…); la card solo lo lee. La foto es `trip.photo`, con el
- * alt descriptivo del registro (`PHOTOS`): el diseño pone el nombre del viaje
- * (`alt="{{ trip.nombre }}"`, `dc.html:118`), que ya es el `h3` de la card y
- * el lector de pantalla leería dos veces.
+ * El viaje va como instancia de `Trip` (tiene comportamiento:
+ * `duration.label()`, `distanceLabel()`…); el panel solo lo lee. La foto es
+ * la del viaje, con el alt descriptivo del registro (`PHOTOS`): el nombre del
+ * viaje ya es el `h3` del panel y el lector de pantalla lo leería dos veces.
+ *
+ * No lleva precio: por pedido del cliente, en el home no aparece ninguno (el
+ * precio de cada viaje vive en el cierre de su página).
  */
-export type TripCardContent = {
-  /** El viaje del catálogo: destino, nombre, foto, tags y precio salen de él. */
+export type TripPanelContent = {
+  /** El viaje del catálogo: destino, nombres y tags salen de él. */
   readonly trip: Trip;
-  /** "Ver viaje" (ancla a su sección) o "Consultar" (WhatsApp, pestaña nueva). */
+  /** La foto del viaje con el encuadre del panel (ver `PANEL_FRAMING`). */
+  readonly photo: Photo;
+  /** "Ver detalles": lleva a la página del viaje (`tripPath(trip.slug)`). */
   readonly cta: CallToAction;
-};
-
-/** Textos y cards de la sección 03 "Próximos viajes" (`dc.html:107-139`). */
-export type TripsContent = Required<SectionHeadingContent> & {
-  /** Bajada debajo del título, en la primera columna del riel. */
-  readonly lead: string;
-  /** Una card por viaje del catálogo, en el orden del catálogo. */
-  readonly cards: readonly TripCardContent[];
+  /**
+   * Lo que oye quien usa lector de pantalla cuando una flecha cambia de viaje
+   * ("Viaje 2 de 4: Lago Lolog a Laguna Verde"). El contador que se ve
+   * ("02 / 04") es decorativo y no dice qué viaje es.
+   */
+  readonly positionLabel: string;
 };
 
 /**
- * Texto del botón según a dónde lleva (`cta` del array `trips`, `dc.html:668-671`).
- * El dominio decide el destino (`trip.callToAction`) y el contenido pone el copy.
+ * Nombres accesibles de las flechas del abanico. No se ven, pero se leen: por
+ * eso viven acá y no en el componente.
  */
-const CTA_LABELS: Readonly<Record<TripCallToAction['kind'], string>> = {
-  detail: 'Ver viaje',
-  inquiry: 'Consultar',
+export type TripsControlsContent = {
+  /** Nombre del botón que abre el viaje anterior (es solo un ícono). */
+  readonly previousLabel: string;
+  /** Nombre del botón que abre el viaje siguiente (es solo un ícono). */
+  readonly nextLabel: string;
 };
 
-/** Arma la card de un viaje: el viaje y el CTA con su texto. */
-function toCard(trip: Trip): TripCardContent {
-  const { kind, href, external } = trip.callToAction(whatsapp);
+/** Textos y paneles de la sección "Próximos viajes" del home. */
+export type TripsContent = Required<SectionHeadingContent> & {
+  /** Bajada, a la derecha del título. */
+  readonly lead: string;
+  /** Datos generales de las travesías, debajo de la bajada: cortos y sin números de un viaje en particular. */
+  readonly facts: readonly string[];
+  /** Nombres accesibles de las flechas. */
+  readonly controls: TripsControlsContent;
+  /** Un panel por viaje del catálogo, en el orden del catálogo. */
+  readonly panels: readonly TripPanelContent[];
+};
+
+/**
+ * Texto del único botón del panel. Es el mismo para todos los viajes: los que
+ * todavía no tienen itinerario también tienen página (con el aviso
+ * "Itinerario próximamente" y "Consultar").
+ */
+const DETAIL_LABEL = 'Ver detalles';
+
+/** "4 travesías": la cantidad sale del catálogo, así no queda vieja cuando se suma un viaje. */
+function tripCountLabel(count: number): string {
+  return count === 1 ? '1 travesía' : `${count} travesías`;
+}
+
+/**
+ * Encuadre de la foto en el panel, para los viajes en los que el del catálogo
+ * (pensado para la portada de la página del viaje) deja algo detrás del texto.
+ * El texto del panel va abajo, sobre un velo oscuro:
+ *
+ * - Calle & Stepanek: con `center 62%` el cartel de cumbre cae justo detrás
+ *   del título. Desde arriba, el panel muestra el cielo y los picos nevados,
+ *   y el cartel queda al pie, bajo el velo.
+ * - Laguna Negra: con `center 70%` las caras del grupo quedan detrás del
+ *   título. Más arriba se ve más cielo estrellado y el grupo baja al pie.
+ */
+const PANEL_FRAMING: Partial<Record<TripSlug, string>> = {
+  'calle-stepanek': 'center 0%',
+  'laguna-negra': 'center 22%',
+};
+
+/** Arma el panel de un viaje: el viaje, su foto, el botón a su página y su posición en la lista. */
+function toPanel(trip: Trip, index: number, trips: readonly Trip[]): TripPanelContent {
+  const framing = PANEL_FRAMING[trip.slug];
   return {
     trip,
-    cta: { label: CTA_LABELS[kind], href, external },
+    photo: framing ? trip.photo.withPosition(framing) : trip.photo,
+    cta: { label: DETAIL_LABEL, href: tripPath(trip.slug) },
+    positionLabel: `Viaje ${index + 1} de ${trips.length}: ${trip.name}`,
   };
 }
 
 /**
- * Contenido de "Próximos viajes". Copys verbatim del marcado (`dc.html:111-113`);
- * los datos de cada viaje salen del catálogo (`tripCatalog`), no se repiten acá.
+ * Contenido de "Próximos viajes". Eyebrow y título verbatim del diseño
+ * (`dc.html:111-112`). La bajada y los datos son del rediseño de octubre de
+ * 2026 (el abanico de paneles): la bajada ya no habla de deslizar ni de
+ * flechas, porque los viajes se recorren pasando por encima. Los datos de cada
+ * viaje salen del catálogo (`tripCatalog`), no se repiten acá.
  */
 export const tripsContent: TripsContent = {
   eyebrow: 'Próximos viajes',
   title: 'Elegí tu próxima aventura',
-  lead: 'Deslizá hacia abajo y recorré las travesías. No necesitás experiencia en altura, solo ganas.',
-  cards: tripCatalog.all().map(toCard),
+  lead: 'Pasá por cada travesía y entrá a la que te llame. No necesitás experiencia en altura, solo ganas.',
+  facts: [tripCountLabel(tripCatalog.size), 'Mendoza y Patagonia', 'Grupos chicos'],
+  controls: {
+    previousLabel: 'Viaje anterior',
+    nextLabel: 'Viaje siguiente',
+  },
+  panels: tripCatalog.all().map(toPanel),
 };

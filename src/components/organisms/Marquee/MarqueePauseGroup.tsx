@@ -9,7 +9,7 @@ import { cn } from '@/utils/cn';
 
 import styles from './MarqueePauseGroup.module.css';
 
-/** Trazo de los íconos: Lucide a 2.75, regla del design system Organic (como `ChatIcon`). */
+/** Trazo de los íconos: Lucide a 2.75, regla del design system Organic. */
 const ICON_STROKE_WIDTH = 2.75;
 
 /** Lado del ícono en px: acompaña los 14px del texto del botón `md`. */

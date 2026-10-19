@@ -1,145 +1,57 @@
 /*
- * Sección 03 "Próximos viajes" (`dc.html:107-139`).
- *
- * El alto de `.section` lo escribe el motor (`HorizontalScrollEffect`): el
- * sobrante del riel más un viewport. Por eso el aire de arriba es margen y no
- * padding: un padding sumaría al alto calculado y correría el pin.
+ * Sección "Próximos viajes": los textos del encabezado. La grilla del
+ * encabezado y el abanico son de `TripsFan.module.css`; cada panel, de
+ * `TripPanel.module.css`.
  */
-.section {
-  position: relative;
-  margin-top: var(--section-space);
-}
 
 /*
- * La escena fija (`dc.html:108`): ocupa el viewport mientras dura la sección y
- * centra el riel y la barra en vertical.
- *
- * `overflow: clip` después del `hidden` (que queda de respaldo para
- * navegadores sin `clip`): recorta igual, pero no convierte a la escena en un
- * contenedor de scroll. Con `hidden`, al enfocar con el teclado el botón de
- * una card que está fuera de pantalla, el navegador desplazaría la escena
- * (`scrollLeft`) para mostrarlo, y ese corrimiento quedaría sumado a la
- * traslación del motor.
+ * En su columna (algo más de la mitad del contenedor) el título va en dos
+ * renglones parejos. El tope baja de los 72px del diseño (`dc.html:112`) a
+ * 64px: a 72px, "Elegí tu próxima" no entraba en la columna y el título se
+ * iba a tres renglones.
  */
-.stage {
-  position: sticky;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100vh;
-  overflow: hidden;
-  overflow: clip;
-}
-
-/*
- * El riel que traslada el motor (`dc.html:109`). `max-content` para que mida
- * todo lo que lleva (el motor lee su `scrollWidth`); `stretch` iguala el alto
- * de las cards.
- */
-.track {
-  display: flex;
-  align-items: stretch;
-  gap: 26px;
-  width: max-content;
-  padding: 60px var(--layout-gutter) 0;
-}
-
-/* Primera columna del riel: eyebrow, título y bajada (`dc.html:110`). */
-.intro {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  justify-content: center;
-  width: min(80vw, 380px);
-}
-
-/* `dc.html:112`. */
 .title {
-  margin: 0 0 18px;
-  font-size: clamp(40px, 5vw, 72px);
-  line-height: 1;
+  margin: 0;
+  font-size: clamp(40px, 4.6vw, 64px);
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
-/* `dc.html:113`. */
+/* `dc.html:113`, con el ancho de su columna. `balance`: una oración por renglón, sin un "No" colgado al final del primero. */
 .lead {
-  max-width: 30ch;
+  max-width: 46ch;
   margin: 0;
   color: var(--color-neutral-700);
   font-size: 16px;
   line-height: 1.6;
+  text-wrap: balance;
 }
 
-/*
- * Las cards van en un `<ul>` que repite el `gap` del riel: se ve igual que si
- * fueran hijas directas (como en el diseño) y el lector de pantalla las
- * anuncia como lista. Se estira con el riel y a su vez estira cada `<li>`.
- */
-.cards {
+/* Tres datos generales, en un renglón: chicos, para que acompañen sin competir con el título. */
+.facts {
   display: flex;
-  flex: none;
-  gap: 26px;
+  flex-wrap: wrap;
+  gap: 8px 22px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* `display: flex` para que el `<article>` se estire a todo el alto del `<li>`. */
-.cardItem {
+.fact {
   display: flex;
-}
-
-/* Margen final del riel: la última card no queda pegada al borde (`dc.html:135`). */
-.endSpacer {
-  flex: none;
-  width: var(--layout-gutter);
-}
-
-/* Riel de la barra de avance (`dc.html:137`). */
-.progress {
-  height: 3px;
-  margin: 28px var(--layout-gutter) 0;
-  overflow: hidden;
-  border-radius: 3px;
-  background: var(--color-neutral-300);
-}
-
-/* El relleno: el motor lo escala en X de 0 a 1 con el avance del riel. */
-.progressFill {
-  height: 100%;
-  background: var(--color-accent-2);
-  transform: scaleX(0);
-  transform-origin: left;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-neutral-800);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 /*
- * La escena sin fijar: el riel scrollea en X a mano y la barra de avance, que
- * no tendría quién la llene, se oculta. Aplica en dos casos (CLAUDE.md §9):
- *
- * - Sin JS (§6.2: "sin JS la página se lee entera"). Nadie estira la sección
- *   ni traslada el riel, y la escena fija de un viewport recortaría las cards
- *   que no entran.
- * - Con menos de 500px de alto (teléfono apaisado, una notebook con zoom del
- *   200%). La card mide `max(220px, 46vh)` de foto más ~233–262px de cuerpo, y
- *   la escena suma 60px de padding arriba y 31px de barra: debajo de ~460px el
- *   precio y el CTA quedan cortados por la escena de 100vh, en cualquier punto
- *   del scroll. El motor ve que la escena dejó de ser sticky y no estira la
- *   sección ni traslada nada (`HorizontalScrollEffect`). Un iPhone SE vertical
- *   (~548px) y las notebooks (650px o más) siguen con el pin del diseño.
+ * Mobile (CLAUDE.md §9.3): el título mantiene el piso de 40px del diseño,
+ * por encima de los 30px de la regla de mobile.
  */
-@media (scripting: none), (max-height: 500px) {
-  .stage {
-    position: static;
-    height: auto;
-    overflow: visible;
-  }
-
-  .track {
-    width: auto;
-    overflow-x: auto;
-  }
-
-  .progress {
-    display: none;
+@media (max-width: 820px) {
+  .lead {
+    max-width: none;
   }
 }

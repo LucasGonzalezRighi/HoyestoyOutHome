@@ -1,12 +1,11 @@
 import { SITE } from '@/constants/site';
-import { tripCatalog } from '@/content/catalog/trips';
 import { PHOTOS } from '@/content/media';
 import type { SectionHeadingContent } from '@/content/types';
 import { Guide } from '@/domain';
 
 /**
- * Contenido de la sección 10, "¿Quiénes somos?" (`dc.html:314-328`; datos en
- * el array `equipo` del script, `dc.html:708-713`).
+ * Contenido de "¿Quiénes somos?" (sección 10 del diseño, `dc.html:314-328`;
+ * datos en el array `equipo` del script, `dc.html:708-713`).
  *
  * El eyebrow es obligatorio acá (en `SectionHeadingContent` es opcional): la
  * coreografía de la sección cuenta con él para escalonar título y bajada.
@@ -16,11 +15,12 @@ export type TeamContent = SectionHeadingContent & {
   readonly eyebrow: string;
   /** Bajada debajo del título: quiénes somos y cómo trabajamos. */
   readonly lead: string;
-  /** Los guías, en el orden del diseño. Cada uno se muestra como un link a su Instagram. */
+  /**
+   * Los guías que se muestran, cada uno como un link a su Instagram. Hoy es
+   * uno solo (el diseño tiene cuatro); la sección los centra, sean los que sean.
+   */
   readonly guides: readonly Guide[];
 };
-
-const calleStepanek = tripCatalog.get('calle-stepanek');
 
 /**
  * Las fotos del equipo van **sin alt** (decorativas): cada una está dentro del
@@ -31,17 +31,14 @@ const calleStepanek = tripCatalog.get('calle-stepanek');
  */
 const AVATARS = {
   lucas: PHOTOS.teamLucas.withAlt(''),
-  andres: PHOTOS.teamAndres.withAlt(''),
-  luis: PHOTOS.teamLuis.withAlt(''),
-  estanislao: PHOTOS.teamEstanislao.withAlt(''),
 } as const;
 
 /**
- * Textos y guías de "¿Quiénes somos?", verbatim del diseño.
+ * Textos y guías de "¿Quiénes somos?", verbatim del diseño. De los cuatro
+ * guías del diseño queda solo Lucas Chichizola, a pedido del cliente.
  *
- * El nombre de la marca en la bajada y el nombre corto del viaje en los roles
- * salen de `SITE` y del catálogo: si cambian, esta sección no queda
- * desactualizada.
+ * El nombre de la marca en la bajada sale de `SITE`: si cambia, esta sección
+ * no queda desactualizada.
  */
 export const teamContent: TeamContent = {
   eyebrow: 'Sobre nosotros',
@@ -53,24 +50,6 @@ export const teamContent: TeamContent = {
       role: 'Guía de Turismo Aventura, Senderos y Selva',
       instagramHandle: 'chichizolalucas',
       photo: AVATARS.lucas,
-    }),
-    new Guide({
-      name: 'Andrés Gavilán',
-      role: 'Guía de Montaña y Guía de Selva',
-      instagramHandle: 'andres.gavilan',
-      photo: AVATARS.andres,
-    }),
-    new Guide({
-      name: 'Luis Aguiar',
-      role: `Guía · ${calleStepanek.shortName}`,
-      instagramHandle: 'luisaguuiar',
-      photo: AVATARS.luis,
-    }),
-    new Guide({
-      name: 'Estanislao Malic',
-      role: `Guía · ${calleStepanek.shortName}`,
-      instagramHandle: 'estanislaomalic',
-      photo: AVATARS.estanislao,
     }),
   ],
 };

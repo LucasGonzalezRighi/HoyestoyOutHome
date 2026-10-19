@@ -28,10 +28,10 @@ export type StylableElement = Element & ElementCSSInlineStyle;
  * Ojo: no todas las escrituras del motor pasan por acá. Donde el original
  * escribía directo (`el.style.transform = …`) sobre un elemento que el motor no
  * escribe también por la caché, el port también, para no cambiar cuándo se
- * reescribe cada cosa. La excepción son los reseteos con el movimiento apagado
- * del parallax, el drift y el skew (`dc.html:558`): esas capas se escriben por
- * la caché el resto del tiempo, y un reseteo directo la dejaría desactualizada
- * (al volver el movimiento, la misma pose se saltearía).
+ * reescribe cada cosa. La excepción es el reseteo del parallax con el
+ * movimiento apagado (`dc.html:558`): esas capas se escriben por la caché el
+ * resto del tiempo, y un reseteo directo la dejaría desactualizada (al volver
+ * el movimiento, la misma pose se saltearía).
  */
 export class StyleWriter {
   private readonly written = new WeakMap<StylableElement, Map<CachedStyleProperty, string>>();

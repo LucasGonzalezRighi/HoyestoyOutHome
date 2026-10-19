@@ -11,10 +11,11 @@ Es el design system **Organic** de Claude Design (`docs/design/design-system/`),
 | `tokens.css`       | `:root` con todas las custom properties. El único lugar con hexcodes.                                                 |
 | `base.css`         | Reset + estilos de elementos (`body`, `h1`–`h6`, `a`, `img`, foco, selección), todo con especificidad 0.              |
 | `fonts.ts`         | `next/font/google`: DM Serif Display y Lexend, auto-hospedadas. Exporta `fontVariables`.                              |
-| `tokens/motion.ts` | Números del motor de animación (intensidades, telón, suavizados). Ver `src/motion/README.md`.                         |
+| `tokens/motion.ts` | Números del motor de animación (intensidades, intro, suavizados). Ver `src/motion/README.md`.                         |
+| `intro.css`        | Pose de arranque de las piezas de la intro hasta que el motor toma el control. Ver [Intro](#intro-introcss).          |
 | `print.css`        | Hoja de impresión (`@media print`): la variante para imprimir / PDF del diseño. Ver [Impresión](#impresión-printcss). |
 
-`src/app/globals.css` importa `tokens.css`, `base.css` y `print.css` (en ese orden), y `app/layout.tsx` pone `fontVariables` en el `<html>`. No hay otro CSS global.
+`src/app/globals.css` importa `tokens.css`, `base.css`, `intro.css` y `print.css` (en ese orden), y `app/layout.tsx` pone `fontVariables` en el `<html>`. No hay otro CSS global.
 
 ## Cómo se consume
 
@@ -87,15 +88,12 @@ Escala de títulos de `base.css`: h1 42 · h2 32 · h3 25 · h4 20 · h5 16 · h
 | `--space-1` … `--space-8`                                         | 4.4 · 8.8 · 13.2 · 17.6 · 26.4 · 35.2 px | Escala de 4px con densidad 1.10×                                     |
 | `--radius-sm` / `-md` / `-lg`                                     | 8 · 16 · 28 px                           | Escala del DS; `lg` para contenedores (pilares, stats, testimonios)  |
 | `--radius-card-sm`                                                | 26px                                     | Fotos de la galería                                                  |
-| `--radius-panel`                                                  | 30px                                     | Paneles de servicios                                                 |
-| `--radius-xl`                                                     | 32px                                     | Cards de viaje, foto de Calle & Stepanek, "¿Puedo?"                  |
-| `--radius-2xl`                                                    | 36px                                     | Cards apilables del itinerario                                       |
-| `--radius-3xl`                                                    | 40px                                     | Banda "La montaña te espera."                                        |
-| `--radius-4xl`                                                    | 44px                                     | Tarjeta de precio del cierre                                         |
-| `--radius-pill`                                                   | 999px                                    | Botones, tags, pestañas                                              |
+| `--radius-panel`                                                  | 30px                                     | Paneles de "¿Qué incluye?" de cada viaje                             |
+| `--radius-xl`                                                     | 32px                                     | Cards de viaje, "¿Puedo?" / "¿Es para mí?", "Itinerario próximamente" |
+| `--radius-4xl`                                                    | 44px                                     | Tarjeta del cierre (contacto en el home, precio en cada viaje)       |
+| `--radius-pill`                                                   | 999px                                    | Botones, tags, inputs                                                |
 | `--shadow-sm` / `-md` / `-lg`                                     | sombras teñidas                          | Elevación; nunca un `box-shadow` inventado                           |
 | `--shadow-focus-gap`                                              | aro crema de 2px                         | Llena el hueco del `outline-offset` del foco de botones (contraste)  |
-| `--shadow-curtain-leaf-left` / `-right` · `--shadow-curtain-logo` | negro 45% / 50%                          | Telón de entrada (sobre verde musgo oscuro, donde la tinta no se ve) |
 | `--shadow-cursor`                                                 | negro 25%                                | Cursor montaña, dentro de `drop-shadow()`                            |
 | `--shadow-text-hero-headline` / `-lead`                           | negro 25% / 30%                          | `text-shadow` del titular y la bajada del hero, sobre la foto        |
 
@@ -105,15 +103,14 @@ Escala de títulos de `base.css`: h1 42 · h2 32 · h3 25 · h4 20 · h5 16 · h
 | ----------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------- |
 | `--ease-reveal`                                                         | `cubic-bezier(.22,.61,.36,1)`                             | Apariciones del motor, inclinación de cards |
 | `--ease-in-out`                                                         | `cubic-bezier(.65,0,.35,1)`                               | Cambio de fondo de la página, `clip-path`   |
-| `--ease-curtain`                                                        | `cubic-bezier(.77,0,.18,1)`                               | Telón de entrada                            |
 | `--ease-swap`                                                           | `cubic-bezier(.76,0,.24,1)`                               | "Label swap" del nav                        |
 | `--ease-spring`                                                         | `cubic-bezier(.34,1.56,.64,1)`                            | Imán, platos, fotos del equipo              |
 | `--ease-zoom`                                                           | `cubic-bezier(.2,.7,.2,1)`                                | Zoom de fotos (cards, galería)              |
 | `--ease-fill`                                                           | `cubic-bezier(.16,1,.3,1)`                                | Relleno de los botones (2,5 s)              |
-| `--z-nav` · `--z-float` · `--z-progress` · `--z-cursor` · `--z-curtain` | 60 · 70 · 90 · 111 · 120                                  | Capas del diseño                            |
+| `--z-nav` · `--z-float` · `--z-progress` · `--z-cursor`                 | 60 · 70 · 90 · 111                                        | Capas del diseño                            |
 | `--layout-max` / `--layout-narrow`                                      | 1240px / 1100px                                           | Ancho del contenido / del cierre            |
 | `--layout-gutter`                                                       | `clamp(20px, 5vw, 72px)`                                  | Margen lateral                              |
-| `--section-space` / `-compact`                                          | `clamp(80px, 11vw, 140px)` / `clamp(70px, 9vw, 120px)`    | Aire arriba de cada sección                 |
+| `--section-space`                                                       | `clamp(80px, 11vw, 140px)`                                | Aire arriba de cada sección                 |
 | `--nav-height`                                                          | 66px                                                      | Alto del nav sticky (el hero lo descuenta)  |
 | `--filter-washed`                                                       | `saturate(.6) contrast(.85) brightness(1.1) opacity(.94)` | `.washed` del DS                            |
 | `--filter-vivid`                                                        | `saturate(.92) contrast(1.02)`                            | Foto del hero                               |
@@ -123,11 +120,11 @@ Las duraciones no son tokens: van junto a la transición que las usa, con un com
 ## Reglas
 
 1. **Cero hexcodes fuera de `tokens.css`.** La única excepción es `themeColor` (ver arriba).
-2. **`base.css` va todo dentro de `:where(…)`**, que pesa 0: cualquier clase de un CSS Module lo pisa sin pelear. Excepciones: los pseudo-elementos (no entran en `:where`) y la regla del cursor custom (`html[data-cursor-active]`), que va con especificidad normal a propósito.
+2. **`base.css` e `intro.css` van todos dentro de `:where(…)`**, que pesa 0: cualquier clase de un CSS Module lo pisa sin pelear. Excepciones: los pseudo-elementos (no entran en `:where`) y la regla del cursor custom (`html[data-cursor-active]`), que va con especificidad normal a propósito.
 3. **Un solo breakpoint: `@media (max-width: 820px)`**, el del diseño (nav sin links, grillas a una columna, sticky desactivado).
 4. **CSS Modules puros**: cada selector lleva al menos una clase local. Nada de estilos globales fuera de esta carpeta.
 5. **Los componentes compartidos ponen su base; los features la ajustan con `className`.** Las dos clases pesan lo mismo, así que gana la que carga después: el módulo del feature, porque el feature importa el componente antes que su propio `.module.css`. Mantener ese orden de imports.
-6. **Íconos: Lucide con trazo 2.75** (ver `components/atoms/ChatIcon`).
+6. **Íconos: Lucide con trazo 2.75.** La única excepción es el logo de WhatsApp (`components/atoms/WhatsAppIcon`).
 7. **Fotos: siempre por `WashedImage`**, que aplica el lavado y recorta con `overflow: hidden`. El radio, el alto o el `aspect-ratio` del marco los pone quien la usa, por `className`.
 8. **Impresión: lo general en `print.css`, lo propio de un componente en su módulo.** `print.css` solo nombra atributos (`data-*` del motor, ARIA) y estructura; nunca clases de módulo, que vienen con hash. Si un componente necesita un ajuste de impresión sobre sus clases, va en un `@media print` de su propio módulo (como el hero).
 
@@ -140,22 +137,29 @@ El ancho útil de la hoja (720px en carta, 698px en A4, con 0,5in de margen) que
 | Qué                | Cómo                                                                                                                                                                                                                                                   |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Hoja               | `@page { margin: 0.5in }`, papel blanco (sin el fondo crema ni el verde que el motor le escribe al cierre), fondos y colores exactos (`print-color-adjust: exact`).                                                                                    |
-| Piezas fijas       | Telón, cursor, barra de progreso, nav, WhatsApp flotante y "Saltar al contenido" no se imprimen.                                                                                                                                                       |
+| Piezas fijas       | Cursor, barra de progreso, nav, WhatsApp flotante y "Saltar al contenido" no se imprimen.                                                                                                                                                       |
 | Movimiento         | Sin animaciones (cada una salta a su último cuadro) ni transiciones. Todo lo que el motor anima queda en su pose final: apariciones visibles y en su lugar, parallax centrado, cintas quietas, cards derechas, relleno de la línea de tiempo completo. |
-| 03 Próximos viajes | Sin scroll horizontal: la sección toma su alto natural, la escena deja de ser fija, el riel parte en renglones y la barra de avance no va. Foto de cada card a 240px (en vez de `46vh`).                                                               |
-| 06 Banda           | 520px de alto (en vez de `92vh`).                                                                                                                                                                                                                      |
-| 07 Lolog           | Cards del itinerario en flujo normal (`position: static`), sin achicarse ni oscurecerse; la foto con tope de 520px para que cada día entre en una hoja.                                                                                                |
-| 09 Servicios       | Se imprime la pestaña activa (la elegida al imprimir; al cargar, la primera): hay un solo `tabpanel` en el DOM. La tira de pestañas queda, como en el diseño.                                                                                          |
-| 11 Testimonios     | Cada testimonio una vez (la copia de la cinta se oculta), en grilla `repeat(auto-fit, minmax(260px, 1fr))` alineada con el título.                                                                                                                     |
-| 12 Galería         | Cada foto una vez; las dos cintas parten en renglones.                                                                                                                                                                                                 |
-| Cortes             | `break-inside: avoid` en secciones, cards, figuras, ítems de lista y cards apilables; títulos pegados a lo que sigue; `orphans`/`widows` en 3.                                                                                                         |
-| Hero               | En su módulo: alto fijo de 560px (en vez de `100svh`), sin el texto calado "Out Of Home" ni la cinta verde (el print del diseño no los tiene).                                                                                                         |
+| Testimonios        | Cada testimonio una vez (la copia de la cinta se oculta), en grilla `repeat(auto-fit, minmax(260px, 1fr))` alineada con el título.                                                                                                                     |
+| Galería            | Cada foto una vez; las dos cintas parten en renglones.                                                                                                                                                                                                 |
+| Cortes             | `break-inside: avoid` en secciones, cards, figuras e ítems de lista; títulos pegados a lo que sigue; `orphans`/`widows` en 3.                                                                                                         |
+| En cada módulo     | Hero: alto fijo de 560px (en vez de `100svh`) y sin la cinta verde (el print del diseño no la tiene). Próximos viajes: el carrusel en grilla de dos columnas, sin flechas ni barra de avance.                                                                                                         |
 
-Por qué casi todo va con `!important`: el motor deja estilos **inline** (`transform`, `opacity`, `clip-path`, el alto de la sección horizontal, el color del fondo) congelados en la pose del último frame, y un estilo inline solo se pisa con `!important`. Lo que no es inline vive en CSS Modules, y una clase de módulo pesa lo mismo que un selector de atributo: sin `!important` ganaría la que cargue después, y ese orden no es confiable. `app/layout.tsx` importa los componentes antes que `./globals.css`, y tanto en dev como en el build de producción la hoja de los módulos va **antes** que la global.
+Por qué casi todo va con `!important`: el motor deja estilos **inline** (`transform`, `opacity`, `clip-path`, el color del fondo) congelados en la pose del último frame, y un estilo inline solo se pisa con `!important`. Lo que no es inline vive en CSS Modules, y una clase de módulo pesa lo mismo que un selector de atributo: sin `!important` ganaría la que cargue después, y ese orden no es confiable. `app/layout.tsx` importa los componentes antes que `./globals.css`, y tanto en dev como en el build de producción la hoja de los módulos va **antes** que la global.
 
 Por eso los módulos no le ganan a `base.css` por orden de carga sino por especificidad: `base.css` va entero dentro de `:where()` (pesa 0). **Ojo:** una regla global nueva sin `:where()` que pese lo mismo que una clase le ganaría a los módulos en producción, porque la global carga después.
 
-Los **contadores** (`data-count`: stats de Lolog y precio del cierre) no los puede tocar esta hoja: su texto lo escribe el motor. Para que no se impriman en 0 cuando no se scrolleó hasta ellos, el motor corre un frame con el movimiento apagado en `beforeprint` (`handleBeforePrint` de `src/motion/core/MotionEngine.ts`), que escribe la pose final de todo, valor de los contadores incluido.
+Los **contadores** (`data-count`: las stats y el precio de cada viaje) no los puede tocar esta hoja: su texto lo escribe el motor. Para que no se impriman en 0 cuando no se scrolleó hasta ellos, el motor corre un frame con el movimiento apagado en `beforeprint` (`handleBeforePrint` de `src/motion/core/MotionEngine.ts`), que escribe la pose final de todo, valor de los contadores incluido.
+
+El telón de entrada, el scroll horizontal de Próximos viajes, las cards apilables de Lolog, la banda "La montaña te espera." y las pestañas de Servicios se sacaron por pedido del cliente (octubre 2026), y con ellos sus reglas de impresión.
+
+## Intro (`intro.css`)
+
+Sin telón de entrada (se sacó por pedido del cliente, octubre 2026), entre el primer pintado y la hidratación se ve el HTML del servidor. Las piezas que entran con la intro (las palabras del titular del hero, `reveal('word')`, y los reveals con `intro`) se verían enteras y, al hidratar, el motor las ocultaría para animarlas: un parpadeo. `intro.css` las deja en su pose de arranque desde el primer pintado, mientras `<html>` no tenga `data-intro-controlled` (`MOTION_STATE.introControlled`), que el motor pone al terminar su primer frame, con cada pieza ya posada inline.
+
+- Solo con ` (scripting: enabled)`: **sin JS la página se ve entera**.
+- Solo sin `prefers-reduced-motion: reduce`: con el movimiento reducido el motor no anima la intro.
+- Failsafe: si el JS nunca llega, a los 6 s una animación de la hoja las deja en su lugar.
+- La pose de las palabras tiene que ser **igual** a `wordRevealTransform(0, …)` de `src/motion/math/revealTransforms.ts`; los reveals con `intro` solo arrancan transparentes. Si cambia una coreografía de la intro, se revisa esta hoja.
 
 ## Relación con Organic (Claude Design)
 

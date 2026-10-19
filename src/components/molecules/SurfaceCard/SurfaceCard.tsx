@@ -7,20 +7,20 @@ import styles from './SurfaceCard.module.css';
 
 /** Fondo de la card. */
 export type SurfaceCardTone =
-  /** `--color-surface`: pilares de "Por qué" y paneles de servicios. */
+  /** `--color-surface`: pilares de "Por qué" y paneles de "¿Qué incluye?". */
   | 'surface'
-  /** Dorado claro: "¿Puedo?". */
+  /** Dorado claro: "¿Puedo?" e "Itinerario próximamente". */
   | 'accent-100'
   /** Verde musgo claro: "¿Es para mí?". */
   | 'accent-2-100'
-  /** Verde musgo oscuro con texto claro: stats de Lago Lolog. */
+  /** Verde musgo oscuro con texto claro: stats de cada viaje ("Sobre el viaje"). */
   | 'accent-2-800';
 
 /** Radio de la card. */
 export type SurfaceCardRadius =
-  /** `--radius-lg` (28px): pilares y stats de Lolog. */
+  /** `--radius-lg` (28px): pilares y stats de cada viaje. */
   | 'lg'
-  /** `--radius-xl` (32px): "¿Puedo?" / "¿Es para mí?". */
+  /** `--radius-xl` (32px): "¿Puedo?" / "¿Es para mí?" e "Itinerario próximamente". */
   | 'xl';
 
 const TONE_CLASSES: Record<SurfaceCardTone, string | undefined> = {
@@ -49,8 +49,9 @@ export type SurfaceCardProps = {
 } & Omit<HTMLAttributes<HTMLDivElement>, 'className' | 'children'>;
 
 /**
- * La card que se inclina siguiendo al cursor: pilares, "¿Puedo?",
- * "¿Es para mí?", paneles de servicios y stats de Lolog.
+ * La card que se inclina siguiendo al cursor: pilares del home y, en la
+ * página de cada viaje, stats, "¿Puedo?", "¿Es para mí?", paneles de "¿Qué
+ * incluye?" e "Itinerario próximamente".
  *
  * Son dos capas porque las mueven dos efectos distintos del motor: el
  * envoltorio externo recibe la aparición (`reveal`, esparcida desde afuera) y

@@ -1,0 +1,458 @@
+/*
+ * Acordeón de "Preguntas frecuentes": una tarjeta por pregunta, ensartadas por
+ * un sendero punteado con un mojón en cada una.
+ *
+ * Las medidas del sendero (`--faq-axis`, `--faq-text-start`, `--faq-row-pad`,
+ * `--faq-icon`, `--faq-dot`, `--faq-flag`, `--faq-gap`, `--faq-summit-gap`,
+ * `--faq-card-tone`) las define `.trail` en `Faq.module.css`: las comparte la
+ * cumbre (`FaqSummit`), que tiene que caer sobre el mismo eje.
+ *
+ * Capas dentro de cada pregunta: la tarjeta, encima la línea punteada
+ * (`z-index` 1) y encima el mojón (2). El reveal va en el `<li>`, así las tres
+ * entran y salen juntas.
+ *
+ * Las clases de estado las pone el componente:
+ * - `.enhanced`: la página hidrató y las preguntas son botones. Sin ella
+ *   (sin JS, o antes de hidratar) todas las respuestas quedan a la vista.
+ * - `.itemOpen`: la pregunta abierta (sin `.enhanced`, todas).
+ * - `.animated`: ya hubo un clic. El plegado se anima recién ahí, así el de
+ *   la hidratación no se ve.
+ */
+
+/* Sin líneas entre preguntas: las separa el aire y el tono de cada tarjeta. */
+.list {
+  display: grid;
+  gap: var(--faq-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Ancla del sendero y del mojón de la pregunta. */
+.item {
+  position: relative;
+}
+
+/* La superficie de la pregunta: un paso más clara que la banda. */
+.card {
+  border-radius: var(--radius-lg);
+  background: var(--faq-card-tone);
+}
+
+/* El `<h3>` solo pone la tipografía: el botón la hereda. */
+.heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(21px, 1.7vw, 24px);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.25;
+}
+
+/*
+ * La fila de la pregunta, que es toda la zona de toque: el texto arranca a la
+ * derecha del sendero y el "+" va al final. Es un `<button>` (con JS) o un
+ * `<span>` (sin JS): se le saca todo lo que el navegador le pone a un botón
+ * para que los dos se vean igual. `align-items: start` + el padding de
+ * `.question` dejan el primer renglón, el "+" y el mojón sobre la misma línea
+ * aunque la pregunta ocupe dos o tres renglones.
+ */
+.trigger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  padding: var(--faq-row-pad) 24px var(--faq-row-pad) var(--faq-text-start);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.enhanced .trigger {
+  cursor: pointer;
+}
+
+/* El anillo de foco del design system, por dentro de la tarjeta y con su mismo redondeo. */
+.trigger:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Centra el primer renglón en el alto del "+" (1.25em es el interlineado de `.heading`). */
+.question {
+  padding-block: calc((var(--faq-icon) - 1.25em) / 2);
+  transition: color 160ms ease;
+}
+
+/* La pregunta abierta toma el color de acento (el paso que da AA sobre la tarjeta). */
+.enhanced .itemOpen .question {
+  color: var(--color-accent-600);
+}
+
+/*
+ * El "+" va en un círculo del tono de la banda (un hueco en la tarjeta, sin
+ * borde). Abierto, el círculo se llena de verde musgo y el "+" gira 45° hasta
+ * ser una "×". Al apretar, el círculo se achica un poco: es la respuesta
+ * inmediata al toque.
+ */
+.iconFrame {
+  display: grid;
+  place-items: center;
+  width: var(--faq-icon);
+  height: var(--faq-icon);
+  border-radius: 50%;
+  background: var(--color-neutral-200);
+  color: var(--color-accent-700);
+  transition:
+    transform 150ms ease-out,
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.enhanced .trigger:active .iconFrame {
+  transform: scale(0.9);
+}
+
+.enhanced .itemOpen .iconFrame {
+  background: var(--color-accent-2);
+  color: var(--color-bg);
+}
+
+.icon {
+  transition: transform 240ms var(--ease-fill);
+}
+
+.enhanced .itemOpen .icon {
+  transform: rotate(45deg);
+}
+
+/* El hover solo donde hay un puntero de verdad: en táctil queda pegado después del toque. */
+@media (hover: hover) and (pointer: fine) {
+  .enhanced .trigger:hover .question {
+    color: var(--color-accent-600);
+  }
+
+  .enhanced .item:not(.itemOpen) .trigger:hover .iconFrame {
+    background: var(--color-accent-200);
+  }
+}
+
+/* ── Sendero ───────────────────────────────────────────────────────────── */
+
+/*
+ * Un tramo de la línea punteada: una barra de 4px recortada en puntos por una
+ * máscara (un círculo cada 11px; en una máscara solo cuenta el alfa, por eso
+ * `black` y no un token). Así el relleno puede ser una barra lisa que el motor
+ * escala, y los puntos no se estiran. Pasa por dentro de la tarjeta, no por un
+ * margen al costado: la columna queda centrada de verdad debajo del título.
+ */
+.trail {
+  position: absolute;
+  left: calc(var(--faq-axis) - 2px);
+  z-index: 1;
+  width: 4px;
+  background: var(--color-neutral-400);
+  mask-image: radial-gradient(circle closest-side, black calc(100% - 0.5px), transparent);
+  mask-size: 4px 11px;
+  mask-repeat: repeat-y;
+  pointer-events: none;
+}
+
+/*
+ * El tramo que llega: desde el borde de la pregunta anterior (cruza el aire
+ * entre tarjetas) hasta el centro del mojón. Los puntos se cuentan desde
+ * arriba y los del tramo que sale, desde abajo: en el empalme entre dos
+ * preguntas el paso de 11px no se corta, y el desfasaje queda detrás del mojón.
+ */
+.trailIn {
+  top: calc(-1 * var(--faq-gap));
+  height: calc(var(--faq-gap) + var(--faq-row-pad) + var(--faq-icon) / 2);
+  mask-position: top;
+}
+
+/* El tramo que sale: del centro del mojón al borde de abajo de la pregunta. */
+.trailOut {
+  top: calc(var(--faq-row-pad) + var(--faq-icon) / 2);
+  bottom: 0;
+  mask-position: bottom;
+}
+
+/* El último sigue hasta la tarjeta de la cumbre, donde termina el sendero. */
+.item:last-child .trailOut {
+  bottom: calc(-1 * var(--faq-summit-gap));
+}
+
+/* El tramo recorrido. Arranca vacío: el motor escribe el `scaleY` con el scroll. */
+.trailFill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent-2);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+/* ── Mojón ─────────────────────────────────────────────────────────────── */
+
+/*
+ * Un punto sin tamaño sobre el eje del sendero, a la altura del primer renglón
+ * de la pregunta; el punto y la banderita se centran en él.
+ */
+.marker {
+  position: absolute;
+  top: calc(var(--faq-row-pad) + var(--faq-icon) / 2);
+  left: var(--faq-axis);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* `translate` los centra y deja `transform` libre para las transiciones. */
+.dot,
+.flag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  /* Un aro del color de la tarjeta corta la línea punteada antes del mojón. */
+  box-shadow: 0 0 0 5px var(--faq-card-tone);
+  translate: -50% -50%;
+}
+
+/* El mojón todavía no alcanzado: un aro del color del sendero sin pintar. */
+.dot {
+  box-sizing: border-box;
+  width: var(--faq-dot);
+  height: var(--faq-dot);
+  border: 3px solid var(--color-neutral-400);
+  background: var(--faq-card-tone);
+}
+
+/* El relleno verde del mojón alcanzado: tapa también el aro. */
+.dotFill {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: var(--color-accent-2);
+  opacity: 0;
+}
+
+/*
+ * El mojón se llena cuando el sendero pintado lo alcanza. El motor pinta el
+ * sendero hasta la línea del 60% del viewport (`TIMELINE.fillLine`), así que
+ * la animación va atada al scroll con esa misma línea: `view()` con el borde
+ * de abajo corrido un 40%, y el tramo en que el mojón la cruza (empieza un
+ * mojón y medio antes, para que no sea un salto). Sin soporte de
+ * `animation-timeline`, los mojones quedan como aros y el sendero se pinta igual.
+ */
+@supports (animation-timeline: view()) {
+  .dotFill {
+    animation: reach linear both;
+    animation-timeline: view(block 0% 40%);
+    animation-range: entry -150% entry 100%;
+  }
+}
+
+@keyframes reach {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*
+ * La banderita de cumbre de la pregunta abierta. Cerrada tiene el tamaño del
+ * mojón (`--faq-dot` / `--faq-flag`) y es transparente: al abrir, el mojón
+ * crece hasta ser la bandera, con el rebote de la marca (`--ease-spring`), y
+ * el mástil termina de pararse. Corta y con un solo rebote: responde a un clic.
+ */
+.flag {
+  display: grid;
+  place-items: center;
+  width: var(--faq-flag);
+  height: var(--faq-flag);
+  background: var(--color-accent-2);
+  color: var(--color-bg);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 140ms ease-out,
+    transform 140ms ease-out;
+}
+
+.itemOpen .flag {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 120ms ease-out,
+    transform 260ms var(--ease-spring);
+}
+
+/* El triángulo de la bandera queda a la derecha del mástil: se corre 1px para centrarlo a ojo. */
+.flagIcon {
+  translate: 1px 0;
+  transform: rotate(-20deg);
+  transform-origin: 25% 90%;
+  transition: transform 140ms ease-out;
+}
+
+.itemOpen .flagIcon {
+  transform: rotate(0deg);
+  transition: transform 300ms var(--ease-spring);
+}
+
+/* ── Respuesta ─────────────────────────────────────────────────────────── */
+
+/*
+ * La respuesta se despliega animando la fila de una grilla de `0fr` a `1fr`
+ * (sin medir alturas en JS); el contenido interno se recorta mientras crece.
+ */
+.panel {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.panelInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/*
+ * Alineada con el texto de la pregunta y sin pasar por debajo del "+"
+ * (24px de borde + el círculo + 20px de separación). El padding va acá y no
+ * en `.panelInner`: un padding en el ítem de la grilla no se pliega a 0.
+ * El tope de ancho deja renglones de ~70 caracteres.
+ */
+.answer {
+  box-sizing: content-box;
+  max-width: 64ch;
+  margin: 0;
+  padding: 0 calc(var(--faq-icon) + 44px) calc(var(--faq-row-pad) + 6px) var(--faq-text-start);
+  color: var(--color-neutral-800);
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+
+/*
+ * Cerrada: plegada, transparente y con `visibility: hidden`, que la saca del
+ * orden de tabulación y del árbol de accesibilidad.
+ */
+.enhanced .item:not(.itemOpen) .panel {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/*
+ * Abrir, 300 ms; cerrar, 200 ms (lo que se va no tiene que hacerse esperar).
+ * Las dos con una curva que arranca rápido. `visibility` también transiciona:
+ * al cerrar se mantiene visible hasta que termina de plegarse y recién ahí se
+ * oculta; al abrir pasa a visible en el acto. La transición que corre es la
+ * del estado al que se va: por eso la de abrir está en `.itemOpen`.
+ */
+.animated .panel {
+  transition:
+    grid-template-rows 200ms var(--ease-reveal),
+    opacity 160ms ease-out,
+    visibility 200ms;
+}
+
+.animated .itemOpen .panel {
+  transition:
+    grid-template-rows 300ms var(--ease-fill),
+    opacity 300ms ease-out,
+    visibility 0s;
+}
+
+/*
+ * Reduced motion: los estados cambian en el acto. El relleno del mojón sigue
+ * atado al scroll (es un indicador, como el sendero), pero sin crecer.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .question,
+  .iconFrame,
+  .icon,
+  .flag,
+  .itemOpen .flag,
+  .flagIcon,
+  .itemOpen .flagIcon,
+  .animated .panel,
+  .animated .itemOpen .panel {
+    transition: none;
+  }
+
+  .enhanced .trigger:active .iconFrame {
+    transform: none;
+  }
+
+  .dotFill {
+    animation-name: reachFade;
+  }
+}
+
+@keyframes reachFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Mobile: la pregunta a 19,5px y el "+" pegado al borde. La respuesta usa todo
+ * el ancho a la derecha del sendero (abajo del "+" no hay nada) y sube al piso
+ * de 16px de los párrafos. La fila sigue midiendo más de 44px de alto.
+ */
+@media (max-width: 820px) {
+  .heading {
+    font-size: 19.5px;
+  }
+
+  .trigger {
+    gap: 12px;
+    padding-right: 14px;
+  }
+
+  .answer {
+    padding-right: 18px;
+    font-size: 16px;
+  }
+
+  .dot,
+  .flag {
+    box-shadow: 0 0 0 4px var(--faq-card-tone);
+  }
+}
+
+/*
+ * Impresa, cada pregunta con su respuesta; el "+" no sirve en papel. Los
+ * mojones van llenos, como el sendero (`print.css` lo deja pintado entero).
+ */
+@media print {
+  .enhanced .item:not(.itemOpen) .panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .enhanced .itemOpen .question {
+    color: inherit;
+  }
+
+  .iconFrame,
+  .flag {
+    display: none;
+  }
+
+  .dotFill {
+    opacity: 1;
+    animation-name: none;
+  }
+}

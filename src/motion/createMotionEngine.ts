@@ -10,16 +10,15 @@ import { PointerTracker } from './core/PointerTracker';
 import { StyleWriter } from './core/StyleWriter';
 import { BackgroundShiftEffect } from './effects/BackgroundShiftEffect';
 import { CounterEffect } from './effects/CounterEffect';
+import { CoverPairEffect } from './effects/CoverPairEffect';
 import { CursorEffect } from './effects/CursorEffect';
-import { DriftEffect } from './effects/DriftEffect';
-import { HorizontalScrollEffect } from './effects/HorizontalScrollEffect';
 import { MagnetEffect } from './effects/MagnetEffect';
 import { MarqueeEffect } from './effects/MarqueeEffect';
+import { NavBarEffect } from './effects/NavBarEffect';
 import { ParallaxEffect } from './effects/ParallaxEffect';
+import { PinSplitEffect } from './effects/PinSplitEffect';
 import { RevealEffect } from './effects/RevealEffect';
 import { ScrollProgressEffect } from './effects/ScrollProgressEffect';
-import { SkewEffect } from './effects/SkewEffect';
-import { StackEffect } from './effects/StackEffect';
 import { TiltEffect } from './effects/TiltEffect';
 import { TimelineEffect } from './effects/TimelineEffect';
 
@@ -38,9 +37,10 @@ import { TimelineEffect } from './effects/TimelineEffect';
  *   lectura obligaba al navegador a recalcular estilos en el momento. Primero,
  *   lee con el estilo limpio. Los tres escriben elementos distintos, así que
  *   la pose de cada uno no cambia.
- * - `apply` (escritura con el scroll): reproduce el del original: progreso →
- *   fondo → horizontal → stack → timeline → contadores → parallax → drift →
- *   cintas (solo su reseteo si el movimiento está apagado) → skew → reveals
+ * - `apply` (escritura con el scroll): el orden del original sin los efectos
+ *   que se sacaron por pedido del cliente (octubre 2026: scroll horizontal,
+ *   stack, drift y skew): progreso → nav → fondo → cortinas → secuencia del contacto → timeline → contadores → parallax
+ *   → cintas (solo su reseteo si el movimiento está apagado) → reveals
  *   (`dc.html:528-597`). El imán no tiene `measure` ni `apply`, así que
  *   ponerlo primero no cambia el orden de esas fases.
  *
@@ -49,7 +49,8 @@ import { TimelineEffect } from './effects/TimelineEffect';
  * @param level Nivel de animaciones (`NEXT_PUBLIC_MOTION_LEVEL`, ya resuelto).
  */
 export function createMotionEngine(level: MotionLevel): MotionEngine {
-  // Compartidos: una sola caché de estilos y un solo estado del puntero.
+  // Una sola caché de estilos para todos los efectos, y el estado del puntero
+  // que alimenta el motor.
   const styles = new StyleWriter();
   const pointer = new PointerTracker(window);
 
@@ -57,17 +58,16 @@ export function createMotionEngine(level: MotionLevel): MotionEngine {
     new MagnetEffect(styles),
     new CursorEffect(),
     new ScrollProgressEffect(),
+    new NavBarEffect(),
     new BackgroundShiftEffect(styles),
-    new HorizontalScrollEffect(styles),
-    new StackEffect(styles),
+    new CoverPairEffect(styles),
+    new PinSplitEffect(),
     new TimelineEffect(),
     new CounterEffect(),
     new ParallaxEffect(styles),
-    new DriftEffect(styles),
     new MarqueeEffect(),
-    new SkewEffect(styles, pointer),
     new RevealEffect(styles),
-    new TiltEffect(pointer),
+    new TiltEffect(),
   ];
 
   return new MotionEngine(

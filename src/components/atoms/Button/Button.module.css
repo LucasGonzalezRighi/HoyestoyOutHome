@@ -83,23 +83,8 @@
   color: var(--color-bg);
 }
 
-.ghost {
-  padding-inline: var(--space-1);
-  color: var(--color-accent-700);
-}
-
-.ghost:active {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-}
-
-.ghost:where(:not(:disabled)):hover {
-  background: transparent;
-  color: var(--color-bg);
-}
-
 /* ── Tamaños ───────────────────────────────────────────────────────────── */
-/* Van después de las variantes: en el diseño son inline y le ganan también
-   al `padding-inline` del ghost. */
+/* Van después de las variantes: en el diseño son inline. */
 
 /* CTA del hero ("Ver próximos viajes" / "Hablá con nosotros"). */
 .lg {
@@ -107,7 +92,7 @@
   font-size: 16px;
 }
 
-/* CTA del cierre ("Reservá tu lugar por WhatsApp"). */
+/* CTA del cierre de cada viaje ("Consultar por WhatsApp"). */
 .xl {
   padding: 16px 32px;
   font-size: 17px;

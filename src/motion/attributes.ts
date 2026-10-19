@@ -26,14 +26,12 @@ export const MOTION_ATTRIBUTES = {
   revealDelay: 'data-reveal-delay',
   /** Porción del viewport que dura la aparición (0–1). Por defecto 0.16. */
   revealSpan: 'data-reveal-span',
-  /** La aparición la dispara la intro (telón), no el scroll. Solo sobre el fold. */
+  /** La aparición la dispara la intro (al hidratar), no el scroll. Solo sobre el fold. */
   revealIntro: 'data-reveal-intro',
   /** Capa de parallax vertical. Valor: factor (0.4 = se mueve al 40% del scroll relativo). */
   parallax: 'data-parallax',
   /** La capa de parallax arranca con zoom y lo pierde durante la intro. */
   parallaxZoom: 'data-parallax-zoom',
-  /** Desplazamiento horizontal proporcional al scroll. Valor: factor (negativo = a la izquierda). */
-  drift: 'data-drift',
   /** Cinta infinita. Valor: dirección (1 o -1). El contenido tiene que venir duplicado. */
   marquee: 'data-marquee',
   /** Velocidad base de la cinta en px/frame. Por defecto 0.7. */
@@ -44,14 +42,6 @@ export const MOTION_ATTRIBUTES = {
    * cada frame, porque el `MutationObserver` no re-escanea por atributos.
    */
   marqueePaused: 'data-marquee-paused',
-  /** Sección con scroll horizontal fijado (el alto lo calcula el motor). */
-  horizontalScroll: 'data-hscroll',
-  /** El riel que se traslada dentro de la sección horizontal. */
-  horizontalTrack: 'data-hscroll-track',
-  /** Barra de progreso de la sección horizontal. */
-  horizontalBar: 'data-hscroll-bar',
-  /** Card apilable: se achica y oscurece cuando la siguiente se le sube encima. */
-  stack: 'data-stack',
   /** Relleno vertical de una línea de tiempo, atado al scroll. */
   timeline: 'data-timeline',
   /** Contador que sube hasta su valor al entrar en viewport. Valor: número final. */
@@ -62,8 +52,6 @@ export const MOTION_ATTRIBUTES = {
   tilt: 'data-tilt',
   /** Imagen dentro de un `tilt` que hace zoom mientras la card está inclinada. */
   tiltZoom: 'data-tilt-zoom',
-  /** Se deforma con la velocidad del scroll (skew + rotación leve). */
-  skew: 'data-skew',
   /** Botón magnético: se deja atraer por el cursor cercano. */
   magnet: 'data-magnet',
   /** Mientras la sección cruza el centro del viewport, el fondo de la página toma este color. */
@@ -72,32 +60,56 @@ export const MOTION_ATTRIBUTES = {
   backgroundRoot: 'data-bg-root',
   /** Barra de progreso de lectura de la página. */
   scrollProgress: 'data-scroll-progress',
+  /**
+   * El nav. El motor le escribe `--nav-solid`: 0 transparente (sobre la foto de
+   * portada, arriba de todo) a 1 sólido, a medida que se scrollea.
+   */
+  navBar: 'data-nav-bar',
+  /**
+   * Portada con foto que pasa por debajo del nav (el hero, la portada de un
+   * viaje). Si la página tiene una, el nav arranca transparente; si no, sólido.
+   */
+  navOverlay: 'data-nav-overlay',
+  /**
+   * Par "cortina": la primera hija queda fija en pantalla y la segunda sube por
+   * encima y la tapa. El motor fija la primera donde su borde de abajo toca el
+   * de la pantalla y la achica y apaga mientras la segunda la cubre.
+   */
+  coverPair: 'data-cover-pair',
+  /**
+   * Sección fija que el scroll recorre como una secuencia (pedido del cliente,
+   * octubre 2026, como el contacto de su portafolio): una palabra gigante
+   * cerrada se parte hacia los costados y debajo aparece el contenido. El
+   * motor escribe `--enter`, `--open`, `--reveal` y `--exit` (0 → 1).
+   */
+  pinSplit: 'data-pin-split',
+  /** Lo que sube por encima de la secuencia al final (el footer) y la tapa. */
+  pinExit: 'data-pin-exit',
   /** El cursor custom (la montaña que sigue al mouse). */
   cursor: 'data-cursor',
-  /** Telón de entrada. */
-  curtain: 'data-curtain',
-  /** Hoja del telón. Valor: `'left' | 'right'`. */
-  curtainLeaf: 'data-curtain-leaf',
-  /** Logo centrado del telón. */
-  curtainLogo: 'data-curtain-logo',
 } as const;
 
 /**
  * Atributos de **estado** que el motor pone en `<html>` (no se esparcen en JSX).
  *
- * `base.css` se cuelga de ellos: el cursor del sistema se oculta solo mientras
- * `data-cursor-active` está presente, o sea, solo si el cursor custom de verdad
- * está andando. Si el JS falla, el cursor normal sigue ahí.
+ * El CSS global se cuelga de ellos para no depender de que el JS ande: si
+ * falla, ninguno aparece y la página se ve como sin motor.
  */
 export const MOTION_STATE = {
+  /**
+   * El cursor custom está andando (`CursorEffect`). `base.css` oculta el
+   * cursor del sistema solo mientras está presente: si el JS falla, el cursor
+   * normal sigue ahí.
+   */
   cursorActive: 'data-cursor-active',
   /**
-   * El JS tomó el control del telón (`CurtainController.start()`). Mientras no
-   * está, corre el failsafe de CSS que oculta el telón solo; en cuanto aparece,
-   * el failsafe se cancela y la coreografía queda en manos del controlador. Así
-   * una hidratación lenta no corta la animación de las hojas a la mitad.
+   * El motor tomó el control de la intro: al final de su primer frame, cuando
+   * cada pieza de la intro ya tiene su pose inline (`MotionEngine`). Mientras
+   * no está, `design-system/intro.css` deja esas piezas en su pose de arranque
+   * (ocultas), para que no se vean enteras entre el primer pintado y la
+   * hidratación; en cuanto aparece, la hoja deja de aplicar.
    */
-  curtainControlled: 'data-curtain-controlled',
+  introControlled: 'data-intro-controlled',
 } as const;
 
 /** Clave de un atributo de animación (`'reveal'`, `'parallax'`…). */
@@ -142,7 +154,7 @@ export type RevealVariant =
   | 'scale'
   /** Banda que se expande y gana opacidad (foto grande, tarjeta de precio). */
   | 'expand'
-  /** Palabra del titular del hero: sube desde detrás de una máscara con la intro. */
+  /** Palabra del titular del hero: sube desde detrás de una máscara con la intro (al hidratar). */
   | 'word';
 
 /** Ajustes de `reveal()`: cuándo arranca la entrada, cuánto dura y si la maneja la intro. */
@@ -151,7 +163,11 @@ export type RevealOptions = {
   delay?: number;
   /** Porción del viewport que dura la entrada (0–1). Por defecto 0.16. */
   span?: number;
-  /** La maneja la intro del telón en vez del scroll. Solo para contenido sobre el fold. */
+  /**
+   * La maneja la intro (arranca cuando hidrata la página) en vez del scroll.
+   * Solo para contenido sobre el fold: hasta que hidrata, `intro.css` lo deja
+   * con opacidad 0.
+   */
   intro?: boolean;
 };
 
@@ -182,17 +198,13 @@ export function reveal(
  * (`overflow: hidden`) y la capa tiene que ser más alta que el marco.
  *
  * @param factor Fracción del desplazamiento del padre (0.4 en el hero, -0.3 en un círculo que sube).
- * @param options.introZoom Arranca con zoom y lo suelta durante la intro (fotos grandes).
+ * @param options.introZoom Arranca con zoom y lo suelta durante la intro (fotos grandes). Hasta
+ *   que hidrata la página, `intro.css` la deja con ese zoom de arranque.
  */
 export function parallax(factor: number, options: { introZoom?: boolean } = {}): MotionAttributes {
   const attributes: Record<string, string> = { [MOTION_ATTRIBUTES.parallax]: String(factor) };
   if (options.introZoom) attributes[MOTION_ATTRIBUTES.parallaxZoom] = '';
   return attributes as MotionAttributes;
-}
-
-/** Desplazamiento horizontal proporcional al scroll de la página (texto calado del hero). */
-export function drift(factor: number): MotionAttributes {
-  return { [MOTION_ATTRIBUTES.drift]: String(factor) };
 }
 
 /** Ajustes de `marquee()`: sentido y velocidad base de la cinta. */
@@ -230,21 +242,6 @@ export function marquee(options: MarqueeOptions = {}): MotionAttributes {
  */
 export function marqueePause(paused: boolean): MotionAttributes {
   return paused ? { [MOTION_ATTRIBUTES.marqueePaused]: '' } : {};
-}
-
-/** Sección con scroll horizontal fijado: la sección, su riel y su barra de progreso. */
-export const horizontalScroll = {
-  section: (): MotionAttributes => ({ [MOTION_ATTRIBUTES.horizontalScroll]: '' }),
-  track: (): MotionAttributes => ({ [MOTION_ATTRIBUTES.horizontalTrack]: '' }),
-  bar: (): MotionAttributes => ({ [MOTION_ATTRIBUTES.horizontalBar]: '' }),
-} as const;
-
-/**
- * Card apilable. Va en el **envoltorio sticky**; el motor transforma a su
- * primer hijo (la card en sí). La última del grupo nunca se achica.
- */
-export function stackCard(): MotionAttributes {
-  return { [MOTION_ATTRIBUTES.stack]: '' };
 }
 
 /**
@@ -291,11 +288,6 @@ export function tiltZoom(): MotionAttributes {
   return { [MOTION_ATTRIBUTES.tiltZoom]: '' };
 }
 
-/** Se deforma con la velocidad del scroll. Se combina con `tilt()`: el tilt tiene prioridad. */
-export function skew(): MotionAttributes {
-  return { [MOTION_ATTRIBUTES.skew]: '' };
-}
-
 /** Botón magnético. */
 export function magnet(): MotionAttributes {
   return { [MOTION_ATTRIBUTES.magnet]: '' };
@@ -318,17 +310,38 @@ export function scrollProgress(): MotionAttributes {
   return { [MOTION_ATTRIBUTES.scrollProgress]: '' };
 }
 
+/** Marca el nav: el motor le escribe `--nav-solid` según el scroll (`NavBarEffect`). */
+export function navBar(): MotionAttributes {
+  return { [MOTION_ATTRIBUTES.navBar]: '' };
+}
+
+/** Marca una portada con foto que pasa por debajo del nav: el nav arranca transparente. */
+export function navOverlay(): MotionAttributes {
+  return { [MOTION_ATTRIBUTES.navOverlay]: '' };
+}
+
+/**
+ * Marca un par "cortina" (`CoverPairEffect`): la primera hija queda fija y la
+ * segunda la tapa al scrollear. Va en el envoltorio de las dos.
+ */
+export function coverPair(): MotionAttributes {
+  return { [MOTION_ATTRIBUTES.coverPair]: '' };
+}
+
+/**
+ * Marca una secuencia fija con palabra partida (`PinSplitEffect`). Va en el
+ * envoltorio alto; su primera hija es el panel que queda fijo.
+ */
+export function pinSplit(): MotionAttributes {
+  return { [MOTION_ATTRIBUTES.pinSplit]: '' };
+}
+
+/** Marca lo que sube por encima de la secuencia al terminar (el footer). */
+export function pinExit(): MotionAttributes {
+  return { [MOTION_ATTRIBUTES.pinExit]: '' };
+}
+
 /** El cursor custom (la montaña que sigue al mouse, `site-chrome`). */
 export function cursor(): MotionAttributes {
   return { [MOTION_ATTRIBUTES.cursor]: '' };
 }
-
-/**
- * Piezas del telón de entrada (`site-chrome`): el contenedor, cada hoja
- * (`'left' | 'right'`) y el logo centrado. Las coreografía `CurtainController`.
- */
-export const curtain = {
-  root: (): MotionAttributes => ({ [MOTION_ATTRIBUTES.curtain]: '' }),
-  leaf: (side: 'left' | 'right'): MotionAttributes => ({ [MOTION_ATTRIBUTES.curtainLeaf]: side }),
-  logo: (): MotionAttributes => ({ [MOTION_ATTRIBUTES.curtainLogo]: '' }),
-} as const;

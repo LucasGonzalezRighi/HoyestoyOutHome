@@ -6,7 +6,6 @@ import type { ButtonSize, ButtonTone, ButtonVariant } from './Button.types';
 const VARIANT_CLASSES: Record<ButtonVariant, string | undefined> = {
   primary: styles.primary,
   secondary: styles.secondary,
-  ghost: styles.ghost,
 };
 
 /** `md` es el tamaño base del `.btn`: no necesita clase propia. */

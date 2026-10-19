@@ -16,4 +16,3 @@ export { FrameEffect, MotionEffect, PointerEffect, ScrollEffect } from './core/M
 export type { FrameState, MotionSettings, PointerSnapshot } from './core/FrameState';
 export { PointerTracker } from './core/PointerTracker';
 export { StyleWriter, type CachedStyleProperty, type StylableElement } from './core/StyleWriter';
-export { CurtainController, type IntroTarget } from './intro/CurtainController';

@@ -1,9 +1,9 @@
 import type { Trip, TripSlug } from './Trip';
 
 /**
- * El catálogo de viajes: la lista ordenada (el orden es el de la sección
- * "Próximos viajes") más la búsqueda por slug que usan las secciones de cada
- * viaje (`tripCatalog.get('calle-stepanek').price`).
+ * El catálogo de viajes: la lista ordenada (el orden es el del carrusel de
+ * viajes del home) más la búsqueda por slug que usan la página de cada viaje y
+ * el calendario (`tripCatalog.get('calle-stepanek').price`).
  *
  * Invariante: no hay dos viajes con el mismo slug. Si los viajes pasan a venir
  * de un CMS, se reemplaza quién arma el catálogo, no esta clase.

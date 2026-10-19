@@ -1,5 +1,7 @@
 /* Estilos globales: solo el design system. Todo lo demás son CSS Modules. */
 @import '../design-system/tokens.css';
 @import '../design-system/base.css';
+/* Pose de arranque de la intro hasta que el motor toma el control (ver el archivo). */
+@import '../design-system/intro.css';
 /* Después de base.css: la hoja de impresión pisa estilos base e inline (ver el archivo). */
 @import '../design-system/print.css';

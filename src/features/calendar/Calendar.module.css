@@ -1,0 +1,486 @@
+/*
+ * "Calendario": encabezado centrado y, debajo, la línea de tiempo de las
+ * salidas. El ancho lo pone `Container` y el aire de arriba, `Section`.
+ *
+ * La línea tiene dos sentidos con el mismo marcado:
+ * - Base (mobile e impresión): vertical. La línea a la izquierda, los meses
+ *   como marcas y las salidas apiladas a su derecha.
+ * - Pantallas de más de 820px: horizontal. La línea cruza la pantalla de lado
+ *   a lado, los meses son marcas sobre ella y de cada marca cuelgan sus
+ *   salidas.
+ *
+ * El corte es el de todo el sitio (820px), escrito al revés (`width > 820px`)
+ * para que la impresión se quede con la versión vertical cualquiera sea el
+ * ancho de la hoja: en papel no hay scroll de costado.
+ */
+
+/* ── Encabezado ────────────────────────────────────────────────────────── */
+
+.heading {
+  text-align: center;
+}
+
+/* Mismo tamaño que el título de "¿Quiénes somos?" (`dc.html:316`). */
+.title {
+  margin: 0 0 14px;
+  font-size: clamp(38px, 4.6vw, 64px);
+  line-height: 1.05;
+}
+
+/* Bajada: la de "¿Quiénes somos?" (`dc.html:317`), centrada. */
+.lead {
+  max-width: 46ch;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.7;
+  text-wrap: balance;
+}
+
+/* ── Línea de tiempo: base vertical ────────────────────────────────────── */
+
+/*
+ * `--axis-x` es el eje de la línea (su centro) y `--gutter` la columna que
+ * ocupa: los puntos de los meses y los tramos que la unen con cada tarjeta se
+ * ubican con esas dos medidas.
+ */
+.timeline {
+  --axis-x: 10px;
+  --gutter: 38px;
+
+  position: relative;
+  margin-top: clamp(30px, 6vw, 44px);
+  padding-left: var(--gutter);
+}
+
+/* La línea horizontal no existe en este sentido. */
+.rail {
+  display: none;
+}
+
+/* Línea vertical: las medidas del riel de `Timeline` (3px, pastilla, `--color-neutral-300`). */
+.spine {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: calc(var(--axis-x) - 1.5px);
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-300);
+}
+
+/* Arranca vacía: el motor le escribe el `scaleY` con el scroll (`timelineFill`). */
+.spineFill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--color-accent-2), var(--color-accent-500));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.months,
+.departures,
+.tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.month + .month {
+  margin-top: 30px;
+}
+
+.monthLabel {
+  position: relative;
+  margin: 0 0 14px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+/*
+ * La marca del mes: un punto verde musgo de 13px centrado en la línea, a la
+ * altura del renglón del rótulo. El aro del color del fondo lo despega de la
+ * línea, como en los meses de `Timeline`.
+ */
+.monthLabel::before {
+  content: '';
+  position: absolute;
+  top: calc(0.6em - 6.5px);
+  left: calc(var(--axis-x) - var(--gutter) - 6.5px);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-accent-2);
+  box-shadow: 0 0 0 4px var(--color-bg);
+}
+
+.departures {
+  display: grid;
+  gap: 14px;
+}
+
+.departure {
+  position: relative;
+}
+
+/* El tramo que une la línea con la tarjeta, a la altura de la fecha. */
+.departure::before {
+  content: '';
+  position: absolute;
+  top: 46px;
+  left: calc(var(--axis-x) - var(--gutter));
+  width: calc(var(--gutter) - var(--axis-x));
+  height: 2px;
+  background: var(--color-neutral-300);
+}
+
+/* ── Tarjeta de una salida ─────────────────────────────────────────────── */
+
+/*
+ * Compacta: la fecha a la izquierda, grande, y a su derecha el viaje, el
+ * rango, los tags y el botón. `--color-surface` sobre el crema, como las
+ * demás cards del sitio.
+ */
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'date trip'
+    'date range'
+    'date tags'
+    'date cta';
+  column-gap: 18px;
+  align-content: start;
+  height: 100%;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* La fecha es lo que manda en la tarjeta: en la tipografía de títulos y en el dorado de la marca. */
+.date {
+  grid-area: date;
+  color: var(--color-accent-700);
+  font-family: var(--font-heading);
+}
+
+/* "13" arriba y "nov" abajo, centrados. */
+.dateFace {
+  display: grid;
+  justify-items: center;
+  min-width: 54px;
+  line-height: 1;
+}
+
+.day {
+  font-size: 46px;
+}
+
+.monthShort {
+  margin-top: 4px;
+  font-size: 19px;
+}
+
+.trip {
+  grid-area: trip;
+  margin: 2px 0 4px;
+  color: var(--color-text);
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+/* Piso de 16px para párrafos en mobile (CLAUDE.md §9.3). */
+.range {
+  grid-area: range;
+  margin: 0 0 12px;
+  color: var(--color-neutral-800);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.tags {
+  grid-area: tags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+/* El `<li>` como caja flex: el tag (inline-flex) no hereda el interlineado del body y mide lo suyo. */
+.tagItem {
+  display: flex;
+}
+
+.cta {
+  grid-area: cta;
+  justify-self: start;
+}
+
+/* ── Aviso de fechas de ejemplo ────────────────────────────────────────── */
+
+/*
+ * Aviso temporal (`placeholderNote`), chico y centrado debajo de la línea.
+ * El borde punteado lo marca como algo a completar, no como parte del diseño.
+ */
+.note {
+  width: fit-content;
+  max-width: min(100%, 64ch);
+  margin: clamp(22px, 2.6vw, 30px) auto 0;
+  padding: 8px 16px;
+  border: 1px dashed var(--color-accent-400);
+  border-radius: var(--radius-md);
+  color: var(--color-neutral-700);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ── Línea de tiempo: horizontal ───────────────────────────────────────── */
+
+@media screen and (width > 820px) {
+  /*
+   * Medidas de la fila, todas desde su borde de arriba:
+   * - `--label-height`: el renglón del rótulo del mes;
+   * - `--rail-y`: el centro de la línea;
+   * - `--card-y`: el borde de arriba de las tarjetas.
+   * `--axis-x` pasa a ser el eje de cada salida: el rótulo del mes, su punto,
+   * el tramo que baja y la fecha de la tarjeta arrancan todos ahí.
+   *
+   * Con 200px de mínimo por salida y 20px entre una y otra, cinco salidas
+   * entran sin scroll en el contenedor (1096px de ancho útil a 1440px).
+   */
+  .timeline {
+    --stop-min: 200px;
+    --stop-gap: 20px;
+    --axis-x: 22px;
+    --label-height: 28px;
+    --rail-y: 50px;
+    --card-y: 78px;
+    --row-inset: 4px;
+
+    margin-top: clamp(40px, 4.6vw, 64px);
+    padding-left: 0;
+  }
+
+  .spine {
+    display: none;
+  }
+
+  /*
+   * La línea, a sangre: sale del contenedor y cruza toda la pantalla
+   * (`50% - 50vw` es la distancia del borde del contenedor al del viewport).
+   * Lo que sobra por la barra de scroll lo recorta el `overflow-x: clip` del
+   * `<html>`. Va fuera de la fila que scrollea: si la fila se mueve, la línea
+   * se queda y las marcas corren sobre ella.
+   */
+  .rail {
+    position: absolute;
+    top: calc(var(--row-inset) + var(--rail-y) - 1.5px);
+    right: calc(50% - 50vw);
+    left: calc(50% - 50vw);
+    display: block;
+    height: 3px;
+    background: var(--color-neutral-300);
+  }
+
+  /* Pintada entera por defecto; con scroll-driven animations se pinta al entrar (abajo). */
+  .railFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-2), var(--color-accent-500));
+    transform-origin: left center;
+  }
+
+  /*
+   * La fila: scroll nativo de costado si las salidas no entran, con snap en
+   * cada tarjeta. `overflow-y: hidden` explícito: con `overflow-x: auto` el
+   * otro eje pasaría a `auto`, y la tarjeta que entra corrida hacia abajo
+   * haría aparecer una barra vertical. El padding de abajo es el lugar de
+   * ese recorrido. `position: relative` la pinta encima de la línea.
+   */
+  .scroller {
+    position: relative;
+    overflow: auto hidden;
+    padding-block: var(--row-inset) 26px;
+    scroll-snap-type: x proximity;
+    scrollbar-color: var(--color-neutral-400) transparent;
+    scrollbar-width: thin;
+  }
+
+  /* Una columna por salida. Un mes ocupa tantas como salidas tiene. */
+  .months {
+    display: grid;
+    grid-template-columns: repeat(var(--stops), minmax(var(--stop-min), 1fr));
+    column-gap: var(--stop-gap);
+  }
+
+  .month {
+    display: grid;
+    grid-template-rows: var(--card-y) 1fr;
+    grid-template-columns: subgrid;
+    grid-column: span var(--span);
+  }
+
+  .month + .month {
+    margin-top: 0;
+  }
+
+  .monthLabel {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding-left: var(--axis-x);
+    font-size: 20px;
+    line-height: var(--label-height);
+    white-space: nowrap;
+  }
+
+  /* El punto, sobre la línea y centrado en el tramo de 2px que baja a la primera tarjeta. */
+  .monthLabel::before {
+    top: calc(var(--rail-y) - 6.5px);
+    left: calc(var(--axis-x) - 5.5px);
+  }
+
+  .departures {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: 0 var(--stop-gap);
+  }
+
+  .departure {
+    scroll-snap-align: start;
+  }
+
+  /* El tramo baja de la línea al borde de la tarjeta. */
+  .departure::before {
+    top: calc(var(--rail-y) - var(--card-y));
+    left: var(--axis-x);
+    width: 2px;
+    height: calc(var(--card-y) - var(--rail-y));
+    transform-origin: top;
+  }
+
+  /* En columna: la fecha arriba ("13 nov" en un renglón) y el botón contra el borde de abajo. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px var(--axis-x);
+  }
+
+  .date {
+    margin-bottom: 14px;
+  }
+
+  .dateFace {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .day {
+    font-size: 56px;
+  }
+
+  .monthShort {
+    margin-top: 0;
+    font-size: 22px;
+  }
+
+  .trip {
+    margin-top: 0;
+  }
+
+  .range {
+    font-size: 14.5px;
+  }
+
+  .tags {
+    margin-bottom: 20px;
+  }
+
+  .cta {
+    margin-top: auto;
+  }
+}
+
+/* ── Movimiento ────────────────────────────────────────────────────────── */
+
+/*
+ * El momento de la sección: la línea se pinta de izquierda a derecha mientras
+ * la fila entra en pantalla y, apenas pasa por cada marca, baja el tramo y
+ * aparece su tarjeta. Todo atado al scroll (va y vuelve con él), con una sola
+ * línea de tiempo: la de la fila entera (`--calendar`).
+ *
+ * Va por CSS (scroll-driven animations) y no por los reveals del motor: la
+ * fila es un contenedor con scroll y un reveal desplaza la tarjeta 70px × k,
+ * que ahí adentro quedaría recortada. Acá sube 18px, dentro del padding.
+ *
+ * Mejora progresiva: sin soporte (`@supports`), al imprimir o con movimiento
+ * reducido estas reglas no existen y la línea y las tarjetas se ven enteras.
+ * Lo único que CSS no conoce es el nivel `apagado` del motor.
+ *
+ * Los rangos van en px de scroll desde que asoma la fila (`entry`): la línea
+ * se pinta entre los 30 y los 290px, y la tarjeta `--stop` arranca a los
+ * 70px + su parte de 200px repartidos entre todas las salidas (con cinco, una
+ * cada 40px): más o menos cuando la línea llega a su marca.
+ */
+@media screen and (width > 820px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .timeline {
+      view-timeline: --calendar block;
+    }
+
+    .railFill {
+      animation: calendar-paint linear both;
+      animation-timeline: --calendar;
+      animation-range: entry 30px entry 290px;
+    }
+
+    .departure::before {
+      animation: calendar-drop linear both;
+      animation-timeline: --calendar;
+      animation-range: entry calc(60px + var(--stop) * 200px / var(--stops))
+        entry calc(110px + var(--stop) * 200px / var(--stops));
+    }
+
+    .card {
+      animation: calendar-rise var(--ease-reveal) both;
+      animation-timeline: --calendar;
+      animation-range: entry calc(70px + var(--stop) * 200px / var(--stops))
+        entry calc(220px + var(--stop) * 200px / var(--stops));
+    }
+  }
+}
+
+/*
+ * En vertical cada tarjeta entra con su propio scroll (`view()`): la lista es
+ * más alta que la pantalla y no hay un solo momento para todas.
+ */
+@media screen and (width <= 820px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .card {
+      animation: calendar-rise var(--ease-reveal) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+  }
+}
+
+@keyframes calendar-paint {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes calendar-drop {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes calendar-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}

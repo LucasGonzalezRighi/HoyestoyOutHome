@@ -4,11 +4,15 @@ import type { PointerSnapshot } from './FrameState';
 
 /**
  * Estado del puntero que comparten el motor y los efectos
- * (`mouse`, `mouseMoved`, `fine` y `tiltEl` del original, `dc.html:422-425`).
+ * (`mouse`, `mouseMoved` y `fine` del original, `dc.html:422-425`).
  *
- * Lo crea `createMotionEngine` y se inyecta al motor —que lo alimenta con cada
- * `pointermove`— y a los efectos que necesitan compartir estado entre sí.
- * Ninguno usa variables globales.
+ * Lo crea `createMotionEngine` y se inyecta al motor, que lo alimenta con cada
+ * `pointermove` y lo congela en cada frame (`FrameState.pointer`). Nadie usa
+ * variables globales.
+ *
+ * El `tiltEl` del original (la card inclinada) quedó adentro de `TiltEffect`:
+ * solo lo compartía con el skew por velocidad, que se sacó por pedido del
+ * cliente (octubre 2026).
  *
  * El `hot` del original (el mouse sobre un link o botón) no se portó: solo lo
  * usaba el anillo del cursor, que tampoco se portó (ver CLAUDE.md §9).
@@ -16,15 +20,6 @@ import type { PointerSnapshot } from './FrameState';
 export class PointerTracker {
   /** Hay un mouse de verdad. Se decide una vez, al montar, como en el diseño. */
   readonly fine: boolean;
-
-  /**
-   * La card que el tilt tiene inclinada en este momento, o `null`.
-   *
-   * Es el estado que comparten `TiltEffect` (lo escribe) y `SkewEffect` (lo lee):
-   * mientras una card está inclinada, el skew por velocidad no la toca, porque
-   * los dos escriben `transform` y se pisarían.
-   */
-  tiltTarget: HTMLElement | null = null;
 
   private x: number;
   private y: number;

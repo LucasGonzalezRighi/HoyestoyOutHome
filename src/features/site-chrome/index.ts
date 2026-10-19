@@ -1,5 +1,4 @@
-export { SiteChrome, type SiteChromeProps } from './SiteChrome';
-export { Curtain, type CurtainProps } from './components/Curtain';
+export { SiteChrome } from './SiteChrome';
 export { CustomCursor } from './components/CustomCursor';
 export { FloatingWhatsApp, type FloatingWhatsAppProps } from './components/FloatingWhatsApp';
 export { ScrollProgress } from './components/ScrollProgress';

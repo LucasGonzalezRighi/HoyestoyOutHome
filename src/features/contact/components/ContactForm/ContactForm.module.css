@@ -1,0 +1,66 @@
+/*
+ * Formulario breve de Contacto, sobre la tarjeta verde del cierre. Los
+ * campos traen su propio estilo (`FormField`, tono `inverse`); acá va el
+ * ritmo vertical y los textos de alrededor.
+ *
+ * El aire va con márgenes y no con `gap`: la región de estado está siempre en
+ * el DOM (vacía hasta que se envía) y un `gap` le dejaría su espacio igual.
+ */
+
+.form {
+  text-align: start;
+}
+
+/* "Mandanos tu consulta": un `h3` en la tipografía de títulos, en crema como el título de la sección. */
+.title {
+  margin: 0 0 6px;
+  color: var(--color-bg);
+  font-size: clamp(22px, 2vw, 26px);
+}
+
+/* `--color-accent-2-200`: 8,6:1 sobre la tarjeta. */
+.hint {
+  margin: 0 0 20px;
+  color: var(--color-accent-2-200);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/*
+ * Nombre y viaje comparten renglón cuando hay lugar para dos campos de 200px;
+ * si no, se apilan. El mínimo es el mayor entre 200px y media fila: así nunca
+ * hay más de dos columnas por ancho que sea el formulario. El mensaje
+ * (`.message`) ocupa siempre la fila entera.
+ */
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(200px, calc(50% - 8px))), 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.message {
+  grid-column: 1 / -1;
+}
+
+/* "Se abrió tu app de correo…". `--color-accent-2-100`: 10:1 sobre la tarjeta. */
+.status {
+  margin: 18px 0 0;
+  color: var(--color-accent-2-100);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Vacía no ocupa lugar, pero sigue en el DOM: una región que aparece recién al llenarse no siempre se anuncia. */
+.status:empty {
+  margin: 0;
+}
+
+@media (max-width: 820px) {
+  /* Botón a lo ancho; si el label no entra, parte en renglones centrados. */
+  .submit {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+}

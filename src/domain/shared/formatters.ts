@@ -9,8 +9,11 @@
  * agrupa los números de cuatro cifras (`1900`), y el diseño muestra `1.900`
  * y `1.400 m desnivel`. Es el mismo valor que `SITE.locale`; se repite porque
  * el dominio no importa configuración de afuera.
+ *
+ * Se exporta solo para el resto del dominio (las fechas de `CalendarDate`
+ * usan el mismo); el barrel no lo expone.
  */
-const LOCALE = 'es-AR';
+export const LOCALE = 'es-AR';
 
 /** Un `Intl.NumberFormat` por cantidad de decimales: crearlos es caro y se reusan. */
 const numberFormats = new Map<number | 'auto', Intl.NumberFormat>();

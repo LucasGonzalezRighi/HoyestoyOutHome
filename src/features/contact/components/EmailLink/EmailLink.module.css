@@ -1,0 +1,27 @@
+/*
+ * Link de texto sobre el verde del cierre. El `--color-accent-700` de los
+ * links de `base.css` no se lee sobre el verde: va en `--color-accent-2-100`
+ * (10:1 sobre la tarjeta), como los links del footer, y pasa a crema con el
+ * cursor encima.
+ */
+.link {
+  color: var(--color-accent-2-100);
+  /* Un mail no tiene dónde partirse: en una columna angosta se corta donde haga falta en vez de desbordar. */
+  overflow-wrap: anywhere;
+}
+
+.link:hover {
+  color: var(--color-bg);
+}
+
+/*
+ * El anillo dorado del design system solo da 2,7:1 sobre el verde: se le suma
+ * el aro crema en el hueco (`--shadow-focus-gap`), como a los botones
+ * (CLAUDE.md §9.2).
+ */
+.link:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-focus-gap);
+}

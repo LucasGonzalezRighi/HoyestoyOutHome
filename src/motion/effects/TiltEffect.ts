@@ -3,7 +3,6 @@ import { TILT, TILT_TRANSITION } from '@/design-system/tokens/motion';
 import { MOTION_SELECTORS } from '../attributes';
 import type { MotionSettings } from '../core/FrameState';
 import { PointerEffect } from '../core/MotionEffect';
-import type { PointerTracker } from '../core/PointerTracker';
 
 /** Devuelve la card a su pose natural (y el zoom de su imagen). */
 function release(card: HTMLElement): void {
@@ -22,28 +21,27 @@ function release(card: HTMLElement): void {
  * al instante, y la transición CSS (`TILT_TRANSITION`) la suaviza. Con el
  * movimiento apagado queda el brillo y la sombra, pero la card no se mueve.
  *
- * La card inclinada se publica en el `PointerTracker` compartido para que el
- * skew por velocidad no la pise.
+ * En el diseño la card inclinada (`tiltEl`) se compartía con el skew por
+ * velocidad de las cards de viaje, para que no se pisaran. El skew se sacó
+ * por pedido del cliente (octubre 2026): el estado ahora es solo del tilt.
  */
 export class TiltEffect extends PointerEffect {
-  constructor(private readonly pointer: PointerTracker) {
-    super();
-  }
+  /** La card inclinada en este momento, o `null`. */
+  private current: HTMLElement | null = null;
 
   override onPointerMove(event: PointerEvent, settings: MotionSettings): void {
     const card =
       event.target instanceof Element
         ? event.target.closest<HTMLElement>(MOTION_SELECTORS.tilt)
         : null;
-    const current = this.pointer.tiltTarget;
-    if (current && current !== card) {
-      release(current);
-      this.pointer.tiltTarget = null;
+    if (this.current && this.current !== card) {
+      release(this.current);
+      this.current = null;
     }
     if (!card) return;
 
     if (!card.style.transition) card.style.transition = TILT_TRANSITION;
-    this.pointer.tiltTarget = card;
+    this.current = card;
 
     const rect = card.getBoundingClientRect();
     // Posición del cursor dentro de la card, 0–1 en cada eje.
@@ -61,9 +59,8 @@ export class TiltEffect extends PointerEffect {
 
   /** Si el motor se apaga con una card inclinada, la endereza. */
   override dispose(): void {
-    const current = this.pointer.tiltTarget;
-    if (!current) return;
-    release(current);
-    this.pointer.tiltTarget = null;
+    if (!this.current) return;
+    release(this.current);
+    this.current = null;
   }
 }

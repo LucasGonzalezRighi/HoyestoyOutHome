@@ -67,8 +67,8 @@ export abstract class FrameEffect extends MotionEffect {
  * viewport, intro, intensidad o velocidad) y en los de la ventana de
  * asentamiento que abre cada cambio de scroll, viewport, intro o intensidad
  * (`SETTLE_MS`; un cambio de velocidad mide ese frame pero no la abre). Mide
- * en `measure` y escribe en `apply`; los que no necesitan medir (drift, skew)
- * dejan `measure` vacío. Como `apply` puede correr varias veces con la misma
+ * en `measure` y escribe en `apply`; uno que no necesite medir deja `measure`
+ * vacío. Como `apply` puede correr varias veces con la misma
  * entrada, tiene que dar lo mismo cada vez (escribir con `StyleWriter` evita
  * las escrituras repetidas).
  */

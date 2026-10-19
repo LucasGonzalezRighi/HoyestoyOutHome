@@ -25,7 +25,7 @@ export type TestimonialsContent = SectionHeadingContent & {
 
 /** Los testimonios nombran el viaje por su nombre corto: sale del catálogo para que no se desfase. */
 const CALLE_STEPANEK = tripCatalog.get('calle-stepanek').shortName;
-const LOLOG = tripCatalog.get('lolog').shortName;
+const LOLOG = tripCatalog.get('lago-lolog-laguna-verde').shortName;
 
 /** Textos y testimonios de "Lo que se traen de la montaña", verbatim del diseño. */
 export const testimonialsContent: TestimonialsContent = {

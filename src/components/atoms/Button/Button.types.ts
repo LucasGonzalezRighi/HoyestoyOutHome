@@ -3,27 +3,25 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
 /**
  * Variantes del `.btn` del design system.
  *
- * Las tres comparten el efecto de la marca: al pasar el cursor, un relleno
+ * Las dos comparten el efecto de la marca: al pasar el cursor, un relleno
  * verde musgo avanza de izquierda a derecha y el texto pasa a crema.
  */
 export type ButtonVariant =
-  /** Sólido dorado — "Ver próximos viajes", "Escribinos", "Reservá tu lugar…". */
+  /** Sólido dorado — "Ver próximos viajes", "Escribinos", "Ver detalles", "Consultar por WhatsApp". */
   | 'primary'
-  /** Contorno — "Hablá con nosotros" (sobre la foto del hero, con `tone="inverse"`). */
-  | 'secondary'
-  /** Solo texto — la pestaña inactiva de "Servicios y equipo". */
-  | 'ghost';
+  /** Contorno — "Hablá con nosotros" (sobre la foto del hero, con `tone="inverse"`), "Ver viaje" del calendario. */
+  | 'secondary';
 
 /**
  * Tamaños. `md` es el `.btn` del design system; los otros dos son los que el
  * diseño fija inline en los CTA grandes.
  */
 export type ButtonSize =
-  /** 14px, padding del design system. Nav, cards de viaje, pestañas. */
+  /** 14px, padding del design system. Nav, cards de viaje, calendario. */
   | 'md'
-  /** 16px, padding 14px 26px. CTA del hero. */
+  /** 16px, padding 14px 26px. CTA del hero, de la portada de cada viaje y del formulario. */
   | 'lg'
-  /** 17px, padding 16px 32px. CTA del cierre ("Reservá tu lugar por WhatsApp"). */
+  /** 17px, padding 16px 32px. CTA del cierre de cada viaje ("Consultar por WhatsApp"). */
   | 'xl';
 
 /**
@@ -42,7 +40,7 @@ type ButtonBaseProps = {
   size?: ButtonSize;
   /** Por defecto `default`. */
   tone?: ButtonTone;
-  /** Ícono antes del label (p. ej. `<ChatIcon />`). Se separa del texto con el gap de 6px del `.btn`. */
+  /** Ícono antes del label (p. ej. `<WhatsAppIcon />`). Se separa del texto con el gap de 6px del `.btn`. */
   icon?: ReactNode;
   className?: string;
   children?: ReactNode;
@@ -55,11 +53,18 @@ export type ButtonProps = ButtonBaseProps &
 /** Props de `LinkButton`: las comunes más cualquier atributo de `<a>`. */
 export type LinkButtonProps = ButtonBaseProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonBaseProps | 'href'> & {
+    /**
+     * Destino. Una ruta del sitio (`tripPath(slug)`, `homeAnchorTo('faq')`)
+     * navega con el router de Next, sin recargar; un ancla de la misma página
+     * (`anchorTo('trips')`), un `mailto:` o una URL de otro sitio van como
+     * `<a>` común. Siempre armado con las funciones de `constants/`, nunca
+     * literal.
+     */
     href: string;
     /**
      * Link a otro sitio (WhatsApp, Instagram): abre en otra pestaña con
      * `rel="noopener noreferrer"`, para que la página abierta no tenga acceso
-     * a `window.opener` ni reciba el referrer.
+     * a `window.opener` ni reciba el referrer. Siempre es un `<a>` común.
      */
     external?: boolean;
   };

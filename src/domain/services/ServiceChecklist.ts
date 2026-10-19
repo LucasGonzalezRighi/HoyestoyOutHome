@@ -12,13 +12,13 @@ export const SERVICE_GROUP_KINDS = [
   'gear',
 ] as const;
 
-/** Un grupo de la checklist. `content/` indexa por esta clave el título de cada pestaña. */
+/** Un grupo de la checklist. `content/` indexa por esta clave el título de cada grupo. */
 export type ServiceGroupKind = (typeof SERVICE_GROUP_KINDS)[number];
 
 /**
- * Un grupo de la checklist. Es un objeto plano a propósito: es lo que cruza a
- * la pestaña de Servicios, que es Client Component y no puede recibir
- * instancias de clases.
+ * Un grupo de la checklist. Es un objeto plano a propósito: es lo que recorren
+ * los paneles de "¿Qué incluye y qué necesito?" de la página de cada viaje,
+ * sin conocer la clase.
  */
 export type ServiceGroup = {
   readonly kind: ServiceGroupKind;
@@ -29,8 +29,9 @@ export type ServiceGroup = {
 export type ServiceChecklistParams = { readonly [K in ServiceGroupKind]: readonly string[] };
 
 /**
- * Qué incluye un viaje y qué tiene que llevar el viajero (sección 09 del
- * diseño, una checklist por pestaña).
+ * Qué incluye un viaje y qué tiene que llevar el viajero ("¿Qué incluye y qué
+ * necesito?" en la página de cada viaje; en el diseño, la sección 09, una
+ * checklist por pestaña).
  *
  * Invariante: los cinco grupos tienen al menos un ítem y ninguno en blanco.
  * El título de cada grupo ("Servicios incluidos", "¿Qué necesito? · Ropa") es

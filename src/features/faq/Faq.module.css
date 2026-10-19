@@ -1,0 +1,120 @@
+/*
+ * "Preguntas frecuentes": sobre el fondo de curvas de nivel de toda la página
+ * (`ContourLines`, en el layout), el encabezado centrado y las preguntas en una columna, ensartadas por
+ * un sendero punteado que termina en la "cumbre". No está en el diseño: sigue
+ * su lenguaje (tokens de Organic, tipografías y radios de las demás secciones).
+ */
+
+/*
+ * La sección. Arriba, solo el aire entre secciones (el `padding` de arriba era
+ * de cuando tenía franja propia, y sumado al margen duplicaba el aire); el
+ * fondo es el de la página (las curvas de nivel del layout).
+ */
+.band {
+  position: relative;
+  isolation: isolate;
+  margin-top: var(--section-space);
+  padding-bottom: clamp(64px, 8vw, 112px);
+}
+
+/* ── Encabezado ────────────────────────────────────────────────────────── */
+
+.intro {
+  max-width: 780px;
+  margin: 0 auto clamp(36px, 4.4vw, 56px);
+  text-align: center;
+}
+
+/* Mismo tamaño que el título de "¿Quiénes somos?" (`dc.html:316`), en dos renglones parejos. */
+.title {
+  margin: 0 0 16px;
+  font-size: clamp(38px, 4.6vw, 64px);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* Más angosta que el título, para que el encabezado cierre hacia abajo. */
+.lead {
+  max-width: 30em;
+  margin: 0 auto;
+  color: var(--color-neutral-800);
+  font-size: 18px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ── Sendero ───────────────────────────────────────────────────────────── */
+
+/*
+ * La columna de las preguntas y la única fuente de las medidas del sendero,
+ * que comparten la línea y los mojones (`FaqAccordion`) y la cumbre
+ * (`FaqSummit`):
+ *
+ *   --faq-axis        centro de la línea punteada, desde el borde de la columna
+ *   --faq-text-start  dónde arranca el texto de preguntas, respuestas y cumbre
+ *   --faq-row-pad     padding de arriba y abajo de la fila de cada pregunta
+ *   --faq-icon        lado del "+" (y alto del primer renglón de la pregunta)
+ *   --faq-dot         mojón sin abrir
+ *   --faq-flag        mojón de la pregunta abierta (la banderita)
+ *   --faq-gap         aire entre tarjetas
+ *   --faq-summit-gap  aire entre la última pregunta y la cumbre
+ *   --faq-card-tone   color de las tarjetas (los mojones lo usan para recortarse)
+ */
+.trail {
+  --faq-axis: 46px;
+  --faq-text-start: 88px;
+  --faq-row-pad: 22px;
+  --faq-icon: 40px;
+  --faq-dot: 14px;
+  --faq-flag: 36px;
+  --faq-gap: 10px;
+  --faq-summit-gap: 18px;
+  --faq-card-tone: var(--color-neutral-100);
+
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+/*
+ * Mobile: el sendero se angosta y se pega a la izquierda (mojones chicos), y
+ * la fila se ajusta sin bajar de los 44px de zona de toque.
+ */
+@media (max-width: 820px) {
+  .band {
+    padding-bottom: 64px;
+  }
+
+  /*
+   * "Lo que nos preguntan" entra en un renglón desde los 320px de ancho, así
+   * el título queda en dos; el piso respeta los 30px de los `h2` en mobile.
+   */
+  .title {
+    font-size: clamp(30px, 8.8vw, 38px);
+  }
+
+  .lead {
+    font-size: 17px;
+  }
+
+  .trail {
+    --faq-axis: 26px;
+    --faq-text-start: 50px;
+    --faq-row-pad: 16px;
+    --faq-icon: 34px;
+    --faq-dot: 12px;
+    --faq-flag: 28px;
+    --faq-gap: 8px;
+    --faq-summit-gap: 14px;
+  }
+}
+
+/*
+ * Al imprimir, la banda va pegada a lo anterior y sin tanto aire: en papel el
+ * tono de fondo ya la separa.
+ */
+@media print {
+  .band {
+    margin-top: 0;
+    padding-block: 32px;
+  }
+}

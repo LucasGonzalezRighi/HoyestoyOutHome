@@ -30,11 +30,12 @@ function staggerWords(lines: readonly HeroHeadlineLine[]): StaggeredWord[][] {
 }
 
 /**
- * Titular del hero (`dc.html:63-71`), el único `<h1>` de la página.
+ * Titular del hero (`dc.html:63-71`), el único `<h1>` del home.
  *
- * Cada palabra sube desde detrás de su máscara (`overflow: hidden`) cuando se
- * abre el telón: `reveal('word')` la deja en manos de la intro, no del scroll,
- * y el escalón (`delay`) la hace entrar una después de otra.
+ * Cada palabra sube desde detrás de su máscara (`overflow: hidden`) con la
+ * intro, que arranca al hidratar: `reveal('word')` la deja en manos de la
+ * intro, no del scroll, y el escalón (`delay`) la hace entrar una después de
+ * otra.
  *
  * En escritorio son los dos renglones del diseño, cada uno en una línea. En
  * mobile (≤ 820px) los renglones se disuelven y la frase fluye como un solo

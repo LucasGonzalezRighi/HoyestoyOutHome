@@ -36,13 +36,13 @@ export type WashedImageTone =
  * desplazamiento nunca deje ver el borde de la capa.
  */
 export type WashedImageParallax = {
-  /** Fracción del desplazamiento (0.4 en el hero, 0.25 en la banda, 0.12 en Calle & Stepanek). */
+  /** Fracción del desplazamiento (0.4 en el hero y en la portada de cada viaje). */
   factor: number;
   /** `top` de la capa respecto del marco, p. ej. `'-10%'` (hero). */
   overscanTop: string;
   /** Alto de la capa respecto del marco, p. ej. `'122%'` (hero). */
   overscanHeight: string;
-  /** Arranca con zoom y lo suelta durante la intro del telón (fotos sobre el fold). */
+  /** Arranca con zoom y lo suelta durante la intro, al hidratar (fotos sobre el fold: hero y portada de cada viaje). */
   introZoom?: boolean;
 };
 

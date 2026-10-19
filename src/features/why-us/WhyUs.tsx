@@ -15,15 +15,15 @@ export type WhyUsProps = {
 
 /**
  * Sección 02 "Por qué viajar con nosotros" (`dc.html:90-104`): encabezado y
- * cuatro pilares en cards que se inclinan con el cursor.
+ * cuatro pilares en cards que se inclinan con el cursor, todas del mismo alto.
  *
  * Coreografía del diseño: el eyebrow entra desde la izquierda, el título sube
  * un escalón después (los dos los pone `SectionHeading`) y cada card sube
  * girando con un escalón más que la anterior (`data-rv="rot" data-rv-d="{{ $index }}"`).
  *
- * Los pilares van en un `<ol>`: el orden 01–04 es parte del contenido, y la
- * lista ya se lo anuncia al lector de pantalla, así que el número grande queda
- * `aria-hidden` para no leerlo dos veces.
+ * En el diseño cada card abre con un número grande (01–04) y los pilares van
+ * en una lista ordenada. A pedido del cliente las cards van sin número: sin un
+ * orden a la vista, los pilares son una lista sin orden (`<ul>`).
  *
  * Server Component: la animación va por atributos, no hay estado.
  */
@@ -36,24 +36,21 @@ export function WhyUs({ content }: WhyUsProps) {
           title={content.title}
           titleClassName={styles.title}
         />
-        <ol className={styles.pillars}>
+        <ul className={styles.pillars}>
           {content.pillars.map((pillar, index) => (
-            <li key={pillar.number} className={styles.pillarItem}>
+            <li key={pillar.title} className={styles.pillarItem}>
               <SurfaceCard
                 tone="surface"
                 radius="lg"
                 innerClassName={styles.card}
                 {...reveal('rotate', { delay: index })}
               >
-                <p className={styles.number} aria-hidden="true">
-                  {pillar.number}
-                </p>
                 <h3 className={styles.pillarTitle}>{pillar.title}</h3>
                 <p className={styles.description}>{pillar.description}</p>
               </SurfaceCard>
             </li>
           ))}
-        </ol>
+        </ul>
       </Section>
     </Container>
   );

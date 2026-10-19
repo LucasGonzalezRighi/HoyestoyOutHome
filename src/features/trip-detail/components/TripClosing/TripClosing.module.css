@@ -1,0 +1,198 @@
+/*
+ * Cierre de la página de viaje — el patrón de la tarjeta de cierre del diseño
+ * (`dc.html:361-373`), sin el monto ni la nota de reserva (los sacó el
+ * cliente): logo, título, bajada y el botón a WhatsApp.
+ *
+ * Las transformaciones (expansión de la tarjeta, parallax de los círculos,
+ * apariciones) las escribe el motor inline; acá solo va la pose de reposo.
+ */
+
+/*
+ * Arriba, el aire de cualquier otra sección (`--section-space`) y no el
+ * `clamp(100px, 14vw, 180px)` del diseño: aquel separaba un bloque mucho más
+ * alto. Sin padding abajo: lo pone el footer, que en el diseño estaba adentro
+ * de esta sección.
+ */
+.section {
+  padding: var(--section-space) var(--layout-gutter) 0;
+}
+
+/*
+ * Tarjeta verde musgo (dc.html:362). `overflow: hidden` recorta los círculos.
+ * El padding vertical baja de `clamp(48px, 8vw, 100px)` a un tope de 84px: con
+ * menos contenido, el del diseño dejaba la tarjeta hueca.
+ */
+.card {
+  position: relative;
+  max-width: var(--layout-narrow);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: clamp(44px, 6vw, 84px) clamp(18px, 5vw, 80px);
+  border-radius: var(--radius-4xl);
+  background: var(--color-accent-2-800);
+  color: var(--color-accent-2-100);
+  text-align: center;
+}
+
+/* ── Círculos decorativos (dc.html:363-364) ─────────────────────────────── */
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Arriba a la izquierda (dc.html:363); sube más rápido que la tarjeta (`data-parallax="-0.3"`). */
+.circleTop {
+  top: -160px;
+  left: -140px;
+  width: 420px;
+  height: 420px;
+  background: var(--color-accent-2-700);
+}
+
+/* Abajo a la derecha, en dorado (dc.html:364); sube más lento que la tarjeta (`data-parallax="0.25"`). */
+.circleBottom {
+  right: -90px;
+  bottom: -130px;
+  width: 300px;
+  height: 300px;
+  background: var(--color-accent-700);
+  opacity: 0.7;
+}
+
+/* ── Contenido ─────────────────────────────────────────────────────────── */
+
+/*
+ * En el diseño cada hijo lleva `position: relative` para pintarse encima de
+ * los círculos (que son absolutos y van antes). Un solo envoltorio relativo
+ * logra lo mismo; los círculos siguen teniendo a la tarjeta como padre, que
+ * es lo que mide el parallax.
+ *
+ * Columna centrada: cada pieza se centra sola y el aire entre ellas son sus
+ * márgenes (26 · 20 · 34 px: se abre hacia el botón, que es adonde va todo).
+ */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * Logo sobre una chapita crema (dc.html:365). `mix-blend-mode: normal` pisa el
+ * `multiply` de `BrandLogo`: multiplicado contra el verde, el blanco del PNG
+ * se volvería verde y la chapita desaparecería.
+ */
+.logo {
+  width: 74px;
+  margin: 0 0 26px;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  mix-blend-mode: normal;
+}
+
+/*
+ * "La montaña te espera. / ¿Te animás a subir?" (dc.html:369). Es lo más grande
+ * de la tarjeta, donde antes estaba el monto: sube del `clamp(34px, 4.4vw, 60px)`
+ * del diseño a un tope de 72px (desde ~1385px de ancho).
+ *
+ * El tramo fluido (`16px + 4.05vw`) está calculado para que cada oración entre
+ * en su renglón también en un teléfono: a 390px da 31,8px y "La montaña te
+ * espera." mide ~294px en los ~311px que deja la tarjeta. Con el piso de 34px
+ * del diseño partía en "La montaña / te espera." y la pregunta quedaba suelta.
+ */
+.title {
+  margin: 0;
+  font-size: clamp(30px, 16px + 4.05vw, 72px);
+  font-style: italic;
+  line-height: 1.04;
+  color: var(--color-bg);
+}
+
+/*
+ * Un renglón por bloque. `balance` reparte las palabras si aun así un renglón
+ * no entra (debajo de ~355px): "La montaña / te espera." en vez de dejar
+ * "espera." sola.
+ */
+.titleLine {
+  display: block;
+  text-wrap: balance;
+}
+
+/*
+ * La pregunta, en el dorado claro de la rampa: es la que empuja al botón.
+ * Contraste: 6,6:1 sobre el verde de la tarjeta y 4,6:1 sobre el círculo, que
+ * es más claro (texto grande: AA pide 3:1).
+ */
+.titleLine:last-child {
+  color: var(--color-accent-300);
+}
+
+/* La bajada: una oración, al ancho justo para que parta en dos renglones parejos. */
+.lead {
+  max-width: 46ch;
+  margin: 20px 0 0;
+  font-size: clamp(16px, 1.35vw, 19px);
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+/* dc.html:370. */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 34px;
+}
+
+@media (max-width: 820px) {
+  /*
+   * Los círculos del diseño están pensados para una tarjeta de 1100px: en un
+   * teléfono el de arriba (420px) tapaba casi todo el ancho detrás del título.
+   * Se achican a algo más de la mitad y quedan como acentos en dos esquinas.
+   */
+  .circleTop {
+    top: -110px;
+    left: -110px;
+    width: 250px;
+    height: 250px;
+  }
+
+  /*
+   * En una tarjeta angosta el botón llega casi de borde a borde y el círculo
+   * dorado le pasa por detrás: al 70% del diseño el dorado del botón se
+   * empastaba contra él. Más chico y más tenue, queda como un tinte cálido.
+   */
+  .circleBottom {
+    right: -80px;
+    bottom: -100px;
+    width: 180px;
+    height: 180px;
+    opacity: 0.38;
+  }
+
+  /* Con el título a ~32px, la chapita de 74px le competía: baja a 64px. */
+  .logo {
+    width: 64px;
+    margin-bottom: 22px;
+  }
+
+  /*
+   * El botón `xl` es `nowrap` y mide 279px (17px, padding 16px 32px, logo de
+   * 22px). Debajo de ~355px de ancho la tarjeta deja menos que eso: el texto y
+   * el padding bajan de a poco (hasta 15px y 18px a 320px) para que siga
+   * entrando en un renglón, con el logo pegado al texto. Desde 390px son los
+   * del botón. Si aun así no entra (texto agrandado), parte en renglones en
+   * vez de que el `overflow: hidden` de la tarjeta lo corte.
+   *
+   * `.actions .cta` y no `.cta` sola: tiene que ganarle a las clases del
+   * botón sin depender del orden en que carguen las dos hojas.
+   */
+  .actions .cta {
+    padding-inline: clamp(18px, 20vw - 46px, 32px);
+    font-size: clamp(15px, 4.6vw, 17px);
+    white-space: normal;
+    text-align: center;
+  }
+}

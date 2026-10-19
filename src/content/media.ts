@@ -17,44 +17,43 @@ function assetPath(dir: keyof typeof ASSET_DIRS, file: string): string {
  *
  * `width`/`height` son las del archivo tal cual está en `public/images/`
  * (píxeles, sin rotación EXIF). Si se reemplaza una foto, se actualizan acá:
- * las cards del itinerario de Lolog toman su alto de esta proporción.
+ * las fotos del cronograma de Lolog (`Timeline`) toman su alto de esta
+ * proporción (`photo.aspectRatio`).
  *
- * Encuadre base = el más común entre los usos del diseño. En un empate gana
- * `center` (el neutro, el que asume cualquier uso que no fija uno); si ninguno
- * de los usos es `center`, gana el primero en el orden de la página.
+ * Encuadre base = el más común entre los usos. En un empate gana `center` (el
+ * neutro, el que asume cualquier uso que no fija uno).
  *
- * Los alt de hero, Calle & Stepanek y banda son los del diseño; el resto se
+ * Los alt de hero y de Calle & Stepanek son los del diseño; el resto se
  * escribió mirando cada foto. El diseño usa el nombre del viaje o del tramo,
  * que ya está escrito al lado de la foto (el lector de pantalla lo leería dos
- * veces), o `alt=""` en la galería: acá las cards de viaje, el itinerario y la
- * galería usan el alt descriptivo de este registro. Las fotos de la pensión y
- * del equipo llevan el nombre como alt, pero esas secciones las usan como
+ * veces), o `alt=""` en la galería: acá las cards de viaje, el cronograma de
+ * Lolog y la galería usan el alt descriptivo de este registro. Las fotos de la
+ * pensión y del equipo llevan el nombre como alt, pero se usan como
  * decorativas (`withAlt('')`) porque el nombre ya está en el texto visible.
  *
- * Qué foto usa cada sección del diseño (`docs/design/hoy-estoy-ooh-landing.dc.html`):
+ * Dónde se usa cada foto (con el encuadre, si no es el base):
  *
- * | Clave                 | Archivo (`photos/`)              | Sección del diseño (encuadre si no es el base)                   | Base        |
- * |-----------------------|----------------------------------|-------------------------------------------------------------------|-------------|
- * | `heroRange`           | IMG_20251125_105946729_HDR.jpg   | 01 Hero (fondo con parallax)                                      | center      |
- * | `calleSummitSign`     | IMG_20251125_105222469_HDR.jpg   | 03 Viajes, card Calle & Stepanek (center 62%) · 04 foto sticky     | center      |
- * | `volcanicPlain`       | IMG_2907.jpg                     | 03 Viajes, card Lago Lolog                                        | center      |
- * | `refugeUnderStars`    | 1.jpg                            | 03 Viajes, card Laguna Negra · 07 Itinerario día 1 (center 75%)   | center 70%  |
- * | `riverCrossing`       | IMG_2778.jpg                     | 03 Viajes, card Cajón del Azul                                    | center 35%  |
- * | `summitAboveClouds`   | IMG_20260310_104358.jpg          | 06 Banda "La montaña te espera."                                  | center 62%  |
- * | `lakeshoreRest`       | IMG_2616.jpg                     | 07 Itinerario día 0 · 12 Galería fila 1                           | center      |
- * | `valleyDescent`       | IMG_2926.jpg                     | 07 Itinerario día 2 · 12 Galería fila 2                           | center      |
- * | `lakeshoreHorse`      | IMG_2240.jpg                     | 07 Itinerario día 3 · 12 Galería fila 2                           | center      |
- * | `volcanoView`         | IMG_2923.jpg                     | 07 Itinerario día 4 (center 30%) · 12 Galería fila 2              | center      |
- * | `volcanicTrailAscent` | IMG_2903.jpg                     | 12 Galería fila 1                                                 | center      |
- * | `rockFlowers`         | IMG_20251125_110844038_HDR.jpg   | 12 Galería fila 1                                                 | center      |
- * | `summitMate`          | IMG_3339.jpg                     | 12 Galería fila 1                                                 | center      |
- * | `snowyPeakClouds`     | IMG_20251125_105621337_HDR.jpg   | 12 Galería fila 1                                                 | center      |
- * | `summitCross`         | IMG_20260311_134556.jpg          | 12 Galería fila 1                                                 | center      |
- * | `mountainStream`      | IMG_20251125_122309240_HDR.jpg   | 12 Galería fila 2                                                 | center      |
- * | `screeAscent`         | IMG_20251125_080344703_HDR.jpg   | 12 Galería fila 2                                                 | center      |
- * | `rockyRidgeClimber`   | IMG_20251125_104854614_HDR.jpg   | 12 Galería fila 2 (en el diseño: `uploads/IMG_20251125_104854614 (1).jpg`) | center |
- * | `food*`               | `food/*.png`                     | 08 Pensión completa                                               | center      |
- * | `team*`               | `team/*.png`                     | 10 ¿Quiénes somos?                                                | center      |
+ * | Clave                 | Archivo (`photos/`)              | Uso                                                                  | Base        |
+ * |-----------------------|----------------------------------|----------------------------------------------------------------------|-------------|
+ * | `heroRange`           | IMG_20251125_105946729_HDR.jpg   | Hero del home (fondo con parallax) · alt de la imagen para compartir  | center      |
+ * | `calleSummitSign`     | IMG_20251125_105222469_HDR.jpg   | Viaje Calle & Stepanek: card y portada de su página (center 62%)     | center      |
+ * | `volcanicPlain`       | IMG_2907.jpg                     | Viaje Lago Lolog: card y portada                                     | center      |
+ * | `refugeUnderStars`    | 1.jpg                            | Viaje Laguna Negra: card y portada · Lolog, cronograma día 1 (center 75%) | center 70% |
+ * | `riverCrossing`       | IMG_2778.jpg                     | Viaje Cajón del Azul: card y portada                                 | center 35%  |
+ * | `lakeshoreRest`       | IMG_2616.jpg                     | Lolog, cronograma día 0 · Galería fila 1                             | center      |
+ * | `valleyDescent`       | IMG_2926.jpg                     | Lolog, cronograma día 2 · Galería fila 2                             | center      |
+ * | `lakeshoreHorse`      | IMG_2240.jpg                     | Lolog, cronograma día 3 · Galería fila 2                             | center      |
+ * | `volcanoView`         | IMG_2923.jpg                     | Lolog, cronograma día 4 (center 30%) · Galería fila 2                | center      |
+ * | `volcanicTrailAscent` | IMG_2903.jpg                     | Galería fila 1                                                       | center      |
+ * | `rockFlowers`         | IMG_20251125_110844038_HDR.jpg   | Galería fila 1                                                       | center      |
+ * | `summitMate`          | IMG_3339.jpg                     | Galería fila 1                                                       | center      |
+ * | `snowyPeakClouds`     | IMG_20251125_105621337_HDR.jpg   | Galería fila 1                                                       | center      |
+ * | `summitCross`         | IMG_20260311_134556.jpg          | Galería fila 1                                                       | center      |
+ * | `mountainStream`      | IMG_20251125_122309240_HDR.jpg   | Galería fila 2                                                       | center      |
+ * | `screeAscent`         | IMG_20251125_080344703_HDR.jpg   | Galería fila 2                                                       | center      |
+ * | `rockyRidgeClimber`   | IMG_20251125_104854614_HDR.jpg   | Galería fila 2 (en el diseño: `uploads/IMG_20251125_104854614 (1).jpg`) | center   |
+ * | `food*`               | `food/*.png`                     | Pensión completa, en la página de cada viaje                         | center      |
+ * | `teamLucas`           | `team/lucas.png`                 | ¿Quiénes somos? (home)                                               | center      |
  *
  * Orden de la galería en el diseño — fila 1: volcanicTrailAscent, rockFlowers,
  * summitMate, snowyPeakClouds, summitCross, lakeshoreRest · fila 2:
@@ -96,14 +95,6 @@ export const PHOTOS = {
     alt: 'Mochilero cruza un río con el agua a las rodillas, las botas colgadas y bastones',
     // Card de Cajón del Azul (`pos: 'center 35%'` en el array `trips` del diseño).
     position: 'center 35%',
-  }),
-  summitAboveClouds: new Photo({
-    src: assetPath('photos', 'IMG_20260310_104358.jpg'),
-    width: 1600,
-    height: 1200,
-    alt: 'Grupo en la cumbre sobre las nubes',
-    // `object-position: center 62%` de la banda (sección 06).
-    position: 'center 62%',
   }),
   lakeshoreRest: new Photo({
     src: assetPath('photos', 'IMG_2616.jpg'),
@@ -210,23 +201,5 @@ export const PHOTOS = {
     width: 216,
     height: 216,
     alt: 'Lucas Chichizola',
-  }),
-  teamAndres: new Photo({
-    src: assetPath('team', 'andres.png'),
-    width: 232,
-    height: 232,
-    alt: 'Andrés Gavilán',
-  }),
-  teamLuis: new Photo({
-    src: assetPath('team', 'luis.png'),
-    width: 216,
-    height: 216,
-    alt: 'Luis Aguiar',
-  }),
-  teamEstanislao: new Photo({
-    src: assetPath('team', 'estanislao.png'),
-    width: 216,
-    height: 216,
-    alt: 'Estanislao Malic',
   }),
 } as const satisfies Record<string, Photo>;

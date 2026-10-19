@@ -5,6 +5,7 @@
  * de 1s es la que suaviza ese cambio.
  */
 .backgroundRoot {
+  isolation: isolate;
   min-height: 100vh;
   background-color: var(--color-bg);
   transition: background-color 1s var(--ease-in-out);
@@ -12,14 +13,16 @@
 
 /*
  * "Saltar al contenido": el primer foco de la página. Queda fuera de pantalla
- * hasta que alguien llega con Tab, y ahí aparece arriba de todo, incluso del
- * telón de entrada. Tiene la forma del botón primario (pastilla dorada).
+ * hasta que alguien llega con Tab, y ahí aparece encima del nav, del WhatsApp
+ * flotante y de la barra de progreso. Queda debajo del cursor montaña, que
+ * no tapa nada (`pointer-events: none`) y tiene que dibujarse sobre todo.
+ * Tiene la forma del botón primario (pastilla dorada).
  */
 .skipLink {
   position: fixed;
   top: var(--space-4);
   left: var(--space-4);
-  z-index: calc(var(--z-curtain) + 1);
+  z-index: calc(var(--z-progress) + 1);
   padding: var(--space-2) calc(var(--space-3) * 1.2);
   border-radius: var(--radius-pill);
   background: var(--color-accent-600);
@@ -33,4 +36,15 @@
 
 .skipLink:focus {
   transform: none;
+}
+
+/*
+ * El fondo general de curvas de nivel (`ContourLines`): una capa fija del
+ * tamaño de la pantalla, detrás de todo. El `isolation` del envoltorio la deja
+ * encima del color de fondo (que cambia en el cierre) y debajo del contenido.
+ */
+.contours {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 }

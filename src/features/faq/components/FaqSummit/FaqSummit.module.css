@@ -1,0 +1,120 @@
+/*
+ * La "cumbre": la tarjeta donde termina el sendero de "Preguntas frecuentes".
+ * El eje y la columna del texto (`--faq-axis`, `--faq-text-start`) son los de
+ * las preguntas: los define `.trail` en `Faq.module.css`.
+ */
+
+/*
+ * Una fila: la montaña sobre el eje del sendero, el texto en la columna de las
+ * preguntas y el botón al final. El `z-index` la pone por encima de la línea
+ * punteada: el sendero llega hasta la tarjeta y termina ahí.
+ */
+.summit {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px 32px;
+  align-items: center;
+  margin-top: var(--faq-summit-gap);
+  padding: 30px 32px 30px var(--faq-text-start);
+  border-radius: var(--radius-xl);
+  background: var(--color-accent-2-800);
+  color: var(--color-bg);
+}
+
+/*
+ * Los anillos de cota, centrados en la montaña y detrás del texto. Miden 760px
+ * de lado (la tarjeta los recorta) y se apagan hacia afuera: cerca de la cima
+ * se leen, debajo del texto y del botón casi no están.
+ */
+.rings {
+  position: absolute;
+  top: 50%;
+  left: var(--faq-axis);
+  z-index: -1;
+  width: 760px;
+  height: 760px;
+  stroke: var(--color-bg);
+  stroke-width: 1.25px;
+  opacity: 0.2;
+  translate: -50% -50%;
+  mask-image: radial-gradient(circle closest-side, black 12%, transparent 78%);
+  pointer-events: none;
+}
+
+/* Un mojón más grande, crema sobre el verde, centrado en el alto de la tarjeta. */
+.badge {
+  position: absolute;
+  top: 50%;
+  left: var(--faq-axis);
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-accent-2);
+  translate: -50% -50%;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 2.1vw, 30px);
+  line-height: 1.15;
+}
+
+/* accent-2-200 sobre el verde 800: 8,6:1. */
+.lead {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--color-accent-2-200);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/*
+ * Mobile: el texto y, debajo, el botón a lo ancho de la columna del texto
+ * (cómodo para el pulgar). La montaña sube a la altura del primer renglón de
+ * la frase: 26px de padding + la mitad de su renglón (24px × 1,15).
+ */
+@media (max-width: 820px) {
+  .summit {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 26px 18px 26px var(--faq-text-start);
+    border-radius: var(--radius-lg);
+  }
+
+  .rings,
+  .badge {
+    top: calc(26px + 24px * 1.15 / 2);
+  }
+
+  .badge {
+    width: 32px;
+    height: 32px;
+  }
+
+  .badge svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .action {
+    justify-self: stretch;
+    white-space: normal;
+  }
+}
+
+/* En papel el botón no lleva a ningún lado: queda la frase, sobre el verde. */
+@media print {
+  .action {
+    display: none;
+  }
+}

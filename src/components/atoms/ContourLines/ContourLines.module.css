@@ -1,0 +1,55 @@
+/*
+ * Curvas de nivel del fondo de "Preguntas frecuentes". Dónde va el marco y
+ * cómo se desvanece lo decide quien lo usa (`Faq.module.css`); acá está solo
+ * el dibujo.
+ */
+
+/* Recorta el dibujo, que es más alto que la sección. No recibe clics. */
+.frame {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * Anclado arriba y centrado. El ancho manda (el alto sale del `viewBox`), con
+ * un piso de 1400px: en un celular el dibujo no se achica hasta ser un garabato,
+ * se ve su franja central a escala parecida a la de escritorio.
+ */
+.drawing {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: max(100%, 1400px);
+  height: auto;
+  translate: -50% 0;
+}
+
+/*
+ * Verde musgo, muy lavado: es un fondo. `non-scaling-stroke` mantiene el
+ * grosor del trazo en px aunque el dibujo se escale con el ancho de la pantalla.
+ */
+.minor,
+.major {
+  stroke: var(--color-accent-2);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.minor {
+  stroke-width: 1.25px;
+  opacity: 0.2;
+}
+
+/* Las curvas maestras de una carta topográfica: una cada tanto, más marcada. */
+.major {
+  stroke-width: 2px;
+  opacity: 0.28;
+}
+
+/* En papel las curvas son tinta que no dice nada. */
+@media print {
+  .frame {
+    display: none;
+  }
+}

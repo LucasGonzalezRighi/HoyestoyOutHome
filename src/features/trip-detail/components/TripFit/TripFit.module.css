@@ -1,0 +1,11 @@
+/*
+ * "¿Puedo?" / "¿Es para mí?" — `dc.html:181`. Dos cards lado a lado que pasan
+ * a una columna solas cuando no entran (`repeat(auto-fit, minmax(300px, 1fr))`).
+ * El `min(…, 100%)` evita que, en un teléfono de menos de 340px, la columna
+ * mínima de 300px desborde el contenedor.
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 22px;
+}

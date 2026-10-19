@@ -1,0 +1,117 @@
+/*
+ * Portada de la página de viaje. Toma el lenguaje del hero del home
+ * (`dc.html:54-78`): foto a sangre con parallax y un degradé que oscurece la
+ * base para el texto crema y la funde con el crema de la página.
+ *
+ * Un poco más baja que el hero (86% del alto visible, con piso de 520px): al
+ * llegar a la página tiene que asomar que hay contenido abajo.
+ */
+.cover {
+  position: relative;
+  display: grid;
+  /*
+   * Pasa por debajo del nav, que es transparente sobre la foto (pedido del
+   * cliente, octubre 2026): sube el alto del nav y lo suma al suyo.
+   */
+  min-height: max(520px + var(--nav-height), 86svh);
+  margin-top: calc(-1 * var(--nav-height));
+  overflow: hidden;
+}
+
+/* Capa a sangre: pisa el `position: relative` del marco de `WashedImage`. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Un velo arriba para que se lea "Todos los viajes", limpio en el medio (la
+ * foto) y marrón montaña hacia abajo, donde va el texto, hasta el crema del
+ * último borde (los cortes del hero, `dc.html:59`).
+ */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-900) 38%, transparent) 0%,
+    transparent 22%,
+    transparent 34%,
+    color-mix(in srgb, var(--color-accent-900) 45%, transparent) 62%,
+    color-mix(in srgb, var(--color-accent-900) 60%, transparent) 90%,
+    var(--color-bg) 100%
+  );
+}
+
+/* El link arriba y el bloque de texto contra el borde de abajo. */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  /* Arriba suma el alto del nav, que ahora va encima de la foto. */
+  padding-block: calc(var(--nav-height) + clamp(20px, 3vh, 32px)) clamp(40px, 7vh, 72px);
+}
+
+.body {
+  max-width: 820px;
+}
+
+/* El eyebrow verde no se lee sobre la foto: pasa al crema dorado de la bajada del hero. */
+.eyebrow {
+  color: var(--color-accent-100);
+  text-shadow: var(--shadow-text-hero-lead);
+}
+
+/* Parte renglones en cualquier ancho: el piso de 40px ya es legible en mobile. */
+.title {
+  margin: 0;
+  color: var(--color-bg);
+  font-size: clamp(40px, 6vw, 88px);
+  line-height: 1.02;
+  text-shadow: var(--shadow-text-hero-headline);
+}
+
+/* "Calle &" en dorado (`dc.html:155`), un paso claro: sobre la foto oscura el acento base no se lee. */
+.titleAccent {
+  color: var(--color-accent-300);
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  color: var(--color-accent-100);
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2.6vw, 36px);
+  font-style: italic;
+  text-shadow: var(--shadow-text-hero-lead);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Un poco más grandes que los tags de las cards: acá son el resumen del viaje. */
+.tag {
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 28px;
+}
+
+/* Impresión: alto fijo, como el hero (en papel `svh` se mide contra la hoja). */
+@media print {
+  .cover {
+    min-height: 560px;
+  }
+}

@@ -1,0 +1,62 @@
+/*
+ * Hoja de arranque de la intro: las piezas que entran con la intro (el
+ * titular, la bajada y los botones del hero; la portada de cada viaje),
+ * quietas en su pose de arranque hasta que el motor toma el control.
+ *
+ * Solo sostiene **texto**. La foto del hero no pasa por acá: se pinta en su
+ * lugar desde el primer pintado, con y sin JS, y el motor la toma en esa
+ * misma pose (ver `.backdrop` en `features/hero/Hero.module.css`).
+ *
+ * Por qué existe: el telón de entrada (se sacó por pedido del cliente,
+ * octubre 2026) tapaba la página hasta que la intro arrancaba. Sin él, entre
+ * el primer pintado y la hidratación se ve el HTML del servidor, sin estilos
+ * inline del motor: las piezas de la intro, enteras. Al hidratar, el primer
+ * frame las ocultaba y la intro las volvía a mostrar (un parpadeo, más largo
+ * cuanto más tarda la hidratación).
+ *
+ * Cuándo aplica:
+ * - Solo mientras `<html>` no tenga `data-intro-controlled`
+ *   (`MOTION_STATE.introControlled`): el motor lo pone al terminar su primer
+ *   frame, cuando cada pieza ya tiene la misma pose inline (`MotionEngine`).
+ *   Desde ahí manda el motor.
+ * - Solo con `scripting: enabled`: sin JS no hay motor que las suelte, y la
+ *   página se ve entera de entrada (como antes la dejaba el failsafe del
+ *   telón).
+ * - Sin `prefers-reduced-motion: reduce`: con el movimiento reducido el motor
+ *   no las anima (`RESPECT_OS_REDUCED_MOTION`), y se ven enteras desde el
+ *   primer pintado.
+ * - Failsafe: si el JS nunca llega (bloqueado, error de hidratación), a los
+ *   6 s una animación las deja en su lugar. Es el mismo plazo que tenía el
+ *   failsafe del telón.
+ *
+ * Las poses son las del motor con la intro en 0 (`src/motion/math/revealTransforms.ts`):
+ * - `reveal('word')`: `wordRevealTransform(0, …)`, detrás de su máscara. Tiene
+ *   que ser **igual** a la que escribe el motor: si no, al soltarla la
+ *   transición del reveal la llevaría de una a la otra.
+ * - `reveal(…, { intro: true })`: transparente. Las variantes que se usan con
+ *   la intro (`up`, `left`) arrancan con opacidad 0; el desplazamiento depende
+ *   de la intensidad, que CSS no conoce, y no hace falta: mientras se acomoda
+ *   la pieza sigue invisible.
+ *
+ * Todo dentro de `:where()` (especificidad 0), como `base.css`: una clase de
+ * módulo que le ponga `opacity` o `transform` a una de estas piezas le gana.
+ */
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  :where(html:not([data-intro-controlled])) :where([data-reveal='word']) {
+    transform: translate3d(0, 110%, 0) rotate(8deg);
+    animation: intro-failsafe 0s linear 6s forwards;
+  }
+
+  :where(html:not([data-intro-controlled])) :where([data-reveal-intro]) {
+    opacity: 0;
+    animation: intro-failsafe 0s linear 6s forwards;
+  }
+}
+
+@keyframes intro-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

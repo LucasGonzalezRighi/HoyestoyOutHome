@@ -1,6 +1,6 @@
-import { CURTAIN_TIMINGS, MOTION_MEDIA, SETTLE_MS } from '@/design-system/tokens/motion';
+import { INTRO_DURATION_MS, MOTION_MEDIA, SETTLE_MS } from '@/design-system/tokens/motion';
 
-import { MOTION_SELECTORS } from '../attributes';
+import { MOTION_SELECTORS, MOTION_STATE } from '../attributes';
 
 import { scrollingElementOf } from './dom';
 import type { FrameState, MotionSettings } from './FrameState';
@@ -56,6 +56,12 @@ function changesElements(record: MutationRecord): boolean {
  *    (imanes, cursor, cintas).
  * 7. Si toca layout, `apply` de todos: solo escrituras.
  *
+ * La intro arranca en el primer frame, al hidratar (el diseño la arrancaba al
+ * abrirse el telón de entrada, que se sacó por pedido del cliente en octubre
+ * 2026). Al terminar ese frame, con cada pieza de la intro ya posada inline,
+ * el motor marca `<html>` con `MOTION_STATE.introControlled` y
+ * `design-system/intro.css` deja de sostenerlas en su pose de arranque.
+ *
  * El orden de 5 y 6 está dado vuelta respecto del original, que corría el
  * cursor y las cintas antes de medir (`dc.html:483-525`): sus escrituras de
  * `transform` dejaban el estilo sucio y la primera lectura de layout
@@ -75,7 +81,9 @@ function changesElements(record: MutationRecord): boolean {
  */
 export class MotionEngine {
   private readonly scroll = new ScrollTracker();
-  private readonly intro = new IntroClock(CURTAIN_TIMINGS.introDurationMs);
+  private readonly intro = new IntroClock(INTRO_DURATION_MS);
+  /** La intro ya arrancó: va una sola vez por página, en el primer frame. */
+  private introStarted = false;
 
   private running = false;
   private frameId = 0;
@@ -114,9 +122,8 @@ export class MotionEngine {
   /**
    * El movimiento está apagado (nivel `apagado`, o reduced motion si la política lo respeta).
    *
-   * Vale también antes de `start()`: el telón lo lee para decidir si espera
-   * (`IntroTarget`), y con reduced motion no puede esperar 1,3 s solo porque
-   * lo arrancaron antes que el motor.
+   * Se evalúa en vivo, como el `off()` del original: si cambia la preferencia
+   * del sistema, vale desde el próximo frame.
    */
   get motionOff(): boolean {
     if (this.config.intensity === 0) return true;
@@ -155,15 +162,6 @@ export class MotionEngine {
     window.removeEventListener('afterprint', this.handleAfterPrint);
     this.printing = false;
     for (const effect of this.effects) effect.dispose();
-  }
-
-  /**
-   * Programa el arranque de la intro. Lo llama el telón al abrirse.
-   *
-   * @param atMs Momento en la base de `performance.now()`; puede estar en el futuro.
-   */
-  beginIntro(atMs: number): void {
-    this.intro.begin(atMs);
   }
 
   /** Marca el DOM como sucio: el próximo frame re-escanea los elementos. */
@@ -239,6 +237,14 @@ export class MotionEngine {
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     const { scrollY, velocity } = this.scroll.sample(scrollingElementOf(document));
+    // Sin telón, la intro arranca en el primer frame (al hidratar). Con el
+    // movimiento apagado no hay nada que mostrar entrando: queda terminada.
+    const firstFrame = !this.introStarted;
+    if (firstFrame) {
+      this.introStarted = true;
+      if (off) this.intro.finish();
+      else this.intro.begin(time);
+    }
     const intro = this.intro.progress(time);
 
     const frame: FrameState = {
@@ -263,6 +269,12 @@ export class MotionEngine {
     if (layout) for (const effect of this.effects) effect.measure(frame);
     for (const effect of this.effects) effect.tick(frame);
     if (layout) for (const effect of this.effects) effect.apply(frame);
+
+    // El primer frame siempre toca layout (viene de un re-escaneo): cada pieza
+    // de la intro ya tiene su pose inline, y la hoja de arranque la suelta en
+    // el mismo pintado, sin un cuadro con la pieza entera. No se saca en
+    // `dispose`: las poses inline quedan escritas y la hoja ya no hace falta.
+    if (firstFrame) document.documentElement.setAttribute(MOTION_STATE.introControlled, '');
   }
 
   /**
@@ -272,9 +284,9 @@ export class MotionEngine {
    *   intensidad): sí, y abre una ventana de `SETTLE_MS` en la que se sigue
    *   midiendo con todo quieto.
    * - **Cambio de la velocidad redondeada**: sí, pero **no** extiende la
-   *   ventana. El skew de las cards y el de las cintas dependen de la
-   *   velocidad, así que esos frames se miden y escriben como en el original
-   *   (`dc.html:514-516`, donde la velocidad era parte de la firma).
+   *   ventana. En el original la velocidad era parte de la firma
+   *   (`dc.html:514-516`), así que esos frames se miden y escriben como allá.
+   *   Hoy lo único que depende de ella es el skew de las cintas, en `tick`.
    * - **Nada cambió**: solo si la ventana sigue abierta.
    *
    * Por qué la ventana: los efectos leen posiciones que una transición CSS

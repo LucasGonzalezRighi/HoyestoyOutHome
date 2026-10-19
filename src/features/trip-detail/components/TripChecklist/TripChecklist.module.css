@@ -1,0 +1,10 @@
+/*
+ * Grilla de cards (`dc.html:296`): hasta cuatro columnas (entran justo con el
+ * ancho máximo del contenido), una en mobile. El `min(…, 100%)` evita que la
+ * columna mínima de 260px desborde en un teléfono angosto.
+ */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 18px;
+}

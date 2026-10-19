@@ -21,7 +21,7 @@ export type BrandLogoProps = {
 >;
 
 /**
- * Logo de la marca (nav, telón, cierre).
+ * Logo de la marca (nav y cierre: contacto en el home, precio en cada viaje).
  *
  * El PNG tiene fondo blanco, así que se muestra con `mix-blend-mode: multiply`:
  * el blanco toma el color de lo que tiene detrás y el logo se asienta sobre el

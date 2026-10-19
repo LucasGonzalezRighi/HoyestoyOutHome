@@ -1,7 +1,8 @@
 /**
- * API pública del feature `contact`: el cierre de la landing.
+ * API pública del feature `contact`: el cierre del sitio.
  *
- * - `Contact`: "13 Precio y contacto", la última sección del `<main>`.
+ * - `Contact`: la sección de Contacto, la última del `<main>` del home
+ *   (formulario breve + WhatsApp y el mail).
  * - `SiteFooter`: el `<footer>` de la página, que va fuera del `<main>`,
  *   inmediatamente después.
  */

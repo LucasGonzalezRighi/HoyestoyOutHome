@@ -1,6 +1,5 @@
-import type { WhatsAppLink } from '../contact/WhatsAppLink';
-import { formatKilometers } from '../shared/formatters';
-import { assertPositive, assertText } from '../shared/invariants';
+import { formatKilometers, formatMeters } from '../shared/formatters';
+import { assertInteger, assertPositive, assertText } from '../shared/invariants';
 import type { Photo } from '../shared/Photo';
 import type { Price } from '../shared/Price';
 
@@ -11,10 +10,19 @@ import type { TripDuration } from './TripDuration';
  * Identificadores de los viajes. Es una unión cerrada a propósito: un
  * `tripCatalog.get('calle-stepanek')` con un typo no compila. Sumar un viaje
  * es sumar su slug acá.
+ *
+ * Cada slug es también el último tramo de la URL de la página del viaje
+ * (`/viajes/<slug>`, la arma `tripPath()` de `constants/routes.ts`): por eso
+ * van en minúsculas, sin espacios ni `&`.
  */
-export const TRIP_SLUGS = ['calle-stepanek', 'lolog', 'laguna-negra', 'cajon-del-azul'] as const;
+export const TRIP_SLUGS = [
+  'calle-stepanek',
+  'lago-lolog-laguna-verde',
+  'laguna-negra',
+  'cajon-del-azul',
+] as const;
 
-/** Slug de un viaje del catálogo (`'calle-stepanek'`, `'lolog'`…). */
+/** Slug de un viaje del catálogo (`'calle-stepanek'`, `'lago-lolog-laguna-verde'`…). */
 export type TripSlug = (typeof TRIP_SLUGS)[number];
 
 /** Guarda de tipo para slugs que llegan sin tipar (un parámetro de URL, un CMS). */
@@ -27,7 +35,7 @@ export type TripParams = {
   slug: TripSlug;
   /** Nombre completo (título de la card): "Calle & Stepanek — Tu primer 4mil". */
   name: string;
-  /** Nombre corto (pestañas, testimonios, cierre): "Calle & Stepanek". */
+  /** Nombre corto (testimonios, calendario, mensajes): "Calle & Stepanek". */
   shortName: string;
   /** Provincia y lugar: "Mendoza · Vallecitos". */
   destination: string;
@@ -37,38 +45,27 @@ export type TripParams = {
   distanceKm: number;
   price: Price;
   photo: Photo;
-  /** Ancla de la sección propia del viaje (`#calle`). Sin ella, el viaje se consulta por WhatsApp. */
-  detailAnchor?: string;
+  /**
+   * Altura de la cumbre más alta del viaje, en metros sobre el nivel del mar
+   * (entero > 0). Solo la tienen los viajes de ascenso: Calle & Stepanek, 4290.
+   */
+  summitElevationM?: number;
 };
-
-/**
- * A dónde lleva el botón de la card de un viaje.
- *
- * - `detail`: a su sección dentro de la landing (misma pestaña).
- * - `inquiry`: al chat de WhatsApp (pestaña nueva).
- *
- * `kind` existe para que el contenido elija el texto del botón ("Ver viaje" /
- * "Consultar") sin que el dominio tenga copys de UI.
- */
-export type TripCallToAction =
-  | { readonly kind: 'detail'; readonly href: string; readonly external: false }
-  | { readonly kind: 'inquiry'; readonly href: string; readonly external: true };
-
-/** Un ancla válida: `#` seguido de un id sin espacios. */
-const ANCHOR_PATTERN = /^#[\w-]+$/;
 
 /**
  * Un viaje del catálogo (entidad: se identifica por su `slug`).
  *
- * Junta los value objects que lo describen (duración, precio, foto) y decide
- * lo único que depende del viaje en sí: cómo se muestra su distancia y
- * dificultad, y si su botón lleva a una sección propia o a WhatsApp.
+ * Junta los value objects que lo describen (duración, precio, foto) y formatea
+ * lo que depende del viaje en sí: distancia, dificultad y cumbre.
+ *
+ * Todos los viajes tienen página propia. El dominio no conoce rutas: la URL la
+ * arma `tripPath(trip.slug)` de `constants/routes.ts`.
  */
 export class Trip {
   private readonly props: Readonly<TripParams>;
 
   constructor(params: TripParams) {
-    const { slug, name, shortName, destination, difficulty, distanceKm, detailAnchor } = params;
+    const { slug, name, shortName, destination, difficulty, distanceKm, summitElevationM } = params;
     // why: el slug y la dificultad ya los garantiza el tipo, pero si mañana los
     // viajes vienen de un CMS el dato llega sin tipar y esto es lo que lo frena.
     if (!isTripSlug(slug)) {
@@ -83,10 +80,8 @@ export class Trip {
       );
     }
     assertPositive(distanceKm, `La distancia del viaje "${slug}"`);
-    if (detailAnchor !== undefined && !ANCHOR_PATTERN.test(detailAnchor)) {
-      throw new Error(
-        `El ancla del viaje "${slug}" tiene que ser "#id" (llegó ${JSON.stringify(detailAnchor)}). Usá anchorTo().`,
-      );
+    if (summitElevationM !== undefined) {
+      assertInteger(summitElevationM, `La altura de la cumbre del viaje "${slug}"`, { min: 1 });
     }
     this.props = Object.freeze({ ...params });
   }
@@ -127,13 +122,9 @@ export class Trip {
     return this.props.photo;
   }
 
-  get detailAnchor(): string | undefined {
-    return this.props.detailAnchor;
-  }
-
-  /** Tiene sección propia en la landing (Calle & Stepanek, Lolog). */
-  get hasDetail(): boolean {
-    return this.props.detailAnchor !== undefined;
+  /** Altura de la cumbre más alta, en metros, o `undefined` si el viaje no es de ascenso. */
+  get summitElevationM(): number | undefined {
+    return this.props.summitElevationM;
   }
 
   /** `"24 km"`. */
@@ -146,15 +137,9 @@ export class Trip {
     return difficultyLabel(this.props.difficulty);
   }
 
-  /**
-   * El destino del botón de la card. Los viajes con sección propia llevan a su
-   * ancla; el resto abre el chat de WhatsApp **sin mensaje precargado**, como
-   * en el diseño (`https://wa.me/<teléfono>`).
-   */
-  callToAction(whatsapp: WhatsAppLink): TripCallToAction {
-    const { detailAnchor } = this.props;
-    return detailAnchor === undefined
-      ? { kind: 'inquiry', href: whatsapp.chatHref(), external: true }
-      : { kind: 'detail', href: detailAnchor, external: false };
+  /** `"Cumbre 4.290 m"`, o `undefined` si el viaje no tiene cumbre. */
+  summitLabel(): string | undefined {
+    const { summitElevationM } = this.props;
+    return summitElevationM === undefined ? undefined : `Cumbre ${formatMeters(summitElevationM)}`;
   }
 }

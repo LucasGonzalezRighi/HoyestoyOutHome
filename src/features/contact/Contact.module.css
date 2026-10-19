@@ -1,132 +1,272 @@
 /*
- * 13 Precio y contacto — `dc.html:361-373`.
+ * Contacto, el cierre del home, como el contacto del portafolio del cliente
+ * (pedido del cliente, octubre 2026). No está en el diseño: sigue su lenguaje
+ * (verde del cierre, títulos en DM Serif cursiva, crema y dorado).
  *
- * Las transformaciones (expansión de la tarjeta, parallax de los círculos,
- * apariciones) las escribe el motor inline; acá solo va la pose de reposo.
+ * Las etapas las escribe el motor en `.pin` (`PinSplitEffect`), de 0 a 1:
+ *   --enter   la sección entra desde abajo hasta quedar fija
+ *   --open    la frase gigante se parte y las mitades viajan a los costados
+ *   --reveal  aparece el contenido (título, canales y formulario)
+ *   --exit    el footer sube por encima y la tapa
+ * Los valores por defecto (1, 1, 1, 0) son la pose final: así se ve sin JS,
+ * con el movimiento apagado y al imprimir.
  */
 
 /*
- * `padding: clamp(100px, 14vw, 180px) clamp(20px, 5vw, 72px) …` (dc.html:361).
- * Sin padding abajo: el `clamp(60px, 8vw, 100px)` del diseño lo pone el
- * footer, que en el diseño estaba adentro de esta sección.
+ * La sección pinta su propio verde (el de `CLOSING_BACKGROUND`, al que también
+ * cambia la página): así no queda una franja crema arriba mientras el fondo de
+ * la página todavía no cambió.
  */
 .section {
-  padding: clamp(100px, 14vw, 180px) var(--layout-gutter) 0;
-}
-
-/* Tarjeta verde musgo (dc.html:362). `overflow: hidden` recorta los círculos. */
-.card {
   position: relative;
-  max-width: var(--layout-narrow);
-  margin: 0 auto;
-  overflow: hidden;
-  padding: clamp(48px, 8vw, 100px) clamp(24px, 5vw, 80px);
-  border-radius: var(--radius-4xl);
-  background: var(--color-accent-2-800);
+  margin-top: var(--section-space);
+  background: var(--color-accent-2-900);
   color: var(--color-accent-2-100);
-  text-align: center;
 }
 
-/* ── Círculos decorativos (dc.html:363-364) ─────────────────────────────── */
+/*
+ * El recorrido: 240 pantallas % de alto (como el portafolio) más el alto del
+ * footer, que el motor escribe en `--footer-h`. El margen negativo de abajo
+ * hace que el footer suba por encima de ese último tramo mientras el panel
+ * sigue fijo.
+ */
+.pin {
+  --enter: 1;
+  --open: 1;
+  --reveal: 1;
+  --exit: 0;
+  /* Cuánto viaja cada mitad hacia su costado. */
+  --open-dist: clamp(40px, 12vw, 250px);
+  position: relative;
+  height: calc(240svh + var(--footer-h, 0px));
+  margin-bottom: calc(-1 * var(--footer-h, 0px));
+}
 
-.circle {
+/*
+ * El panel fijo. `--pin-top` lo escribe el motor: 0, o negativo si el panel
+ * es más alto que la pantalla (así se ve entero antes de fijarse). Con la
+ * salida se achica, se apaga y se desenfoca, como en el portafolio.
+ */
+.panel {
+  position: sticky;
+  top: var(--pin-top, 0px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 6vh, 72px);
+  min-height: 100svh;
+  padding: calc(var(--nav-height) + clamp(20px, 4vh, 48px)) var(--layout-gutter)
+    clamp(32px, 6vh, 64px);
+  transform-origin: 50% 40%;
+  transform: scale(calc(1 - var(--exit) * 0.05));
+  filter: blur(calc(var(--exit) * 8px));
+  opacity: calc(1 - var(--exit) * 0.45);
+}
+
+/* ── La frase gigante ──────────────────────────────────────────────────── */
+
+/*
+ * Cerrada, vive en el centro de la pantalla (baja 17vh mientras el contenido
+ * no aparece); al aparecer el contenido sube a su lugar. Entra chica y tenue.
+ */
+.giant {
+  width: 100%;
+  /* El reflejo va fuera del flujo: este margen le deja lugar debajo de la frase. */
+  margin: 0 0 0.45em;
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-size: clamp(44px, 6.4vw, 116px);
+  font-style: italic;
+  font-weight: var(--font-heading-weight);
+  line-height: 1;
+  transform: translate3d(0, calc((1 - var(--reveal)) * 17vh + (1 - var(--enter)) * 14vh), 0)
+    scale(calc(0.86 + var(--enter) * 0.14));
+  opacity: calc(0.15 + var(--enter) * 0.85);
+}
+
+.halves {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.26em;
+}
+
+/* Cada mitad entra desenfocada y viaja a su costado con `--open`. */
+.half {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  filter: blur(calc((1 - var(--enter)) * 6px));
+}
+
+.halfStart {
+  transform: translate3d(calc(var(--open) * -1 * var(--open-dist)), 0, 0);
+}
+
+.halfEnd {
+  color: var(--color-accent-300);
+  transform: translate3d(calc(var(--open) * var(--open-dist)), 0, 0);
+}
+
+.word {
+  display: block;
+  text-shadow: 0 0 60px color-mix(in srgb, var(--color-accent-300) 28%, transparent);
+  user-select: none;
+}
+
+/*
+ * El reflejo: la misma palabra dada vuelta, tenue y apagándose hacia abajo.
+ * Va fuera del flujo para no sumar alto al panel. En una máscara solo cuenta
+ * el alfa: por eso `black` y no un token de color.
+ */
+.reflection {
   position: absolute;
-  border-radius: 50%;
+  top: 100%;
+  right: 0;
+  left: 0;
+  transform: scaleY(-1);
+  opacity: 0.16;
+  filter: blur(1px);
+  text-shadow: none;
+  mask-image: linear-gradient(180deg, transparent 40%, black 100%);
   pointer-events: none;
 }
 
-/* Arriba a la izquierda (dc.html:363); sube más rápido que la tarjeta (`data-parallax="-0.3"`). */
-.circleTop {
-  top: -160px;
-  left: -140px;
-  width: 420px;
-  height: 420px;
-  background: var(--color-accent-2-700);
-}
-
-/* Abajo a la derecha, en dorado (dc.html:364); sube más lento que la tarjeta (`data-parallax="0.25"`). */
-.circleBottom {
-  right: -90px;
-  bottom: -130px;
-  width: 300px;
-  height: 300px;
-  background: var(--color-accent-700);
-  opacity: 0.7;
-}
-
-/* ── Contenido ─────────────────────────────────────────────────────────── */
+/* ── El contenido ──────────────────────────────────────────────────────── */
 
 /*
- * En el diseño cada hijo lleva `position: relative` para pintarse encima de
- * los círculos (que son absolutos y van antes). Un solo envoltorio relativo
- * logra lo mismo; los círculos siguen teniendo a la tarjeta como padre, que
- * es lo que mide el parallax.
+ * Dos columnas, sin tarjeta: el título y la alternativa entran desde la
+ * izquierda y el formulario desde la derecha, un poco después.
  */
-.content {
-  position: relative;
+.reveal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 96px);
+  width: 100%;
+  max-width: var(--layout-narrow);
+  text-align: left;
 }
 
-/*
- * Logo sobre una chapita crema (dc.html:365). `mix-blend-mode: normal` pisa el
- * `multiply` de `BrandLogo`: multiplicado contra el verde, el blanco del PNG
- * se volvería verde y la chapita desaparecería.
- */
-.logo {
-  width: 74px;
-  margin: 0 auto 26px;
-  padding: 6px;
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
-  mix-blend-mode: normal;
+.intro {
+  opacity: var(--reveal);
+  transform: translate3d(calc((1 - var(--reveal)) * -40px), 0, 0);
 }
 
-/* "Calle & Stepanek · Precio por persona" (dc.html:366). */
-.kicker {
-  margin: 0;
-  font-size: 16px;
+.formColumn {
+  --form-reveal: clamp(0, calc((var(--reveal) - 0.15) / 0.85), 1);
+  opacity: var(--form-reveal);
+  transform: translate3d(calc((1 - var(--form-reveal)) * 40px), 0, 0);
 }
 
-/* "$690.000" (dc.html:367). */
-.price {
-  margin: 14px 0 10px;
-  font-family: var(--font-heading);
-  font-weight: var(--font-heading-weight);
-  font-size: clamp(56px, 9vw, 120px);
-  line-height: 1.1;
+.title {
+  margin: 0 0 16px;
   color: var(--color-bg);
+  font-size: clamp(34px, 3.6vw, 52px);
+  font-style: italic;
+  line-height: 1.06;
 }
 
-/* Nota de la seña (dc.html:368). */
-.note {
-  max-width: 40ch;
-  margin: 0 auto 30px;
-  font-size: 15.5px;
+.lead {
+  max-width: 38ch;
+  margin: 0 0 28px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
-/* "La montaña te espera. / ¿Te animás a subir?" (dc.html:369). */
-.title {
-  margin: 0 0 34px;
-  font-size: clamp(34px, 4.4vw, 60px);
-  font-style: italic;
-  line-height: 1.05;
-  color: var(--color-bg);
+.email {
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
-/* dc.html:370. */
-.actions {
-  display: flex;
-  justify-content: center;
-}
-
+/*
+ * Teléfono: sin fijarse (el formulario no entra en una pantalla). La frase va
+ * en dos renglones que se separan apenas hacia sus costados al entrar, y el
+ * contenido en una columna.
+ */
 @media (max-width: 820px) {
+  .pin {
+    --open-dist: 6vw;
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .panel {
+    position: static;
+    min-height: 0;
+    padding: var(--section-space) var(--layout-gutter);
+  }
+
   /*
-   * El botón es `nowrap` (17px, padding 16px 32px ≈ 315px de ancho). A 375px
-   * la tarjeta deja ~287px de contenido y el `overflow: hidden` lo cortaría:
-   * en mobile el label puede partirse en dos renglones, centrados.
+   * Sin panel fijo no hace falta bajarla al centro de la pantalla: se queda en
+   * su lugar (si no, mientras entraba se montaba sobre el título).
    */
+  .giant {
+    font-size: clamp(44px, 13vw, 72px);
+    transform: none;
+  }
+
+  .halves {
+    flex-direction: column;
+    gap: 0.06em;
+  }
+
+  .reveal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .title {
+    font-size: clamp(30px, 8.2vw, 44px);
+    text-wrap: balance;
+  }
+
+  .lead {
+    max-width: 46ch;
+  }
+
   .cta {
+    width: 100%;
     white-space: normal;
     text-align: center;
+  }
+}
+
+/* Sin JS o con el movimiento apagado: todo a la vista, sin fijarse. */
+@media (scripting: none), (prefers-reduced-motion: reduce) {
+  .pin {
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .panel {
+    position: static;
+    min-height: 0;
+    padding: var(--section-space) var(--layout-gutter);
+  }
+}
+
+/* Al imprimir: la frase y la alternativa (el formulario no sirve en papel). */
+@media print {
+  .pin {
+    height: auto;
+    margin: 0;
+  }
+
+  .panel {
+    position: static;
+    min-height: 0;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  .formColumn {
+    display: none;
+  }
+
+  .reveal {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

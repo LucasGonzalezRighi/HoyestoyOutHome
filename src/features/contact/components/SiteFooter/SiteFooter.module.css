@@ -6,7 +6,16 @@
  * ponía la sección (dc.html:361). Acá es un elemento aparte, así que ese aire
  * pasa a ser su propio padding: el resultado en pantalla es el mismo.
  */
+/*
+ * Va por encima del Contacto (`z-index`): en el home sube y lo tapa mientras
+ * el Contacto queda fijo, como una hoja con las esquinas redondeadas y una
+ * sombra hacia arriba (pedido del cliente, octubre 2026).
+ */
 .footer {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius-4xl) var(--radius-4xl) 0 0;
+  box-shadow: 0 -24px 60px -30px color-mix(in srgb, var(--color-accent-900) 70%, transparent);
   padding: 50px var(--layout-gutter) clamp(60px, 8vw, 100px);
   /* El mismo verde al que cambia el fondo de la página: sin JS el texto claro sigue legible (CLAUDE.md §9). */
   background-color: var(--color-accent-2-900);

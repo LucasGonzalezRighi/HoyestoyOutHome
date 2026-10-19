@@ -1,6 +1,6 @@
 import { EXTERNAL_LINK_PROPS } from '@/constants/links';
 import type { FooterContent } from '@/content/sections/contact';
-import { backgroundShift } from '@/motion/attributes';
+import { backgroundShift, pinExit } from '@/motion/attributes';
 
 import { CLOSING_BACKGROUND } from '../../closingBackground';
 import styles from './SiteFooter.module.css';
@@ -18,6 +18,8 @@ export type SiteFooterProps = {
  * En el diseño está adentro de la sección 13; acá es el `<footer>` de la
  * página (el `contentinfo`), fuera del `<main>` e inmediatamente después.
  * Por eso trae dos cosas que en el diseño heredaba de la sección:
+ * - `pinExit()`: en el home sube por encima del Contacto fijo y lo tapa (pedido
+ *   del cliente, octubre 2026, como el portafolio).
  * - su propio `backgroundShift()`, para que el fondo siga verde al llegar al
  *   final de la página;
  * - su propio fondo verde en el CSS, para que el texto claro se lea aunque el
@@ -27,7 +29,7 @@ export function SiteFooter({ content }: SiteFooterProps) {
   const { brand, linksLabel, links, note } = content;
 
   return (
-    <footer className={styles.footer} {...backgroundShift(CLOSING_BACKGROUND)}>
+    <footer className={styles.footer} {...backgroundShift(CLOSING_BACKGROUND)} {...pinExit()}>
       <div className={styles.inner}>
         <p className={styles.brand}>{brand}</p>
         <ul className={styles.links} aria-label={linksLabel}>

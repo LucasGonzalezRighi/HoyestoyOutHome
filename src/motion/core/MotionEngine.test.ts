@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { SETTLE_MS } from '@/design-system/tokens/motion';
+import { INTRO_DURATION_MS, SETTLE_MS } from '@/design-system/tokens/motion';
 
-import { MOTION_ATTRIBUTES } from '../attributes';
+import { MOTION_ATTRIBUTES, MOTION_STATE } from '../attributes';
 import { CounterEffect } from '../effects/CounterEffect';
-import { DriftEffect } from '../effects/DriftEffect';
 import { ParallaxEffect } from '../effects/ParallaxEffect';
-import { SkewEffect } from '../effects/SkewEffect';
+import { RevealEffect } from '../effects/RevealEffect';
 
 import type { FrameState } from './FrameState';
 import { MotionEffect, ScrollEffect } from './MotionEffect';
@@ -33,7 +32,7 @@ describe('MotionEngine.motionOff', () => {
     vi.unstubAllGlobals();
   });
 
-  it('con reduced motion ya está apagado antes de start() (el telón lo lee para no esperar)', () => {
+  it('con reduced motion ya está apagado antes de start()', () => {
     stubWindow(true);
     expect(engine(1.8, true).motionOff).toBe(true);
   });
@@ -61,24 +60,34 @@ describe('MotionEngine.motionOff', () => {
 const FRAME_MS = 16;
 
 /**
+ * Desde cuándo, con todo quieto, el motor deja de medir: la intro arranca en
+ * el primer frame y cambia la firma hasta llegar a 1 (`INTRO_DURATION_MS`), y
+ * después sigue abierta la ventana de asentamiento.
+ */
+const SETTLED_AT = INTRO_DURATION_MS + SETTLE_MS;
+
+/**
  * Un navegador mínimo para correr el loop a mano: `requestAnimationFrame`
  * guarda el callback y el test decide el timestamp de cada frame. El scroll
  * queda quieto salvo que el test lo mueva.
  */
-function stubBrowser(nodes: readonly object[]) {
+function stubBrowser(nodes: readonly object[], { reducedMotion = false } = {}) {
   let pending: FrameRequestCallback | null = null;
   const listeners = new Map<string, () => void>();
   const view = {
     innerWidth: 1280,
     innerHeight: 800,
-    matchMedia: () => ({ matches: false }),
+    matchMedia: (query: string) => ({ matches: query.includes('reduce') && reducedMotion }),
     addEventListener: vi.fn((type: string, listener: () => void) => listeners.set(type, listener)),
     removeEventListener: vi.fn((type: string) => listeners.delete(type)),
   };
   const scroller = { scrollTop: 0 };
+  /** Los atributos de estado que el motor le pone a `<html>`. */
+  const rootAttributes = new Set<string>();
   vi.stubGlobal('window', view);
   vi.stubGlobal('document', {
     body: {},
+    documentElement: { setAttribute: (name: string) => rootAttributes.add(name) },
     scrollingElement: scroller,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
@@ -107,6 +116,7 @@ function stubBrowser(nodes: readonly object[]) {
     view,
     /** El elemento que scrollea: el test mueve `scrollTop` para simular scroll. */
     scroller,
+    rootAttributes,
     /** Despacha un evento de `window` que el motor escucha (`beforeprint`, `afterprint`, `resize`). */
     dispatch(type: string): void {
       listeners.get(type)?.();
@@ -207,24 +217,25 @@ describe('MotionEngine: ventana de asentamiento', () => {
     const spy = new MeasureSpy();
     startEngine([spy]);
 
-    browser.run(0, 3000);
+    browser.run(0, 4000);
 
-    // El primer frame (re-escaneo) cambia la firma; nada más la cambia después.
-    expect(spy.measuredAt).toEqual(framesBetween(0, 3000, SETTLE_MS));
+    // El primer frame (re-escaneo) cambia la firma y la intro la sigue
+    // cambiando hasta llegar a 1; nada más la cambia después.
+    expect(spy.measuredAt).toEqual(framesBetween(0, 4000, SETTLED_AT));
   });
 
   it('un cambio de firma reabre la ventana', () => {
     const browser = stubBrowser([]);
     const spy = new MeasureSpy();
     startEngine([spy]);
-    browser.run(0, 2000);
+    browser.run(0, SETTLED_AT);
     spy.measuredAt.length = 0;
 
     // El viewport se angosta sin `resize` (sin re-escaneo): solo cambia la firma.
     browser.view.innerWidth = 1000;
-    browser.run(2000 + FRAME_MS, 5000);
+    browser.run(SETTLED_AT + FRAME_MS, 5000);
 
-    const changedAt = 2000 + FRAME_MS;
+    const changedAt = SETTLED_AT + FRAME_MS;
     expect(spy.measuredAt).toEqual(framesBetween(changedAt, 5000, changedAt + SETTLE_MS));
   });
 
@@ -244,12 +255,12 @@ describe('MotionEngine: ventana de asentamiento', () => {
     const browser = stubBrowser([]);
     const spy = new MeasureSpy();
     startEngine([spy]);
-    browser.run(0, 2000);
+    browser.run(0, SETTLED_AT);
     spy.measuredAt.length = 0;
 
     // Un salto: el scroll cambia en un solo frame y la velocidad suavizada
     // tarda ~0,8 s en volver a 0, cambiando de entero en el camino.
-    const changedAt = 2000 + FRAME_MS;
+    const changedAt = SETTLED_AT + FRAME_MS;
     browser.scroller.scrollTop = 3000;
     browser.run(changedAt, 6000);
 
@@ -263,11 +274,11 @@ describe('MotionEngine: ventana de asentamiento', () => {
     const browser = stubBrowser([]);
     const spy = new MeasureSpy();
     startEngine([spy]);
-    browser.run(0, 2000);
+    browser.run(0, SETTLED_AT);
     spy.measuredAt.length = 0;
 
     // Un salto tan largo que la velocidad todavía cambia de entero pasada la ventana.
-    const changedAt = 2000 + FRAME_MS;
+    const changedAt = SETTLED_AT + FRAME_MS;
     browser.scroller.scrollTop = 40_000;
     browser.run(changedAt, 6000);
 
@@ -336,12 +347,86 @@ describe('MotionEngine: orden de las fases', () => {
   it('sin layout (página quieta, ventana cerrada) solo corre tick, en el orden de la lista', () => {
     const log: string[] = [];
     const browser = startWithSpies(log);
-    browser.run(0, 2000);
+    browser.run(0, SETTLED_AT);
     log.length = 0;
 
-    browser.run(2000 + FRAME_MS, 2000 + FRAME_MS);
+    browser.run(SETTLED_AT + FRAME_MS, SETTLED_AT + FRAME_MS);
 
     expect(log).toEqual(['a:tick', 'b:tick']);
+  });
+});
+
+/** Efecto espía: anota el progreso de la intro en cada frame. */
+class IntroSpy extends MotionEffect {
+  readonly progress = new Map<number, number>();
+
+  override tick(frame: FrameState): void {
+    this.progress.set(frame.time, frame.intro);
+  }
+}
+
+describe('MotionEngine: intro', () => {
+  let subject: MotionEngine | null = null;
+
+  afterEach(() => {
+    subject?.dispose();
+    subject = null;
+    vi.unstubAllGlobals();
+  });
+
+  function startEngine(intensity: number, effects: readonly MotionEffect[]): void {
+    subject = new MotionEngine(
+      { intensity, respectReducedMotion: true },
+      effects,
+      new PointerTracker(window),
+    );
+    subject.start();
+  }
+
+  it(`arranca en el primer frame, aunque la hidratación llegue tarde, y llega a 1 en ${INTRO_DURATION_MS} ms`, () => {
+    const browser = stubBrowser([]);
+    const spy = new IntroSpy();
+    startEngine(1.8, [spy]);
+
+    const firstFrame = 5000;
+    browser.run(firstFrame, firstFrame + INTRO_DURATION_MS + 10 * FRAME_MS);
+
+    expect(spy.progress.get(firstFrame)).toBe(0);
+    expect(spy.progress.get(firstFrame + 50 * FRAME_MS)).toBeCloseTo(
+      (50 * FRAME_MS) / INTRO_DURATION_MS,
+    );
+    expect(spy.progress.get(firstFrame + INTRO_DURATION_MS)).toBe(1);
+    expect(spy.progress.get(firstFrame + INTRO_DURATION_MS + 10 * FRAME_MS)).toBe(1);
+  });
+
+  it.each([
+    ['con el nivel apagado', 0, false],
+    ['con reduced motion', 1.8, true],
+  ])('%s queda en 1 desde el primer frame', (_name, intensity, reducedMotion) => {
+    const browser = stubBrowser([], { reducedMotion });
+    const spy = new IntroSpy();
+    startEngine(intensity, [spy]);
+
+    browser.run(5000, 5000 + 2 * FRAME_MS);
+
+    expect([...spy.progress.values()]).toEqual([1, 1, 1]);
+  });
+
+  it('marca <html> recién al terminar el primer frame, con las poses de la intro ya escritas', () => {
+    const browser = stubBrowser([]);
+    const markedAtApply: boolean[] = [];
+    class ApplySpy extends ScrollEffect {
+      override apply(): void {
+        markedAtApply.push(browser.rootAttributes.has(MOTION_STATE.introControlled));
+      }
+    }
+    startEngine(1.8, [new ApplySpy()]);
+    expect(browser.rootAttributes.has(MOTION_STATE.introControlled)).toBe(false);
+
+    browser.run(0, 0);
+
+    expect(markedAtApply).toEqual([false]);
+    expect(browser.rootAttributes.has(MOTION_STATE.introControlled)).toBe(true);
   });
 });
 
@@ -386,19 +471,23 @@ describe('MotionEngine: impresión', () => {
 
   it.each([
     ['parallax', (styles: StyleWriter) => new ParallaxEffect(styles)],
-    ['drift', (styles: StyleWriter) => new DriftEffect(styles)],
-    ['skew', (styles: StyleWriter) => new SkewEffect(styles, new PointerTracker(window))],
+    ['reveal', (styles: StyleWriter) => new RevealEffect(styles)],
   ])(
     'después de imprimir, con el scroll quieto, la capa con %s vuelve a su pose',
     (_name, createEffect) => {
-      // Como la foto del hero con la página arriba de todo: su marco, 66 px
-      // debajo del borde del viewport, la deja en `translate3d(0, -34.5px, 0)`.
+      // Una capa que sirve a los dos efectos, que la escriben por la caché
+      // del StyleWriter y la resetean con el movimiento apagado. El parallax
+      // mide su marco: como la foto del hero con la página arriba de todo,
+      // 66 px debajo del borde del viewport, la deja en
+      // `translate3d(0, -34.5px, 0)`. El reveal la mide a ella: a 760 px del
+      // borde de arriba, queda a mitad de su entrada.
       const layer = {
-        style: { transform: '' },
+        style: { transform: '', opacity: '', clipPath: '', transition: '' },
         parentElement: { getBoundingClientRect: () => ({ top: 66.35 }) },
+        getBoundingClientRect: () => ({ top: 760, bottom: 860 }),
         getAttribute: (name: string) => {
           if (name === MOTION_ATTRIBUTES.parallax) return '0.4';
-          if (name === MOTION_ATTRIBUTES.drift) return '-0.2';
+          if (name === MOTION_ATTRIBUTES.reveal) return 'up';
           return null;
         },
         hasAttribute: () => false,

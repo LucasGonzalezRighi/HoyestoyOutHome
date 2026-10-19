@@ -37,7 +37,7 @@ const HELD_SELECTOR = ':hover, :focus-within';
  *
  * Corre en cada frame (el loop no depende del scroll), pero su reseteo con el
  * movimiento apagado va en la fase de escritura, en el mismo lugar que el
- * original (junto al parallax, el drift y el skew).
+ * original (junto al parallax).
  */
 export class MarqueeEffect extends FrameEffect {
   private tracks: HTMLElement[] = [];

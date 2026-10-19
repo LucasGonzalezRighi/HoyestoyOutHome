@@ -23,7 +23,7 @@ import { revealStyles, wordRevealTransform } from '../math/revealTransforms';
  * (`REVEAL_TRANSITION`) suaviza el paso entre frames.
  *
  * Tres casos:
- * - `word` (titular del hero): lo maneja solo la intro del telón.
+ * - `word` (titular del hero): lo maneja solo la intro (arranca al hidratar).
  * - con `intro`: la entrada la maneja la intro y nunca salen.
  * - el resto: entrada y salida atadas al scroll, con la coreografía de
  *   `revealTransforms.ts`.

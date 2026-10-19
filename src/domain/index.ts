@@ -5,10 +5,18 @@
  * `import { Trip, Price } from '@/domain'`. Ver `README.md`.
  */
 
+export { Departure, type DateMarker, type DepartureParams } from './calendar/Departure';
+export { DepartureSchedule, type DepartureMonth } from './calendar/DepartureSchedule';
+
 export { WhatsAppLink } from './contact/WhatsAppLink';
 
-export { ItineraryStage, type ItineraryStageParams } from './itinerary/ItineraryStage';
-export { ScheduleDay, type ScheduleDayParams } from './itinerary/ScheduleDay';
+export {
+  ITINERARY_STAT_KINDS,
+  ItineraryDay,
+  type ItineraryDayParams,
+  type ItineraryStat,
+  type ItineraryStatKind,
+} from './itinerary/ItineraryDay';
 
 export { Metric, type MetricParams } from './metrics/Metric';
 
@@ -28,13 +36,6 @@ export { Photo, type PhotoParams } from './shared/Photo';
 export { Price } from './shared/Price';
 
 export { DIFFICULTIES, difficultyLabel, isDifficulty, type Difficulty } from './trips/Difficulty';
-export {
-  TRIP_SLUGS,
-  Trip,
-  isTripSlug,
-  type TripCallToAction,
-  type TripParams,
-  type TripSlug,
-} from './trips/Trip';
+export { TRIP_SLUGS, Trip, isTripSlug, type TripParams, type TripSlug } from './trips/Trip';
 export { TripCatalog } from './trips/TripCatalog';
 export { TripDuration } from './trips/TripDuration';

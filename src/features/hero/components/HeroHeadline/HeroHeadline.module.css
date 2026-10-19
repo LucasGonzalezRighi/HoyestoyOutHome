@@ -7,8 +7,13 @@
   gap: 0.04em;
   margin: 0;
   color: var(--color-bg);
-  /* `min(72px, 5.3vw)` + `nowrap`: en escritorio cada renglón entra entero en una línea. */
-  font-size: min(72px, 5.3vw);
+  /*
+    `5.3vw` + `nowrap`: en escritorio cada renglón entra entero en una línea.
+    El diseño topea en 72px (`min(72px, 5.3vw)`); acá sigue creciendo hasta
+    84px, así en pantallas de 1600px o más el titular no queda chico frente a
+    la foto. Hasta 1358px de ancho mide lo mismo que en el diseño.
+  */
+  font-size: min(84px, 5.3vw);
   line-height: 1.04;
   white-space: nowrap;
   text-shadow: var(--shadow-text-hero-headline);

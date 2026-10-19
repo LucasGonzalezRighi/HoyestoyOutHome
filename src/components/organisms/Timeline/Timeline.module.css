@@ -1,0 +1,208 @@
+/*
+ * Línea de tiempo vertical: el cronograma de Calle & Stepanek del diseño
+ * (`dc.html:163-176`). Las medidas son las del diseño; lo nuevo (la fecha de
+ * dos renglones, los grupos, la foto) está marcado como tal.
+ */
+
+/* Los 64px de la izquierda son la columna de los círculos de cada ítem (`dc.html:163`). */
+.timeline {
+  position: relative;
+  padding-left: 64px;
+}
+
+/*
+ * Riel gris (`dc.html:164`). `left: 21px` lo centra bajo los círculos:
+ * 21 + 3/2 = 22,5, la mitad de los 45px del círculo (borde incluido,
+ * `border-box`). El radio es el de pastilla: en una barra de 3px da lo mismo
+ * que los `border-radius: 3px` del diseño (el navegador lo recorta a la mitad
+ * del ancho), sin escribir un radio suelto.
+ */
+.rail {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 21px;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-300);
+}
+
+/* Arranca vacío: el motor escribe el `scaleY` en cada frame con scroll. */
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--color-accent-2), var(--color-accent-500));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+/* La lista de afuera y la de cada grupo. */
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Ítem ──────────────────────────────────────────────────────────────── */
+
+/* Cada ítem (`dc.html:166-169`). */
+.item {
+  position: relative;
+  margin-bottom: 34px;
+}
+
+/* Círculo montado sobre el riel (sale de la columna de 64px, `dc.html:167`). */
+.marker {
+  position: absolute;
+  top: -4px;
+  left: -64px;
+  display: grid;
+  place-content: center;
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--color-accent-500);
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-accent-700);
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+/* El valor y la bajada de un marcador con detalle, centrados uno sobre el otro. */
+.markerFace {
+  display: grid;
+  justify-items: center;
+}
+
+/*
+ * Fecha de dos renglones ("13" / "nov"): no está en el diseño. El círculo es
+ * el mismo (45px, así el centro sigue sobre el riel); el número baja de 22px a
+ * 19px y el mes va en la tipografía del cuerpo a 11px, el tamaño de los tags.
+ * Con interlineado 1 los dos renglones miden ~31px y entran en los 41px de
+ * adentro del círculo sin tocar el borde.
+ */
+.markerStacked .markerFace {
+  gap: 1px;
+  line-height: 1;
+}
+
+.markerStacked .markerValue {
+  font-size: 19px;
+}
+
+.markerCaption {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.title {
+  margin: 0 0 8px;
+  color: var(--color-accent-600);
+  font-size: 23px;
+}
+
+/* ── Grupo ─────────────────────────────────────────────────────────────── */
+/* No está en el diseño: los meses del calendario. */
+
+/* Un grupo después de otro deja un respiro más que el de entre ítems (34px + 14px). */
+.group + .group {
+  margin-top: 14px;
+}
+
+.groupTitle {
+  position: relative;
+  margin: 0 0 22px;
+  color: var(--color-text);
+  font-size: clamp(24px, 2.2vw, 30px);
+}
+
+/*
+ * Punto verde musgo sobre el riel, a la altura del primer renglón del
+ * subtítulo. Mide 13px y queda centrado en los 22,5px del riel:
+ * -64 + 22,5 - 13/2 = -48px. El `top` centra el punto en el renglón (la mitad
+ * del interlineado de 1,12 de los títulos, `base.css`). El aro del color del
+ * fondo lo despega del riel, como el fondo crema de los círculos.
+ */
+.groupTitle::before {
+  content: '';
+  position: absolute;
+  top: calc(0.56em - 6.5px);
+  left: -48px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-accent-2);
+  box-shadow: 0 0 0 4px var(--color-bg);
+}
+
+/* ── Cuerpo ────────────────────────────────────────────────────────────── */
+
+/* `dc.html:169`. */
+.text {
+  margin: 0 0 12px;
+  color: var(--color-neutral-800);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+/* `dc.html:171`. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * En el diseño cada tag es ítem flex directo de la fila. Acá hay un `<li>` en
+ * el medio: si queda como bloque, el tag (inline-flex) cae en una línea de
+ * texto con el interlineado del body y la fila mide 25px en vez de 23px. Con
+ * `flex` el tag vuelve a ser ítem flex y mide lo mismo que en el diseño.
+ */
+.tagItem {
+  display: flex;
+}
+
+/* El `Tag` outline trae el borde en `--color-accent`; el diseño lo aclara a 500 (`dc.html:172`). */
+.tag {
+  border-color: var(--color-accent-500);
+}
+
+/*
+ * Foto del día (no está en el cronograma del diseño). La proporción llega por
+ * `--photo-ratio`; los topes de 640px de ancho y 520px de alto hacen que una
+ * foto vertical no ocupe más de una pantalla (se recorta, con `object-fit:
+ * cover`, centrada en su encuadre). El radio es el de las cards de foto.
+ */
+.photo {
+  width: 100%;
+  max-width: 640px;
+  max-height: 520px;
+  margin: 16px 0 0;
+  border-radius: var(--radius-lg);
+  aspect-ratio: var(--photo-ratio, 3 / 2);
+}
+
+/*
+ * Mobile (≤820px): el piso de 16px para párrafos de CLAUDE.md §9.3. El resto
+ * ya es legible a 320px: títulos de 23px y la columna de 64px.
+ */
+@media (max-width: 820px) {
+  .text {
+    font-size: 16px;
+  }
+}
+
+/*
+ * Al imprimir, `print.css` no deja partir un `<li>` entre hojas. Un grupo es
+ * un `<li>` con todas las salidas de un mes adentro: puede partirse entre sus
+ * ítems (cada ítem sigue entero).
+ */
+@media print {
+  .group {
+    break-inside: auto;
+  }
+}

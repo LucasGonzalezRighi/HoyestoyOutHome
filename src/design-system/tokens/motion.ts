@@ -101,7 +101,7 @@ export const TILT_TRANSITION = 'transform .5s var(--ease-reveal), box-shadow .5s
  * arreglo deliberado (CLAUDE.md §9).
  *
  * El motor solo mide y escribe cuando cambia la firma del frame (scroll,
- * viewport, intro, intensidad, velocidad). Pero lo que mide puede seguir
+ * viewport, intro, intensidad). Pero lo que mide puede seguir
  * moviéndose después del último cambio: un contador adentro de un reveal lee
  * su `getBoundingClientRect()` mientras la transición del reveal
  * (`REVEAL_TRANSITION`) todavía lo desplaza, y si la firma se queda quieta
@@ -111,10 +111,10 @@ export const TILT_TRANSITION = 'transform .5s var(--ease-reveal), box-shadow .5s
  *
  * Por eso, después del último cambio de scroll, viewport, intro o intensidad
  * el motor sigue midiendo y escribiendo durante esta ventana, y recién después
- * vuelve a ahorrar frames. Un cambio de la velocidad redondeada mide ese frame
- * pero **no** extiende la ventana: la velocidad suavizada tarda ~0,6 s en
- * llegar a 0 después de cada scroll, y si la extendiera serían ~1,7 s de
- * frames completos en vez de 1,1.
+ * vuelve a ahorrar frames. La velocidad del scroll no la abre ni la extiende:
+ * nada de lo que se mide o se escribe con el scroll depende de ella (ver
+ * `MotionEngine.needsLayout`).
+ *
  * Tiene que durar **al menos la transición más larga de `REVEAL_TRANSITION`**
  * (el `clip-path` de 1 s) más unos frames de margen (100 ms ≈ 6 frames a 60 Hz),
  * para que la última lectura sea con todo quieto. Si se alarga esa transición,
@@ -123,43 +123,27 @@ export const TILT_TRANSITION = 'transform .5s var(--ease-reveal), box-shadow .5s
 export const SETTLE_MS = 1100;
 
 /* ────────────────────────────────────────────────────────────────────────── */
-/*  Telón e intro                                                             */
+/*  Intro                                                                     */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-/** Tiempos de la coreografía del telón (`lift()`, `dc.html:429-443`) y de la intro. */
-export const CURTAIN_TIMINGS = {
-  /**
-   * Espera antes de levantar el telón: el logo se lee un rato (`dc.html:442`).
-   * Se cuenta desde el First Contentful Paint (`CurtainController` descuenta
-   * lo ya pintado). Con el movimiento apagado no se usa: el telón se oculta de
-   * una vez.
-   */
-  liftDelayMs: 1300,
-  /** Del fundido del logo a la apertura de las hojas (`dc.html:440`). */
-  leavesDelayMs: 450,
-  /** La intro (titular del hero, fotos con zoom) arranca 500 ms después de abrir las hojas (`dc.html:439`). */
-  introLeadMs: 500,
-  /** Desde el `lift`, cuándo el telón deja de tapar y de recibir clics (`dc.html:441`). */
-  hideDelayMs: 2400,
-  /** Duración de la intro: el progreso 0→1 que consumen las palabras del hero (`dc.html:480`). */
-  introDurationMs: 1600,
-} as const;
-
-/** Pose final del telón (`dc.html:432`, `436-437`). */
-export const CURTAIN_POSE = {
-  /** El logo se achica mientras se desvanece. */
-  logoScale: 0.82,
-  /** Giro en Y de cada hoja: pasan de los 90° para que queden de canto y oscuras. */
-  leafAngleDeg: 105,
-  /** Las hojas se oscurecen al girar, como si dejaran de recibir luz. */
-  leafBrightness: 0.55,
-} as const;
+/**
+ * Duración de la intro, en ms: el progreso 0→1 que consumen las palabras del
+ * titular del hero, los reveals marcados con `intro` y el zoom de las fotos
+ * con `introZoom` (`dc.html:480`).
+ *
+ * En el diseño la intro arrancaba 500 ms después de que se abrieran las hojas
+ * del telón de entrada (`dc.html:439`). El telón se sacó por pedido del
+ * cliente (octubre 2026): la intro arranca en el primer frame del motor, al
+ * hidratar (`MotionEngine`), y hasta entonces `design-system/intro.css` deja
+ * cada pieza en su pose de arranque.
+ */
+export const INTRO_DURATION_MS = 1600;
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Scroll                                                                    */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-/** Velocidad del scroll: la que deforma cintas y cards (`dc.html:478-479`). */
+/** Velocidad del scroll: la que acelera y deforma las cintas (`dc.html:478-479`). */
 export const SCROLL = {
   /** Suavizado exponencial de la velocidad por frame: 12% hacia el valor nuevo. */
   smoothing: 0.12,
@@ -226,22 +210,6 @@ export const MARQUEE = {
   visibilityMarginPx: 200,
 } as const;
 
-/** Cards apilables del itinerario (`dc.html:545-547`). */
-export const STACK = {
-  /** El `top` sticky de las cards: 90px (+ su offset) en el marcado del diseño (`dc.html:249`). */
-  pinTopPx: 90,
-  /** Cuánto se achica la card tapada (9% a intensidad 1). */
-  shrink: 0.09,
-  /** Tope de intensidad para el achique. */
-  shrinkMaxIntensity: 1.4,
-  /** Giro en grados de la card tapada. */
-  rotateDeg: 1.8,
-  /** Cuánto se oscurece (28%). */
-  darken: 0.28,
-  /** Por debajo de este progreso no se aplica `filter` (un `filter` vacío es más barato de componer). */
-  darkenThreshold: 0.01,
-} as const;
-
 /** Relleno de la línea de tiempo del cronograma (`dc.html:550`). */
 export const TIMELINE = {
   /** El relleno llega hasta la línea del 60% del viewport. */
@@ -252,14 +220,6 @@ export const TIMELINE = {
 export const COUNTER = {
   /** Cuentan mientras el elemento sube la primera mitad del viewport. */
   span: 0.5,
-} as const;
-
-/** Deformación por velocidad de las cards de viajes (`dc.html:569`). */
-export const SKEW = {
-  /** Grados de `skewX` por px/frame de velocidad. */
-  skewDeg: 0.12,
-  /** Grados de rotación por px/frame de velocidad. */
-  rotateDeg: 0.05,
 } as const;
 
 /** Fondo de la página que cambia por sección (`dc.html:531`). */
@@ -308,4 +268,54 @@ export const TILT = {
   scale: 1.02,
   /** Zoom de la imagen `tiltZoom` de adentro. */
   zoomScale: 1.1,
+} as const;
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Nav y cortinas                                                            */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Nav sobre la foto de portada (`NavBarEffect`, pedido del cliente, octubre
+ * 2026): arriba de todo es transparente y en estos px de scroll llega a
+ * sólido (el crema de la página con su desenfoque). Más corto se siente como
+ * un corte; más largo, el nav queda a medio pintar sobre el contenido.
+ */
+export const NAV_OVERLAY = {
+  solidDistancePx: 140,
+} as const;
+
+/**
+ * Cortina (`CoverPairEffect`, pedido del cliente, octubre 2026): mientras la
+ * sección de abajo sube y tapa a la fija, la fija se achica y se apaga hasta
+ * estos valores, como si se alejara. No se multiplican por la intensidad: es
+ * un gesto chico y un 1,8 lo volvía un zoom. Con el movimiento apagado, nada.
+ */
+export const COVER = {
+  /** Cuánto se achica la sección tapada al final (escala 1 → 0,95). */
+  scale: 0.05,
+  /** Cuánto se apaga (opacidad 1 → 0,55). */
+  fade: 0.45,
+} as const;
+
+/**
+ * Secuencia fija del Contacto (`PinSplitEffect`, pedido del cliente, octubre
+ * 2026, igual que el contacto de su portafolio). Los tramos son fracciones del
+ * recorrido fijo: la palabra se abre de 0,10 a 0,52 y el contenido aparece de
+ * 0,40 a 0,72; el resto es lectura quieta. Sin lugar para fijarse (un
+ * teléfono), todo se abre a medida que la sección entra en pantalla.
+ */
+export const PIN_SPLIT = {
+  openFrom: 0.1,
+  openSpan: 0.42,
+  revealFrom: 0.4,
+  revealSpan: 0.32,
+  /** Hasta dónde scrollea el foco para que el formulario se vea entero (después de que termina de aparecer). */
+  focusAt: 0.75,
+  /** Sin fijarse: la sección empieza a abrirse con el borde de arriba al 78% de la pantalla… */
+  flowStart: 0.78,
+  /** …y termina de abrirse 52% de pantalla después. */
+  flowSpan: 0.52,
+  /** Sin fijarse, el contenido aparece desde que la palabra va por este punto. */
+  flowRevealFrom: 0.35,
+  flowRevealSpan: 0.5,
 } as const;

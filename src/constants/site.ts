@@ -20,7 +20,8 @@ export const SITE = {
 } as const;
 
 /**
- * WhatsApp es el único canal de contacto: no hay formulario ni backend.
+ * WhatsApp es el canal principal de contacto (nav, botón flotante, consultas
+ * de cada viaje). No hay backend.
  *
  * `phone` va en formato internacional sin `+` ni espacios, que es lo que
  * espera `wa.me`. El link se arma con la clase `WhatsAppLink` del dominio.
@@ -29,6 +30,13 @@ export const WHATSAPP = {
   phone: '541153347012',
   defaultMessage: 'Hola! Quiero info sobre los viajes de Hoy Estoy Out Of Home',
 } as const;
+
+/**
+ * Destino del formulario breve de Contacto. Sin backend: el formulario arma un
+ * `mailto:` con el asunto y el cuerpo ya escritos, y el cliente de mail de
+ * quien escribe lo envía a esta dirección.
+ */
+export const CONTACT_EMAIL = 'lucaschichizola@gmail.com';
 
 /** Perfiles públicos de la marca (footer y galería). */
 export const SOCIAL_PROFILES = {

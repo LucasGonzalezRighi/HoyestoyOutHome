@@ -8,14 +8,11 @@ import styles from './Section.module.css';
 export type SectionSpacing =
   /** `--section-space`: el de casi todas las secciones. */
   | 'default'
-  /** `--section-space-compact`: "¿Puedo?" / "¿Es para mí?", que continúa a Calle & Stepanek. */
-  | 'compact'
-  /** Sin aire: la sección lo maneja sola (scroll horizontal, cierre). */
+  /** Sin aire: la sección lo maneja sola (el cierre, con su tarjeta). */
   | 'none';
 
 const SPACING_CLASSES: Record<SectionSpacing, string | undefined> = {
   default: styles.spacingDefault,
-  compact: styles.spacingCompact,
   none: undefined,
 };
 

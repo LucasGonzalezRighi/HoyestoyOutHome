@@ -1,0 +1,428 @@
+/*
+ * El abanico de "Próximos viajes": encabezado en dos columnas (título a la
+ * izquierda; bajada, datos y controles a la derecha) y, debajo, los paneles.
+ *
+ * El abanico ocupa exactamente el ancho de su contenedor: los paneles se
+ * reparten el 100% (`flex-grow`), así que nada sangra por un costado y los
+ * bordes coinciden con los del resto de la página.
+ *
+ * Lo que este módulo le pasa a cada panel (`TripPanel.module.css`) son cuatro
+ * custom properties: `--trip-open`, `--fan-speed`, `--trip-frame-width` y
+ * `--trip-frame-height`.
+ */
+
+.fan {
+  /*
+   * El interruptor del movimiento: multiplica todas las duraciones y los
+   * retrasos del abanico y de sus paneles. En 0 no hay transiciones.
+   */
+  --fan-speed: 1;
+  /* Separación entre paneles. */
+  --fan-gap: 14px;
+  /* Cuántas veces el ancho de un panel cerrado mide el abierto. */
+  --fan-ratio: 3.2;
+  /*
+   * La parte del ancho que le toca al panel abierto: lo que queda después de
+   * los `gap`, repartido entre el abierto (`--fan-ratio`) y los cerrados (1
+   * cada uno). `--trips-count` lo pone `TripsFan`. Va sin unidad de base para
+   * que sirva sobre un porcentaje (el encabezado) y sobre `100cqi` (la fila).
+   */
+  --fan-open-share: calc(var(--fan-ratio) / (var(--trips-count) - 1 + var(--fan-ratio)));
+  --fan-gaps: calc((var(--trips-count) - 1) * var(--fan-gap));
+}
+
+/* Nivel `apagado` del build (`NEXT_PUBLIC_MOTION_LEVEL`): lo marca `TripsFan`. */
+.fan[data-still] {
+  --fan-speed: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fan {
+    --fan-speed: 0;
+  }
+}
+
+/* ── Encabezado ────────────────────────────────────────────────────────── */
+
+/*
+ * El encabezado repite el corte del abanico: la columna del título mide lo
+ * que el panel abierto y la de la derecha, lo que las franjas. Con el primer
+ * viaje abierto (así carga la página), la bajada y los controles caen justo
+ * sobre las franjas, y las flechas, sobre el borde derecho del abanico. El
+ * piso del 46% es para cuando haya muchos viajes y el panel abierto se
+ * angoste: el título necesita su renglón.
+ *
+ * Las dos columnas se alinean por abajo: la base del título queda a la
+ * altura de las flechas.
+ */
+.header {
+  display: grid;
+  grid-template-columns:
+    minmax(0, max(46%, (100% - var(--fan-gaps)) * var(--fan-open-share)))
+    minmax(0, 1fr);
+  align-items: end;
+  column-gap: var(--fan-gap);
+  margin-bottom: clamp(28px, 3vw, 44px);
+}
+
+.aside {
+  display: grid;
+  row-gap: 18px;
+}
+
+/* ── Controles: contador, barra de segmentos y flechas ─────────────────── */
+
+.controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+/*
+ * "01 / 04". El número de adelante es una tira con todos los números, uno
+ * debajo del otro, detrás de una ventana de un renglón: al cambiar de viaje
+ * la tira se corre y el número rueda. Es una transición de `transform`: si
+ * llega otro cambio a mitad de camino, sigue desde donde está.
+ */
+.counter {
+  --counter-line: 1.2em;
+
+  display: flex;
+  align-items: flex-end;
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 30px;
+  line-height: var(--counter-line);
+  font-variant-numeric: tabular-nums;
+}
+
+.counterWindow {
+  display: block;
+  height: var(--counter-line);
+  overflow: clip;
+}
+
+.counterStrip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--fan-active) * var(--counter-line) * -1));
+  transition: transform calc(var(--fan-speed) * 320ms) var(--ease-fill);
+}
+
+.counterNumber {
+  display: block;
+  height: var(--counter-line);
+}
+
+/* El total, más chico y más claro: lo que cambia es el número de adelante. */
+.counterTotal {
+  padding-bottom: 0.5em;
+  color: var(--color-neutral-700);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.counterTotal::before {
+  content: '/';
+  margin-inline: 8px 6px;
+  color: var(--color-neutral-500);
+}
+
+/* Un segmento por viaje; se llena el del panel abierto. */
+.segments {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 48px;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-300);
+  overflow: clip;
+}
+
+/*
+ * El relleno entra de izquierda a derecha y se va desvaneciéndose: recién
+ * cuando ya no se ve vuelve a su ancho 0 (el `transform` espera a la opacidad).
+ */
+.segment::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-accent-600);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    opacity calc(var(--fan-speed) * 200ms) ease-out,
+    transform 0s linear calc(var(--fan-speed) * 200ms);
+}
+
+.segment[data-active='true']::after {
+  opacity: 1;
+  transform: scaleX(1);
+  transition:
+    opacity calc(var(--fan-speed) * 120ms) ease-out,
+    transform calc(var(--fan-speed) * 420ms) var(--ease-fill);
+}
+
+.arrows {
+  display: flex;
+  gap: 8px;
+}
+
+/*
+ * Flecha redonda: un paso de tono sobre el crema, sin borde. El borde
+ * transparente es para el modo de alto contraste, que lo pinta.
+ */
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    background-color calc(var(--fan-speed) * 180ms) ease,
+    color calc(var(--fan-speed) * 180ms) ease,
+    transform calc(var(--fan-speed) * 140ms) ease-out;
+}
+
+.arrow svg {
+  display: block;
+}
+
+/* Solo con mouse: en una pantalla táctil el hover queda pegado después del toque. */
+@media (hover: hover) and (pointer: fine) {
+  .arrow:hover {
+    background: var(--color-accent-2);
+    color: var(--color-bg);
+  }
+}
+
+.arrow:active {
+  transform: scale(0.94);
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* La región viva no ocupa lugar en la fila de controles (su texto ya está oculto). */
+.status {
+  position: absolute;
+}
+
+/* ── La fila de paneles ────────────────────────────────────────────────── */
+
+.list {
+  /*
+   * Pisos de ancho. Con cuatro viajes no se alcanzan en ningún ancho de
+   * escritorio; con muchos (nueve o más a 1240px), los paneles llegan al piso
+   * y la fila scrollea de costado en vez de aplastarlos.
+   */
+  --fan-closed-min: 88px;
+  --fan-open-min: min(100cqi, 360px);
+  /*
+   * Alto del abanico. Sale del alto de la pantalla menos lo que hay arriba
+   * cuando se llega por el ancla (`/#viajes`): nav, aire de la sección y
+   * encabezado suman unos 416px en escritorio. Así el abanico entra entero,
+   * con el botón del panel abierto a la vista, en una pantalla de 900px de
+   * alto o más.
+   */
+  --fan-height: clamp(420px, 100vh - 430px, 620px);
+  /*
+   * Lo que mide el panel abierto: su parte de la repartija, y nunca menos que
+   * su piso. `100cqi` es el ancho de la fila; la cuenta se resuelve en cada
+   * panel, que es donde se usa.
+   */
+  --trip-frame-width: max(
+    var(--fan-open-min),
+    (100cqi - var(--fan-gaps)) * var(--fan-open-share)
+  );
+  --trip-frame-height: 100%;
+
+  container-type: inline-size;
+  display: flex;
+  gap: var(--fan-gap);
+  height: var(--fan-height);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Solo scrollea si los paneles llegaron a su piso; en vertical no hay nada que se salga. */
+  overflow: auto hidden;
+}
+
+/*
+ * Cada panel. El ancho es `flex-grow`: 1 cerrado, `--fan-ratio` abierto. Es
+ * una transición de layout a propósito (como la del acordeón de la FAQ): la
+ * fila siempre suma el 100%, también si se la interrumpe a mitad de camino,
+ * y adentro no hay nada que se reacomode (la foto y el texto tienen tamaño
+ * fijo). El piso de ancho se anima junto con el `flex-grow` para que no le
+ * gane en ningún punto del recorrido.
+ *
+ * `overflow: clip` y no `hidden`: con `hidden` el `<li>` sería un contenedor
+ * de scroll, y al enfocar con Tab el link de un panel cerrado (que queda
+ * fuera del recorte) el navegador lo scrollearía por dentro y el texto
+ * quedaría corrido.
+ */
+.item {
+  --trip-open: 0;
+
+  position: relative;
+  flex-grow: calc(1 + var(--trip-open) * (var(--fan-ratio) - 1));
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-width: calc(
+    var(--fan-closed-min) + var(--trip-open) * (var(--fan-open-min) - var(--fan-closed-min))
+  );
+  border-radius: var(--radius-xl);
+  overflow: clip;
+  transition:
+    flex-grow calc(var(--fan-speed) * 520ms) var(--ease-reveal),
+    min-width calc(var(--fan-speed) * 520ms) var(--ease-reveal);
+}
+
+/* El estado que mantiene `TripsFan`: un solo `<li>` abierto. */
+.item[data-active='true'] {
+  --trip-open: 1;
+}
+
+/* Una franja cerrada se abre con un clic o un toque. */
+.item:not([data-active='true']) {
+  cursor: pointer;
+}
+
+/* ── Sin JS: manda el CSS ──────────────────────────────────────────────── */
+
+/*
+ * El HTML del servidor trae el primer panel abierto. Sin JS, el que está bajo
+ * el cursor (o, si no hay ninguno, el que tiene el foco) pasa a ser el
+ * abierto; al salir vuelve el primero. Cuatro reglas porque el cursor le gana
+ * al foco: con los dos a la vez habría dos paneles abiertos, y el contenido
+ * está medido para uno solo. Las flechas y el contador no harían nada.
+ */
+@media (scripting: none) {
+  .controls {
+    display: none;
+  }
+
+  .list:has(> .item:hover) > .item {
+    --trip-open: 0;
+  }
+
+  .list:has(> .item:hover) > .item:hover {
+    --trip-open: 1;
+  }
+
+  .list:not(:has(> .item:hover)):has(> .item:focus-within) > .item {
+    --trip-open: 0;
+  }
+
+  .list:not(:has(> .item:hover)):has(> .item:focus-within) > .item:focus-within {
+    --trip-open: 1;
+  }
+}
+
+/* ── Celular: el mismo abanico, en vertical ────────────────────────────── */
+
+/*
+ * Los paneles se apilan: el abierto mide 380px y los cerrados son franjas de
+ * 84px con su nombre. El alto total es fijo (la suma), así que al abrir otro
+ * la página no salta: lo que se reparte es el alto, con el mismo `flex-grow`.
+ * Con cuatro viajes son 662px: entra en una pantalla de 844px debajo del nav.
+ */
+@media (max-width: 820px) {
+  .header {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .aside {
+    row-gap: 16px;
+  }
+
+  .fan {
+    --fan-gap: 10px;
+    --fan-open-height: 380px;
+    --fan-closed-height: 84px;
+    --fan-ratio: calc(380 / 84);
+  }
+
+  .list {
+    --trip-frame-width: 100%;
+    --trip-frame-height: var(--fan-open-height);
+
+    flex-direction: column;
+    height: calc(
+      var(--fan-open-height) + (var(--trips-count) - 1) * var(--fan-closed-height) +
+        var(--fan-gaps)
+    );
+    overflow: visible;
+  }
+
+  .item {
+    min-width: 0;
+    min-height: 0;
+    transition: flex-grow calc(var(--fan-speed) * 520ms) var(--ease-reveal);
+  }
+}
+
+/* ── Impresión ─────────────────────────────────────────────────────────── */
+
+/*
+ * Grilla de dos columnas con todos los viajes abiertos (foto arriba y texto
+ * debajo: lo arma `TripPanel.module.css`). Sin controles: en papel no hay qué
+ * pasar.
+ */
+@media print {
+  .fan {
+    --fan-speed: 0;
+  }
+
+  .header {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+  }
+
+  .controls {
+    display: none;
+  }
+
+  .list {
+    --trip-frame-width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 24px;
+    height: auto;
+    overflow: visible;
+  }
+
+  .item,
+  .item[data-active='true'] {
+    --trip-open: 1;
+
+    min-width: 0;
+    border-radius: 0;
+    overflow: visible;
+    break-inside: avoid;
+    cursor: auto;
+  }
+}

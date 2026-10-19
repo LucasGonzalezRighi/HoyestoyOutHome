@@ -1,7 +1,7 @@
 import { formatNumber } from './formatters';
 import { assertInteger } from './invariants';
 
-/** Pesos en un "mil" del contador del cierre. */
+/** Pesos en un "mil" del contador del precio (cierre de la página de cada viaje). */
 const THOUSAND = 1000;
 
 /**
@@ -20,7 +20,7 @@ export class Price {
 
   /**
    * Símbolo de la moneda (pesos argentinos). Público porque el precio grande
-   * del cierre lo escribe fuera del contador, que solo reescribe los dígitos
+   * del cierre de cada viaje lo escribe fuera del contador, que solo reescribe los dígitos
    * (`dc.html:367`): así el `$` sale de un solo lugar, el mismo que usa `label()`.
    */
   static readonly CURRENCY_SYMBOL = '$';
@@ -60,7 +60,7 @@ export class Price {
   /**
    * El monto en miles: `690000` → `690`.
    *
-   * Lo usa el contador del cierre, que anima `690` y le pega `.000` al final
+   * Lo usa el contador del cierre de cada viaje, que anima `690` y le pega `.000` al final
    * (formato `thousands` de `motion/attributes.ts`). Si el monto no es un
    * número redondo de miles el contador mostraría otro precio, así que tira.
    */

@@ -40,9 +40,9 @@
   /*
    * Desvío del diseño (CLAUDE.md §9): el nav sticky tapa los primeros 66px del
    * viewport. Con esto el navegador los descuenta al llevar algo a la vista,
-   * tanto un salto por ancla como el foco con Tab o Shift+Tab: sin él, una
-   * pestaña de Servicios quedaba enfocada entera debajo del nav, porque para el
-   * navegador ya estaba en pantalla (WCAG 2.4.11). El `--space-4` deja aire
+   * tanto un salto por ancla como el foco con Tab o Shift+Tab: sin él, un
+   * control enfocado con Shift+Tab podía quedar entero debajo del nav, porque
+   * para el navegador ya estaba en pantalla (WCAG 2.4.11). El `--space-4` deja aire
    * entre el nav y lo que llega. No afecta los `window.scrollTo` con
    * coordenadas del motor.
    */
@@ -60,10 +60,9 @@
   /* Evita viudas en los párrafos (helmet del diseño). */
   text-wrap: pretty;
   /*
-   * `clip` y no `hidden`: recorta lo que se sale en X (el texto calado del
-   * hero, la cinta girada, los reveals que entran desde la derecha) sin
-   * convertir al body en contenedor de scroll, que rompería el
-   * `position: sticky` del nav y de las secciones fijadas. Recorta porque el
+   * `clip` y no `hidden`: recorta lo que se sale en X (la cinta girada del
+   * hero, los reveals que entran desde la derecha) sin convertir al body en
+   * contenedor de scroll, que rompería el `position: sticky` del nav. Recorta porque el
    * html también lleva `clip` (arriba): si no, el valor del body se propagaría
    * al viewport y el body no recortaría nada.
    */

@@ -1,0 +1,29 @@
+/* "Cronograma" de la página de viaje. La línea de tiempo trae sus estilos (`Timeline`). */
+
+/* Una columna de lectura: con la foto de cada día, más ancha se leería a saltos. */
+.timeline {
+  max-width: 760px;
+}
+
+/* ── Itinerario próximamente ───────────────────────────────────────────── */
+
+.comingSoon {
+  max-width: 640px;
+}
+
+.comingSoonCard {
+  padding: clamp(28px, 4vw, 44px);
+}
+
+/* El tono dorado de "¿Puedo?" (`dc.html:184`): el aviso es una respuesta, no un error. */
+.comingSoonTitle {
+  margin: 0 0 12px;
+  color: var(--color-accent-600);
+  font-size: clamp(28px, 3vw, 40px);
+}
+
+.comingSoonText {
+  margin: 0 0 24px;
+  font-size: 16.5px;
+  line-height: 1.65;
+}
