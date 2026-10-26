@@ -1,0 +1,347 @@
+/*
+ * Piezas compartidas del panel de administración: tarjetas, campos, listas
+ * editables y botones chicos. Usan los tokens del design system (Organic) del
+ * sitio, en una versión más sobria: el panel es una herramienta, no una
+ * landing.
+ */
+
+/* ── Tarjeta y grupo de campos ─────────────────────────────────────────── */
+
+.card {
+  display: grid;
+  gap: 20px;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-xl);
+  background: var(--color-paper);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-accent-2-900) 6%, transparent);
+}
+
+/* `display: grid` le gana al atributo `hidden` (pestañas del editor de viajes). */
+.card[hidden] {
+  display: none;
+}
+
+.fieldset {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* La leyenda no es un ítem de la grilla del fieldset: su aire va como margen. */
+.legend {
+  margin: 0 0 20px;
+  padding: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2.4vw, 26px);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.15;
+  color: var(--color-accent-2-900);
+}
+
+.sectionLead {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-neutral-700);
+}
+
+/* Campos en fila: se parten solos cuando no entran (sin breakpoints). */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+
+.rowWide {
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}
+
+/* ── Campo ─────────────────────────────────────────────────────────────── */
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--color-accent-2-900);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-neutral-700);
+}
+
+.control {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  caret-color: var(--color-accent);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.45;
+  transition:
+    border-color 160ms var(--ease-in-out),
+    box-shadow 160ms var(--ease-in-out);
+}
+
+.control:hover {
+  border-color: var(--color-neutral-700);
+}
+
+.control:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-2-700);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-2-500) 35%, transparent);
+}
+
+.control[aria-invalid='true'] {
+  border-color: var(--color-accent-800);
+}
+
+textarea.control {
+  min-height: 96px;
+  resize: vertical;
+}
+
+select.control {
+  appearance: none;
+  padding-right: 40px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-neutral-700) 50%),
+    linear-gradient(135deg, var(--color-neutral-700) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 15px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.error {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-accent-800);
+}
+
+.errorIcon {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* Fuera de la vista, pero en el árbol de accesibilidad (como el atom `VisuallyHidden`). */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Interruptor (checkbox) ────────────────────────────────────────────── */
+
+.toggle {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  width: fit-content;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.toggleInput {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-400);
+  cursor: pointer;
+  transition: background-color 180ms var(--ease-in-out);
+}
+
+.toggleInput::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-sm);
+  transition: transform 180ms var(--ease-in-out);
+}
+
+.toggleInput:checked {
+  background: var(--color-accent-2-700);
+}
+
+.toggleInput:checked::after {
+  transform: translateX(18px);
+}
+
+.toggleInput:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ── Listas editables ──────────────────────────────────────────────────── */
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg) 45%, var(--color-paper));
+}
+
+.listItemHeader {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listItemTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-accent-2-800);
+}
+
+/* Lista de textos simples: el campo y sus botones en una línea. */
+.inlineItem {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.inlineItem > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemControls {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--color-neutral-400);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  color: var(--color-neutral-700);
+  text-align: center;
+}
+
+/* ── Botones chicos ────────────────────────────────────────────────────── */
+
+.iconButton {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+  color: var(--color-accent-2-900);
+  cursor: pointer;
+  transition:
+    background-color 160ms var(--ease-in-out),
+    border-color 160ms var(--ease-in-out);
+}
+
+.iconButton:hover:not(:disabled) {
+  border-color: var(--color-neutral-600);
+  background: var(--color-surface);
+}
+
+.iconButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.iconButton:focus-visible,
+.textButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.danger:hover:not(:disabled) {
+  border-color: var(--color-accent-700);
+  color: var(--color-accent-800);
+}
+
+.textButton {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-self: start;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px dashed var(--color-accent-2-500);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-accent-2-800);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-in-out);
+}
+
+.textButton:hover {
+  background: color-mix(in srgb, var(--color-accent-2-200) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control,
+  .toggleInput,
+  .toggleInput::after,
+  .iconButton,
+  .textButton {
+    transition: none;
+  }
+}

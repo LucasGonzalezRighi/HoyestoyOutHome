@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { CONTACT_EMAIL } from '@/constants/site';
-import { contactContent, type ContactMailContent } from '@/content/sections/contact';
+import { buildTripCatalog } from '@/content/catalog/trips';
+import {
+  contactContent as buildContactContent,
+  type ContactMailContent,
+} from '@/content/sections/contact';
+import { SEED_RECORD } from '@/content/seed';
 
 import {
   CONTACT_FIELD_NAMES,
@@ -12,6 +17,12 @@ import {
   readContactForm,
   type ContactFormValues,
 } from './contactMail';
+
+/** El contenido de Contacto con los viajes y textos iniciales. */
+const contactContent = buildContactContent(
+  buildTripCatalog(SEED_RECORD.trips),
+  SEED_RECORD.home.contact,
+);
 
 /** Plantilla fija para los tests de formato: no depende de los copys del contenido. */
 const MAIL: ContactMailContent = {

@@ -17,7 +17,7 @@ const TESTIMONIALS_MARQUEE = { direction: 1, speed: 0.6 } as const;
 
 /** Props de `Testimonials`: solo su slice de contenido. */
 export type TestimonialsProps = {
-  /** `landingContent.testimonials`. */
+  /** `getSiteContent().landing.testimonials`. */
   content: TestimonialsContent;
 };
 

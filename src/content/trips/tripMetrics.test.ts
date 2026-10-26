@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { tripCatalog } from '@/content/catalog/trips';
+import { buildTripCatalog } from '@/content/catalog/trips';
 import { PHOTOS } from '@/content/media';
+import { SEED_TRIPS } from '@/content/seed/trips';
 import { Price, Trip, TripDuration } from '@/domain';
 
 import { tripMetrics, type TripMetricLabels } from './tripMetrics';
@@ -26,9 +27,11 @@ const dayHike = new Trip({
   photo: PHOTOS.refugeUnderStars,
 });
 
+const catalog = buildTripCatalog(SEED_TRIPS);
+
 describe('tripMetrics', () => {
   it('saca distancia, días, noches y cumbre del catálogo (Calle & Stepanek)', () => {
-    const metrics = tripMetrics(tripCatalog.get('calle-stepanek'), LABELS);
+    const metrics = tripMetrics(catalog.get('calle-stepanek'), LABELS);
     expect(metrics.map((metric) => metric.format())).toEqual([
       '24 km',
       '4 días',
@@ -44,7 +47,7 @@ describe('tripMetrics', () => {
   });
 
   it('omite la cumbre si el viaje no tiene, y usa el singular para 1 noche', () => {
-    const metrics = tripMetrics(tripCatalog.get('laguna-negra'), LABELS);
+    const metrics = tripMetrics(catalog.get('laguna-negra'), LABELS);
     expect(metrics.map((metric) => metric.format())).toEqual(['18 km', '2 días', '1 noche']);
   });
 
@@ -54,7 +57,7 @@ describe('tripMetrics', () => {
   });
 
   it('guarda el número sin formato, que es lo que anima el contador', () => {
-    const metrics = tripMetrics(tripCatalog.get('calle-stepanek'), LABELS);
+    const metrics = tripMetrics(catalog.get('calle-stepanek'), LABELS);
     expect(metrics.map((metric) => metric.value)).toEqual([24, 4, 3, 4290]);
   });
 });

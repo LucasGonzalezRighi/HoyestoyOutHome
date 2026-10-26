@@ -1,0 +1,68 @@
+/* Campo de foto: vista previa a la izquierda, controles a la derecha (apilados en angosto). */
+
+.photo {
+  gap: 10px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.image {
+  object-fit: cover;
+}
+
+.placeholder {
+  color: var(--color-neutral-500);
+}
+
+.controls {
+  display: grid;
+  gap: 14px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* El label hace de botón: el `<input type="file">` va oculto. */
+.buttons label {
+  border-style: solid;
+}
+
+/* El foco del input oculto se ve en su label. */
+.buttons label:has(+ input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.remove {
+  border-color: var(--color-neutral-400);
+  color: var(--color-neutral-800);
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--color-accent-2-700);
+}

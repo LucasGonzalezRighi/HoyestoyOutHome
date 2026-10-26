@@ -9,7 +9,7 @@ import styles from './WhyUs.module.css';
 
 /** Props de `WhyUs`: solo su slice de contenido. */
 export type WhyUsProps = {
-  /** `landingContent.whyUs`. */
+  /** `getSiteContent().landing.whyUs`. */
   content: WhyUsContent;
 };
 

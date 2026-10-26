@@ -36,9 +36,9 @@ const BACKGROUND_PARALLAX: WashedImageParallax = {
 const LEAD_DELAY = 6;
 const ACTIONS_DELAY = 7;
 
-/** Props de `Hero`: su slice de `landingContent`. */
+/** Props de `Hero`: su slice del home (`LandingContent`). */
 export type HeroProps = {
-  /** `landingContent.hero`: foto, titular, bajada, CTA y palabras de la cinta. */
+  /** `getSiteContent().landing.hero`: foto, titular, bajada, CTA y palabras de la cinta. */
   content: HeroContent;
 };
 

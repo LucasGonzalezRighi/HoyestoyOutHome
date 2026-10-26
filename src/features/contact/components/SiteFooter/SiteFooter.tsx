@@ -7,7 +7,7 @@ import styles from './SiteFooter.module.css';
 
 /** Props de `SiteFooter`: solo su slice de contenido. */
 export type SiteFooterProps = {
-  /** `landingContent.footer`. */
+  /** `getSiteContent().landing.footer`. */
   content: FooterContent;
 };
 

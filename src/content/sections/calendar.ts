@@ -1,4 +1,5 @@
-import { departureSchedule, type DepartureMonth } from '@/content/catalog/departures';
+import type { DepartureMonth, DepartureSchedule } from '@/content/catalog/departures';
+import type { HomeTextsRecord } from '@/content/records/schema';
 import type { SectionHeadingContent } from '@/content/types';
 
 /**
@@ -21,22 +22,29 @@ export type CalendarContent = Required<SectionHeadingContent> & {
    */
   readonly viewTripLabel: string;
   /**
-   * **Temporal.** Aviso visible de que las fechas son de ejemplo. Cuando el
-   * cliente pase las salidas reales (en `content/catalog/departures.ts`), se
-   * borra este campo y el aviso deja de mostrarse.
+   * Aviso visible arriba del calendario (hoy, que las fechas son de ejemplo).
+   * Se edita desde el panel: vacío, no se muestra.
    */
   readonly placeholderNote?: string;
-  /** Las salidas agrupadas por mes, en orden cronológico (`departureSchedule.byMonth()`). */
+  /** Las salidas agrupadas por mes, en orden cronológico (`schedule.byMonth()`). */
   readonly months: readonly DepartureMonth[];
 };
 
-/** Contenido de "Calendario". */
-export const calendarContent: CalendarContent = {
-  eyebrow: 'Calendario',
-  title: 'Próximas salidas',
-  lead: 'Elegí la fecha que mejor te quede y reservá tu lugar.',
-  viewTripLabel: 'Ver viaje',
-  placeholderNote:
-    '[completar] Fechas de ejemplo: reemplazar por las salidas reales en src/content/catalog/departures.ts.',
-  months: departureSchedule.byMonth(),
-};
+/**
+ * Contenido de "Calendario". Título, bajada y aviso se editan desde el panel;
+ * las salidas, en la pantalla "Salidas" del panel (las que ya pasaron no se
+ * muestran).
+ */
+export function calendarContent(
+  schedule: DepartureSchedule,
+  texts: HomeTextsRecord['calendar'],
+): CalendarContent {
+  return {
+    eyebrow: 'Calendario',
+    title: texts.title,
+    lead: texts.lead,
+    viewTripLabel: 'Ver viaje',
+    ...(texts.note ? { placeholderNote: texts.note } : {}),
+    months: schedule.byMonth(),
+  };
+}

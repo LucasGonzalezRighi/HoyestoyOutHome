@@ -10,7 +10,7 @@ import styles from './Team.module.css';
 
 /** Props de `Team`: solo su slice de contenido. */
 export type TeamProps = {
-  /** `landingContent.team`. */
+  /** `getSiteContent().landing.team`. */
   content: TeamContent;
 };
 

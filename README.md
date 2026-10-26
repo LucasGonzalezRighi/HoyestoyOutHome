@@ -1,6 +1,8 @@
 # Hoy Estoy Out Of Home
 
-Sitio de **Hoy Estoy Out Of Home**: trekkings y ascensos guiados por Mendoza y la Patagonia. Un **home** con la información general (una sola página con anclas: viajes, calendario, quiénes somos, preguntas frecuentes, contacto…) y **una página por viaje** (`/viajes/<slug>`) con su cronograma, qué incluye, salidas y precio. El contacto es por **WhatsApp** y por un formulario breve que arma un `mailto:` (no hay pagos ni backend).
+Sitio de **Hoy Estoy Out Of Home**: trekkings y ascensos guiados por Mendoza y la Patagonia. Un **home** con la información general (una sola página con anclas: viajes, calendario, quiénes somos, preguntas frecuentes, contacto…) y **una página por viaje** (`/viajes/<slug>`) con su cronograma, qué incluye, salidas y precio. El contacto es por **WhatsApp** y por un formulario breve que arma un `mailto:` (no hay pagos).
+
+Tiene un **panel de administración** en `/admin` (una sola persona entra con su mail y contraseña) para editar los viajes y sus fotos, las fechas de salida, las preguntas frecuentes, los testimonios y los textos del home. El contenido se guarda en Postgres (Neon) y las fotos en Vercel Blob; en la compu anda sin conectar nada. Guía: [`docs/panel-admin.md`](docs/panel-admin.md).
 
 Next.js 16 (App Router) · React 19 · TypeScript estricto · CSS Modules sobre un design system propio · motor de animación propio, orientado a objetos.
 
@@ -24,6 +26,10 @@ Las variables de `.env.example`:
 |---|---|
 | `NEXT_PUBLIC_APP_URL` | URL pública (canonical, Open Graph, `robots.txt`, `sitemap.xml`). En desarrollo se deja vacía. En Vercel, vacía, cae al dominio de producción del proyecto; fuera de Vercel es obligatoria en producción. |
 | `NEXT_PUBLIC_MOTION_LEVEL` | Intensidad de las animaciones (ver [Animaciones](#animaciones)). |
+| `DATABASE_URL` | Postgres (Neon) del panel. Vacía en la compu: el contenido va a `.data/content.json`. |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob, para las fotos del panel. Vacía en la compu: van a `public/uploads/`. |
+| `ADMIN_EMAIL` | El mail que puede entrar a `/admin`. |
+| `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` | Hash de la contraseña y secreto de la sesión: `npm run admin:credentials` los genera. |
 
 ## Comandos
 
@@ -34,9 +40,10 @@ Las variables de `.env.example`:
 | `npm run start` | Sirve el build |
 | `npm run lint` | ESLint |
 | `npm run type-check` | `tsc --noEmit` |
-| `npm run test` | Vitest: la lógica pura (dominio, motor de animación, URL pública y funciones puras de contenido y features) |
+| `npm run test` | Vitest: la lógica pura (dominio, motor de animación, URL pública, contenido y features) y el servidor del panel (consultas reales a Postgres en memoria con PGlite, sesión, contraseñas) |
 | `npm run check` | `type-check` + `lint` + `test` |
 | `npm run format` | Prettier sobre `ts`, `tsx` y `css` de `src/` |
+| `npm run admin:credentials` | Genera `ADMIN_PASSWORD_HASH` y `ADMIN_SESSION_SECRET` (pide la contraseña sin mostrarla) |
 
 Antes de pushear: `npm run check` y `npm run build`. Vercel corre el build en cada push, y el build type-chequea todo el proyecto (tests y fixtures incluidos).
 
@@ -44,13 +51,15 @@ Antes de pushear: `npm run check` y `npm run build`. Vercel corre el build en ca
 
 ```
 src/
-├── app/              # layout, home, páginas de viaje (viajes/[slug]), metadata, robots, sitemap, iconos
+├── app/              # (site)/: home y páginas de viaje · admin/: el panel · metadata, robots, sitemap, iconos
 ├── components/       # atoms / molecules / organisms (presentacionales)
 ├── constants/        # marca, URL pública, rutas de páginas, IDs de secciones, rutas de assets
-├── content/          # todo el texto visible + las instancias del dominio
+├── content/          # todo el texto visible, el contenido editable (records/, seed/) y cómo se arma el sitio
 ├── design-system/    # tokens.css, base.css, intro.css, print.css, fuentes, tokens de movimiento
 ├── domain/           # clases del negocio (Trip, Price, WhatsAppLink…), con tests
-├── features/         # una carpeta por sección del home, la página de viaje (trip-detail) y site-chrome
+├── features/         # una carpeta por sección del home, la página de viaje (trip-detail), site-chrome y admin
+├── server/           # solo servidor: dónde se guarda el contenido, fotos, sesión del panel
+├── proxy.ts          # protege /admin (Next 16: el antiguo middleware)
 ├── motion/           # motor de animación (clases) + atributos data-*
 └── utils/            # cn()
 docs/design/          # el diseño exportado de Claude Design (no se compila)

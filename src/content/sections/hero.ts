@@ -1,6 +1,6 @@
 import { anchorTo } from '@/constants/sections';
-import { SITE } from '@/constants/site';
 import { PHOTOS } from '@/content/media';
+import type { HomeTextsRecord } from '@/content/records/schema';
 import type { CallToAction } from '@/content/types';
 import { whatsapp } from '@/content/whatsapp';
 import type { Photo } from '@/domain';
@@ -55,38 +55,27 @@ export type HeroContent = {
   readonly ribbon: readonly string[];
 };
 
-/** Renglones del titular: `heroLines` de `renderVals()` (`dc.html:659`). */
-const HEADLINE_LINES = [
-  ['Creo', 'experiencias', 'en', 'la', 'montaña'],
-  ['para', 'reconectar', 'con', 'lo', 'esencial.'],
-] as const satisfies readonly HeroHeadlineLine[];
+/** Los renglones del titular partidos en palabras: cada una entra con su máscara. */
+function headlineLines(lines: readonly string[]): readonly HeroHeadlineLine[] {
+  return lines.map((line) => line.split(/\s+/).filter(Boolean));
+}
 
 /**
- * Contenido del hero. Copys verbatim del diseño: el marcado (`dc.html:57-75`)
- * y los arrays `heroLines` y `marquee` de `renderVals()` (`dc.html:659-660`).
+ * Contenido del hero. Titular, bajada y cinta se editan desde el panel
+ * (`HomeTextsRecord['hero']`); el texto inicial es el del diseño
+ * (`dc.html:57-75` y los arrays `heroLines` y `marquee` de `renderVals()`,
+ * `dc.html:659-660`). La foto y los botones son fijos.
  *
  * La frase accesible del titular se arma con los mismos renglones, así no hay
  * dos copias del copy que se puedan desincronizar.
  */
-export const heroContent: HeroContent = {
-  photo: PHOTOS.heroRange,
-  headline: {
-    text: HEADLINE_LINES.map((line) => line.join(' ')).join(' '),
-    lines: HEADLINE_LINES,
-  },
-  lead: [
-    'Trekkings y ascensos guiados por Mendoza y la Patagonia.',
-    'Grupos chicos, atención personalizada y la montaña de verdad.',
-  ],
-  tripsCta: { label: 'Ver próximos viajes', href: anchorTo('trips') },
-  contactCta: { label: 'Hablá con nosotros', href: whatsapp.href(), external: true },
-  ribbon: [
-    'Tu primer 4mil',
-    'Huella Andina',
-    'Mendoza',
-    'Neuquén',
-    'Grupos reducidos',
-    // El nombre de la marca sale de `SITE`: si cambia, la cinta no queda vieja.
-    SITE.name,
-  ],
-};
+export function heroContent(texts: HomeTextsRecord['hero']): HeroContent {
+  return {
+    photo: PHOTOS.heroRange,
+    headline: { text: texts.headline.join(' '), lines: headlineLines(texts.headline) },
+    lead: texts.lead,
+    tripsCta: { label: 'Ver próximos viajes', href: anchorTo('trips') },
+    contactCta: { label: 'Hablá con nosotros', href: whatsapp.href(), external: true },
+    ribbon: texts.ribbon,
+  };
+}

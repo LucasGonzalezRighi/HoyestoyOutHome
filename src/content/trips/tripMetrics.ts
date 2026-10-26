@@ -35,10 +35,10 @@ function countSuffix(count: number, [singular, plural]: CountSuffix): string {
  * Existe para que las stats no repitan a mano lo que ya dice el catálogo: si
  * cambia la distancia o la duración de un viaje, cambian también la card del
  * carrusel, los tags de la portada y estas stats. Lago Lolog no la usa porque
- * sus stats son otras (desnivel acumulado), escritas en su archivo.
+ * sus stats son otras (desnivel acumulado), cargadas a mano en el panel.
  *
- * La distancia del catálogo tiene que ser entera: `Metric` solo acepta enteros
- * (el contador anima enteros) y tira con un decimal.
+ * La distancia se redondea al kilómetro: `Metric` solo acepta enteros (el
+ * contador anima enteros), y el catálogo admite decimales ("11,3 km").
  *
  * @example tripMetrics(calle, labels).map((metric) => metric.format())
  *   // → ['24 km', '4 días', '3 noches', '4.290 m']
@@ -46,7 +46,11 @@ function countSuffix(count: number, [singular, plural]: CountSuffix): string {
 export function tripMetrics(trip: Trip, labels: TripMetricLabels): readonly Metric[] {
   const { days, nights } = trip.duration;
   const metrics = [
-    new Metric({ value: trip.distanceKm, suffix: SUFFIXES.kilometers, label: labels.distance }),
+    new Metric({
+      value: Math.round(trip.distanceKm),
+      suffix: SUFFIXES.kilometers,
+      label: labels.distance,
+    }),
     new Metric({ value: days, suffix: countSuffix(days, SUFFIXES.days), label: labels.days }),
   ];
   if (nights > 0) {

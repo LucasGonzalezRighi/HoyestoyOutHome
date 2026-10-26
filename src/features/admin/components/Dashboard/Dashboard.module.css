@@ -1,0 +1,101 @@
+/* Inicio del panel: el estado del guardado y una tarjeta por pantalla. */
+
+.status {
+  display: grid;
+  gap: 4px;
+  padding: 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-2-500) 40%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent-2-100) 55%, var(--color-paper));
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-accent-2-900);
+}
+
+.status p {
+  margin: 0;
+}
+
+.statusWarning {
+  border-color: color-mix(in srgb, var(--color-accent-700) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-100) 60%, var(--color-paper));
+  color: var(--color-accent-900);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 6px;
+  height: 100%;
+  padding: 22px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-xl);
+  background: var(--color-paper);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 180ms var(--ease-in-out),
+    transform 180ms var(--ease-in-out),
+    box-shadow 180ms var(--ease-in-out);
+}
+
+.card:hover {
+  border-color: var(--color-accent-2-400);
+  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--color-accent-2-900) 35%, transparent);
+  transform: translateY(-2px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-2-100);
+  color: var(--color-accent-2-800);
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--color-accent-2-900);
+}
+
+.cardText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-neutral-800);
+}
+
+.count {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent-700);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

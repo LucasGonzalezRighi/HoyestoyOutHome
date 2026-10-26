@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isTripSlug, TRIP_SLUGS, type TripSlug } from './Trip';
+import { isTripSlug, TRIP_SLUG_MAX_LENGTH } from './Trip';
 import { buildTrip } from './Trip.fixture';
 
 describe('Trip', () => {
@@ -39,18 +39,18 @@ describe('Trip', () => {
   });
 
   it('tira con slugs o dificultades que llegan sin tipar', () => {
-    expect(() => buildTrip({ slug: 'aconcagua' as TripSlug })).toThrow('TRIP_SLUGS');
+    expect(() => buildTrip({ slug: 'Calle Stepanek' })).toThrow('no sirve como URL');
     expect(() => buildTrip({ difficulty: 'extrema' as 'alta' })).toThrow('La dificultad');
   });
 
-  it('la guarda de slug reconoce solo los del catálogo', () => {
+  it('la guarda de slug acepta solo tramos de URL: minúsculas, dígitos y guiones sueltos', () => {
     expect(isTripSlug('lago-lolog-laguna-verde')).toBe(true);
-    expect(isTripSlug('aconcagua')).toBe(false);
-  });
-
-  it('los slugs sirven tal cual como tramo de URL: minúsculas, dígitos y guiones', () => {
-    for (const slug of TRIP_SLUGS) {
-      expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
-    }
+    expect(isTripSlug('aconcagua-2027')).toBe(true);
+    expect(isTripSlug('Aconcagua')).toBe(false);
+    expect(isTripSlug('calle--stepanek')).toBe(false);
+    expect(isTripSlug('-calle')).toBe(false);
+    expect(isTripSlug('calle & stepanek')).toBe(false);
+    expect(isTripSlug('')).toBe(false);
+    expect(isTripSlug('a'.repeat(TRIP_SLUG_MAX_LENGTH + 1))).toBe(false);
   });
 });

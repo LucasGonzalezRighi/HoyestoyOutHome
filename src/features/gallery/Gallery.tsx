@@ -20,7 +20,7 @@ const PHOTO_SIZES = '(max-width: 846px) 220px, (max-width: 1385px) 26vw, 360px';
 
 /** Props de `Gallery`: solo su slice de contenido. */
 export type GalleryProps = {
-  /** `landingContent.gallery`. */
+  /** `getSiteContent().landing.gallery`. */
   content: GalleryContent;
 };
 

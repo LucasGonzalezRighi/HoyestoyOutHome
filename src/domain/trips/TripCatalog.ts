@@ -1,12 +1,12 @@
 import type { Trip, TripSlug } from './Trip';
 
 /**
- * El catálogo de viajes: la lista ordenada (el orden es el del carrusel de
+ * El catálogo de viajes: la lista ordenada (el orden es el del abanico de
  * viajes del home) más la búsqueda por slug que usan la página de cada viaje y
- * el calendario (`tripCatalog.get('calle-stepanek').price`).
+ * el calendario (`catalog.get('calle-stepanek').shortName`).
  *
- * Invariante: no hay dos viajes con el mismo slug. Si los viajes pasan a venir
- * de un CMS, se reemplaza quién arma el catálogo, no esta clase.
+ * Invariante: no hay dos viajes con el mismo slug. Lo arma `buildTripCatalog`
+ * (`content/catalog/trips.ts`) con los viajes visibles del contenido guardado.
  */
 export class TripCatalog {
   private readonly trips: readonly Trip[];

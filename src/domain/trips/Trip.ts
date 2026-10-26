@@ -7,27 +7,26 @@ import { difficultyLabel, isDifficulty, type Difficulty } from './Difficulty';
 import type { TripDuration } from './TripDuration';
 
 /**
- * Identificadores de los viajes. Es una unión cerrada a propósito: un
- * `tripCatalog.get('calle-stepanek')` con un typo no compila. Sumar un viaje
- * es sumar su slug acá.
+ * Slug de un viaje: el identificador del catálogo y el último tramo de la URL
+ * de su página (`/viajes/<slug>`, la arma `tripPath()` de `constants/routes.ts`).
  *
- * Cada slug es también el último tramo de la URL de la página del viaje
- * (`/viajes/<slug>`, la arma `tripPath()` de `constants/routes.ts`): por eso
- * van en minúsculas, sin espacios ni `&`.
+ * Es un string abierto y no una unión cerrada porque los viajes se crean desde
+ * el panel de administración: lo que se valida es el formato (`isTripSlug`).
  */
-export const TRIP_SLUGS = [
-  'calle-stepanek',
-  'lago-lolog-laguna-verde',
-  'laguna-negra',
-  'cajon-del-azul',
-] as const;
+export type TripSlug = string;
 
-/** Slug de un viaje del catálogo (`'calle-stepanek'`, `'lago-lolog-laguna-verde'`…). */
-export type TripSlug = (typeof TRIP_SLUGS)[number];
+/** Minúsculas, dígitos y guiones sueltos: sirve tal cual como tramo de URL. */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** Guarda de tipo para slugs que llegan sin tipar (un parámetro de URL, un CMS). */
+/** Largo máximo de un slug: una URL que se puede leer y compartir. */
+export const TRIP_SLUG_MAX_LENGTH = 80;
+
+/**
+ * Guarda de formato para slugs que llegan sin tipar (un parámetro de URL, el
+ * panel de administración): `'calle-stepanek'` sí, `'Calle Stepanek'` no.
+ */
 export function isTripSlug(value: string): value is TripSlug {
-  return (TRIP_SLUGS as readonly string[]).includes(value);
+  return value.length <= TRIP_SLUG_MAX_LENGTH && SLUG_PATTERN.test(value);
 }
 
 /** Datos para crear un `Trip`. */
@@ -66,10 +65,12 @@ export class Trip {
 
   constructor(params: TripParams) {
     const { slug, name, shortName, destination, difficulty, distanceKm, summitElevationM } = params;
-    // why: el slug y la dificultad ya los garantiza el tipo, pero si mañana los
-    // viajes vienen de un CMS el dato llega sin tipar y esto es lo que lo frena.
+    // why: los viajes llegan del panel de administración (sin tipar): un slug
+    // con espacios o mayúsculas rompería la URL de la página del viaje.
     if (!isTripSlug(slug)) {
-      throw new Error(`El slug de viaje ${JSON.stringify(slug)} no está en TRIP_SLUGS.`);
+      throw new Error(
+        `El slug de viaje ${JSON.stringify(slug)} no sirve como URL: van minúsculas, números y guiones.`,
+      );
     }
     assertText(name, `El nombre del viaje "${slug}"`);
     assertText(shortName, `El nombre corto del viaje "${slug}"`);

@@ -52,7 +52,7 @@ export type TripsFanProps = {
   heading: ReactNode;
   /** Arriba de los controles, en la columna derecha: bajada y datos. */
   intro: ReactNode;
-  /** Nombres accesibles de las flechas (`landingContent.trips.controls`). */
+  /** Nombres accesibles de las flechas (`getSiteContent().landing.trips.controls`). */
   labels: TripsControlsContent;
   /** Los paneles, en orden. El primero arranca abierto. */
   items: readonly TripsFanItem[];

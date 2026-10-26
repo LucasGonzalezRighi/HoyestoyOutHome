@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL, SITE, SOCIAL_PROFILES } from '@/constants/site';
-import { tripCatalog } from '@/content/catalog/trips';
+import type { TripCatalog } from '@/content/catalog/trips';
+import type { HomeTextsRecord } from '@/content/records/schema';
 import type { CallToAction } from '@/content/types';
 import { whatsapp } from '@/content/whatsapp';
 
@@ -110,53 +111,62 @@ export type ContactContent = {
 /** Última opción del select de viaje, para quien todavía no eligió. */
 const UNDECIDED_TRIP = 'Todavía no sé';
 
-/** Contenido de Contacto. El título es el del cierre del diseño (`dc.html:369`). */
-export const contactContent: ContactContent = {
-  giant: { start: 'La montaña', end: 'te espera.' },
-  title: '¿Te animás a subir?',
-  lead: 'Contanos qué viaje te interesa y te pasamos fechas, disponibilidad y todo lo que necesitás saber.',
-  email: CONTACT_EMAIL,
-  form: {
-    title: 'Mandanos tu consulta',
-    hint: 'Completá los tres campos. Al enviar se abre tu app de correo con el mensaje listo para mandar.',
-    fields: {
-      name: {
-        label: 'Nombre',
-        placeholder: 'Cómo te llamás',
-        error: 'Escribí tu nombre.',
+/**
+ * Contenido de Contacto. Título y bajada se editan desde el panel (el título
+ * inicial es el del cierre del diseño, `dc.html:369`); las opciones del
+ * select de viaje salen del catálogo.
+ */
+export function contactContent(
+  catalog: TripCatalog,
+  texts: HomeTextsRecord['contact'],
+): ContactContent {
+  return {
+    giant: { start: 'La montaña', end: 'te espera.' },
+    title: texts.title,
+    lead: texts.lead,
+    email: CONTACT_EMAIL,
+    form: {
+      title: 'Mandanos tu consulta',
+      hint: 'Completá los tres campos. Al enviar se abre tu app de correo con el mensaje listo para mandar.',
+      fields: {
+        name: {
+          label: 'Nombre',
+          placeholder: 'Cómo te llamás',
+          error: 'Escribí tu nombre.',
+        },
+        trip: {
+          label: 'Viaje que te interesa',
+          placeholder: 'Elegí un viaje',
+          error: `Elegí un viaje (o “${UNDECIDED_TRIP}”).`,
+        },
+        message: {
+          label: 'Mensaje',
+          placeholder: 'Fechas, cuántos son, dudas sobre el viaje…',
+          error: 'Escribí tu consulta.',
+        },
       },
-      trip: {
-        label: 'Viaje que te interesa',
-        placeholder: 'Elegí un viaje',
-        error: `Elegí un viaje (o “${UNDECIDED_TRIP}”).`,
+      tripOptions: [...catalog.all().map((trip) => trip.shortName), UNDECIDED_TRIP],
+      submitLabel: 'Enviar consulta',
+      sentStatus: {
+        before: 'Se abrió tu app de correo. Si no se abrió, escribinos a',
+        after: '.',
       },
-      message: {
-        label: 'Mensaje',
-        placeholder: 'Fechas, cuántos son, dudas sobre el viaje…',
-        error: 'Escribí tu consulta.',
+      mail: {
+        subject: 'Consulta desde la web',
+        subjectSeparator: ' — ',
+        bodyLabels: { name: 'Nombre', trip: 'Viaje', message: 'Mensaje' },
       },
     },
-    tripOptions: [...tripCatalog.all().map((trip) => trip.shortName), UNDECIDED_TRIP],
-    submitLabel: 'Enviar consulta',
-    sentStatus: {
-      before: 'Se abrió tu app de correo. Si no se abrió, escribinos a',
-      after: '.',
+    channels: {
+      cta: {
+        label: 'Escribinos por WhatsApp',
+        href: whatsapp.href(),
+        external: true,
+      },
+      emailIntro: 'También podés escribirnos a',
     },
-    mail: {
-      subject: 'Consulta desde la web',
-      subjectSeparator: ' — ',
-      bodyLabels: { name: 'Nombre', trip: 'Viaje', message: 'Mensaje' },
-    },
-  },
-  channels: {
-    cta: {
-      label: 'Escribinos por WhatsApp',
-      href: whatsapp.href(),
-      external: true,
-    },
-    emailIntro: 'También podés escribirnos a',
-  },
-};
+  };
+}
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Footer                                                                    */

@@ -44,7 +44,7 @@ const ICON_STROKE_WIDTH = 2.75;
 
 /** Props de `TripCover`. */
 export type TripCoverProps = {
-  /** `tripDetails[slug].cover`. */
+  /** `getSiteContent().tripDetail(slug).cover`. */
   content: TripCoverContent;
 };
 

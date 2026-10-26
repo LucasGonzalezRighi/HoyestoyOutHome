@@ -1,5 +1,6 @@
 import { tripPath } from '@/constants/routes';
-import { tripCatalog, type Trip, type TripSlug } from '@/content/catalog/trips';
+import type { Trip, TripCatalog } from '@/content/catalog/trips';
+import type { HomeTextsRecord } from '@/content/records/schema';
 import type { CallToAction, SectionHeadingContent } from '@/content/types';
 import type { Photo } from '@/domain';
 
@@ -18,7 +19,7 @@ import type { Photo } from '@/domain';
 export type TripPanelContent = {
   /** El viaje del catálogo: destino, nombres y tags salen de él. */
   readonly trip: Trip;
-  /** La foto del viaje con el encuadre del panel (ver `PANEL_FRAMING`). */
+  /** La foto del viaje con el encuadre del panel (ver `PanelFraming`). */
   readonly photo: Photo;
   /** "Ver detalles": lleva a la página del viaje (`tripPath(trip.slug)`). */
   readonly cta: CallToAction;
@@ -66,47 +67,49 @@ function tripCountLabel(count: number): string {
 }
 
 /**
- * Encuadre de la foto en el panel, para los viajes en los que el del catálogo
- * (pensado para la portada de la página del viaje) deja algo detrás del texto.
- * El texto del panel va abajo, sobre un velo oscuro:
- *
- * - Calle & Stepanek: con `center 62%` el cartel de cumbre cae justo detrás
- *   del título. Desde arriba, el panel muestra el cielo y los picos nevados,
- *   y el cartel queda al pie, bajo el velo.
- * - Laguna Negra: con `center 70%` las caras del grupo quedan detrás del
- *   título. Más arriba se ve más cielo estrellado y el grupo baja al pie.
+ * Encuadre de la foto de cada viaje en su panel, por slug, para los viajes en
+ * los que el de la portada deja algo detrás del texto (el texto del panel va
+ * abajo, sobre un velo oscuro). Se carga en el panel de administración
+ * (`TripRecord.panelPosition`).
  */
-const PANEL_FRAMING: Partial<Record<TripSlug, string>> = {
-  'calle-stepanek': 'center 0%',
-  'laguna-negra': 'center 22%',
-};
+export type PanelFraming = Readonly<Record<string, string | undefined>>;
 
 /** Arma el panel de un viaje: el viaje, su foto, el botón a su página y su posición en la lista. */
-function toPanel(trip: Trip, index: number, trips: readonly Trip[]): TripPanelContent {
-  const framing = PANEL_FRAMING[trip.slug];
+function toPanel(
+  trip: Trip,
+  index: number,
+  trips: readonly Trip[],
+  framing: PanelFraming,
+): TripPanelContent {
+  const position = framing[trip.slug];
   return {
     trip,
-    photo: framing ? trip.photo.withPosition(framing) : trip.photo,
+    photo: position ? trip.photo.withPosition(position) : trip.photo,
     cta: { label: DETAIL_LABEL, href: tripPath(trip.slug) },
     positionLabel: `Viaje ${index + 1} de ${trips.length}: ${trip.name}`,
   };
 }
 
 /**
- * Contenido de "Próximos viajes". Eyebrow y título verbatim del diseño
- * (`dc.html:111-112`). La bajada y los datos son del rediseño de octubre de
- * 2026 (el abanico de paneles): la bajada ya no habla de deslizar ni de
- * flechas, porque los viajes se recorren pasando por encima. Los datos de cada
- * viaje salen del catálogo (`tripCatalog`), no se repiten acá.
+ * Contenido de "Próximos viajes". El eyebrow es el del diseño
+ * (`dc.html:111`); título y bajada se editan desde el panel. Los datos de cada
+ * viaje salen del catálogo, no se repiten acá.
  */
-export const tripsContent: TripsContent = {
-  eyebrow: 'Próximos viajes',
-  title: 'Elegí tu próxima aventura',
-  lead: 'Pasá por cada travesía y entrá a la que te llame. No necesitás experiencia en altura, solo ganas.',
-  facts: [tripCountLabel(tripCatalog.size), 'Mendoza y Patagonia', 'Grupos chicos'],
-  controls: {
-    previousLabel: 'Viaje anterior',
-    nextLabel: 'Viaje siguiente',
-  },
-  panels: tripCatalog.all().map(toPanel),
-};
+export function tripsContent(
+  catalog: TripCatalog,
+  texts: HomeTextsRecord['trips'],
+  framing: PanelFraming,
+): TripsContent {
+  const trips = catalog.all();
+  return {
+    eyebrow: 'Próximos viajes',
+    title: texts.title,
+    lead: texts.lead,
+    facts: [tripCountLabel(catalog.size), 'Mendoza y Patagonia', 'Grupos chicos'],
+    controls: {
+      previousLabel: 'Viaje anterior',
+      nextLabel: 'Viaje siguiente',
+    },
+    panels: trips.map((trip, index) => toPanel(trip, index, trips, framing)),
+  };
+}

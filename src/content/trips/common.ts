@@ -1,18 +1,15 @@
 import { homeAnchorTo, tripAnchorTo } from '@/constants/sections';
 import { SITE } from '@/constants/site';
-import { departureSchedule } from '@/content/catalog/departures';
 import { PHOTOS } from '@/content/media';
 import type { CallToAction } from '@/content/types';
 import { whatsapp } from '@/content/whatsapp';
-import type { ItineraryDay, ServiceChecklist, Trip } from '@/domain';
+import type { Departure, ItineraryDay, ServiceChecklist, Trip } from '@/domain';
 
-import { tripMetrics, type TripMetricLabels } from './tripMetrics';
 import type {
   TripChecklistContent,
   TripClosingContent,
   TripCoverContent,
   TripDeparturesContent,
-  TripDetailContent,
   TripMealsContent,
   TripMetaContent,
   TripScheduleContent,
@@ -21,13 +18,14 @@ import type {
 } from './types';
 
 /*
- * Lo que comparten las cuatro páginas de viaje: los copys de la plantilla
+ * Lo que comparten todas las páginas de viaje: los copys de la plantilla
  * ("Cronograma", "Consultar", "Pensión completa*"…) y las funciones que arman
  * cada bloque a partir del viaje del catálogo.
  *
- * Cada archivo de viaje (`calle-stepanek.ts`, …) llama a estas funciones con
- * lo propio del viaje, así un copy de la plantilla se cambia acá una sola vez
- * y los datos del viaje (duración, distancia, cumbre) salen siempre del catálogo.
+ * `buildTripDetail` (`build.ts`) llama a estas funciones con lo propio de cada
+ * viaje (lo que se carga en el panel), así un copy de la plantilla se cambia
+ * acá una sola vez y los datos del viaje (duración, distancia, cumbre) salen
+ * siempre del catálogo.
  */
 
 /**
@@ -156,15 +154,12 @@ export function tripChecklist(checklist: ServiceChecklist): TripChecklistContent
 
 /* ── Pensión completa ──────────────────────────────────────────────────── */
 
-/** Primera frase de la nota de la pensión, la misma en todos los viajes. */
-export const MEALS_FOOTNOTE = '*Las imágenes son a modo de ilustración.';
-
 /**
  * "Pensión completa" (`dc.html:271-283`). Los platos van con `alt=""`: cada
  * foto está en un `<figure>` cuyo `<figcaption>` ya nombra la comida, y las
  * imágenes son ilustrativas (lo avisa la nota).
  *
- * @param footnote La nota del asterisco: `MEALS_FOOTNOTE` más lo propio del viaje.
+ * @param footnote La nota del asterisco ("*Las imágenes son a modo de ilustración.").
  */
 export function tripMeals(footnote: string): TripMealsContent {
   return {
@@ -182,9 +177,9 @@ export function tripMeals(footnote: string): TripMealsContent {
 
 /* ── Próximas salidas ──────────────────────────────────────────────────── */
 
-/** Las salidas de este viaje en el calendario (fechas de ejemplo hasta que el cliente las confirme). */
-export function tripDepartures(trip: Trip): TripDeparturesContent {
-  return { title: 'Próximas salidas', departures: departureSchedule.forTrip(trip.slug) };
+/** Las próximas salidas de este viaje (`schedule.forTrip(slug)`). Vacío: el bloque no se muestra. */
+export function tripDepartures(departures: readonly Departure[]): TripDeparturesContent {
+  return { title: 'Próximas salidas', departures };
 }
 
 /* ── Cierre ────────────────────────────────────────────────────────────── */
@@ -202,41 +197,5 @@ export function tripClosing(trip: Trip): TripClosingContent {
     titleLines: ['La montaña te espera.', '¿Te animás a subir?'],
     lead: `Escribinos y te contamos las próximas fechas y la disponibilidad de ${trip.shortName}.`,
     cta: consultCta(trip, 'Consultar por WhatsApp'),
-  };
-}
-
-/* ── Viajes sin itinerario todavía ─────────────────────────────────────── */
-
-/**
- * Bajadas de las stats de los viajes que todavía no tienen itinerario. Las
- * noches van con un rótulo genérico: todavía no está definido dónde se duerme.
- */
-const UPCOMING_METRIC_LABELS: TripMetricLabels = {
-  distance: 'Distancia total',
-  days: 'De travesía',
-  nights: 'En la montaña',
-  summit: 'Cumbre más alta',
-};
-
-/**
- * La página de un viaje que todavía no tiene itinerario (Laguna Negra, Cajón
- * del Azul): solo lo que dice el catálogo —foto, destino, duración,
- * distancia, dificultad— y el aviso "Itinerario próximamente". Sin datos
- * inventados: no lleva "¿Puedo?", checklist ni pensión hasta que el cliente
- * los pase.
- */
-export function upcomingTripDetail(trip: Trip): TripDetailContent {
-  const facts = `${trip.duration.sentence()}, ${trip.distanceLabel()} y ${trip.difficultyLabel().toLocaleLowerCase(SITE.locale)}`;
-  return {
-    meta: tripMeta(trip, `${trip.name} (${trip.destination}): ${facts}. ${UPCOMING_INVITATION}`),
-    cover: tripCover(trip, { eyebrow: trip.destination, title: { rest: trip.name } }),
-    overview: {
-      title: OVERVIEW_COPY.title,
-      paragraphs: [],
-      stats: { label: OVERVIEW_COPY.statsLabel, items: tripMetrics(trip, UPCOMING_METRIC_LABELS) },
-    },
-    schedule: tripSchedule(trip, []),
-    departures: tripDepartures(trip),
-    closing: tripClosing(trip),
   };
 }

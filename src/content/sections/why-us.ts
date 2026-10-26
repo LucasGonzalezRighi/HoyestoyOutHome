@@ -1,3 +1,4 @@
+import type { HomeTextsRecord } from '@/content/records/schema';
 import type { SectionHeadingContent } from '@/content/types';
 
 /**
@@ -26,30 +27,14 @@ export type WhyUsContent = Required<SectionHeadingContent> & {
 };
 
 /**
- * Contenido de "Por qué viajar con nosotros". Copys verbatim del diseño: el
- * marcado (`dc.html:90-92`) y el array `pilares` de `renderVals()`
- * (`dc.html:661-666`), sin los números 01–04, que el cliente pidió sacar.
+ * Contenido de "Por qué viajar con nosotros". Título y pilares se editan desde
+ * el panel; el texto inicial es el del diseño (`dc.html:90-104`).
  */
-export const whyUsContent: WhyUsContent = {
-  ariaLabel: 'Por qué viajar con nosotros',
-  eyebrow: 'Por qué viajar con nosotros',
-  title: 'La montaña de verdad, sin que tengas que resolver nada',
-  pillars: [
-    {
-      title: 'Guías habilitados',
-      description: 'Guías de Turismo Aventura y de Montaña, con años de experiencia en el terreno.',
-    },
-    {
-      title: 'Grupos pequeños',
-      description: 'Salidas chicas para ir a tu ritmo, conocernos y disfrutar el camino.',
-    },
-    {
-      title: 'Logística resuelta',
-      description: 'Traslados, refugio o carpas, pensión completa y reuniones previas.',
-    },
-    {
-      title: 'Seguridad siempre',
-      description: 'Botiquín, comunicación VHF, seguro de accidentes y coordinación permanente.',
-    },
-  ],
-};
+export function whyUsContent(texts: HomeTextsRecord['whyUs']): WhyUsContent {
+  return {
+    ariaLabel: 'Por qué viajar con nosotros',
+    eyebrow: 'Por qué viajar con nosotros',
+    title: texts.title,
+    pillars: texts.pillars,
+  };
+}

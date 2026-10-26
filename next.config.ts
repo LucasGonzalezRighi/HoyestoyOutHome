@@ -8,6 +8,12 @@ import type { NextConfig } from 'next';
  *   idempotentes y limpian todos sus listeners.
  * - `images.formats`: las fotos del diseño son JPG de 1–1,6 MP. Servirlas en
  *   AVIF/WebP con `next/image` baja el peso de la página a menos de la mitad.
+ * - `images.remotePatterns`: las fotos que se suben desde el panel de
+ *   administración viven en Vercel Blob. Es el único origen externo
+ *   permitido (lo valida también `photoSchema`).
+ * - `experimental.serverActions.bodySizeLimit`: las fotos del panel se suben
+ *   por una Server Action, ya achicadas en el navegador (hasta 4 MB,
+ *   `MAX_PHOTO_BYTES`). El límite por defecto es 1 MB.
  * - `agentRules: false`: desde 16.3, `next dev` le agrega a `CLAUDE.md` un
  *   bloque en inglés que apunta a la documentación de la versión instalada.
  *   Ese dato ya está en `CLAUDE.md` §3 (en español y en su lugar), así que se
@@ -19,6 +25,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
+    remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb',
+    },
   },
 };
 

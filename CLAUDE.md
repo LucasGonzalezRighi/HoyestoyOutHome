@@ -8,7 +8,7 @@ Guía para Claude Code (claude.ai/code) y para cualquier persona que trabaje en 
 
 Sitio de **Hoy Estoy Out Of Home**, una empresa de turismo aventura que arma trekkings y ascensos guiados por Mendoza y la Patagonia. Tiene un **home** con la información general (una sola página con anclas: hero, por qué viajar, viajes, calendario, quiénes somos, testimonios, galería, preguntas frecuentes y contacto) y **una página por viaje** (`/viajes/<slug>`) con todo lo propio de cada uno: cronograma, requisitos, qué incluye, pensión, salidas y precio. Esa estructura la pidió el cliente en octubre de 2026 (§9.6); el diseño original es una landing única.
 
-El funnel es **WhatsApp**: cada "Consultar" abre el chat con un mensaje precargado. Contacto suma un **formulario breve que arma un `mailto:`** a `CONTACT_EMAIL` (lo envía el cliente de correo de quien escribe). No hay backend, pagos ni base de datos. El código está en GitHub (`origin/main`) y se publica en Vercel con cada push (§10).
+El funnel es **WhatsApp**: cada "Consultar" abre el chat con un mensaje precargado. Contacto suma un **formulario breve que arma un `mailto:`** a `CONTACT_EMAIL` (lo envía el cliente de correo de quien escribe). No hay pagos. Desde octubre de 2026 tiene un **panel de administración** de uso personal (`/admin`, §4.8) para editar viajes y fotos, salidas, preguntas, testimonios y textos del home: el contenido vive en Postgres (Neon) y las fotos en Vercel Blob. El código está en GitHub (`origin/main`) y se publica en Vercel con cada push (§10).
 
 ---
 
@@ -45,11 +45,12 @@ Una copia exportada vive en **`docs/design/`** (no se compila):
 | Imágenes | `next/image` (AVIF/WebP, `sizes` por uso) |
 | Fuentes | `next/font/google` — **DM Serif Display** (títulos) y **Lexend** (cuerpo), auto-hospedadas en el build |
 | Iconos | **lucide-react**, trazo 2.75 (regla del design system) |
-| Tests | **Vitest** (entorno `node`, con DOM falso donde hace falta) — dominio, motor (matemática, efectos, el loop y la intro), tokens de movimiento, la URL pública (`constants/siteUrl`), `tripMetrics` de `content/trips`, funciones puras de los features (`checklistPanels`, `contactMail`, `fanNavigation`, `panelPhotoSizes`) e `isRouterHref` de `LinkButton` |
+| Contenido editable | Panel en `/admin` (§4.8): **Postgres en Neon** (`@neondatabase/serverless`, por HTTP) para el contenido, **Vercel Blob** para las fotos, **zod 4** para validar (mensajes en castellano), **jose** para la sesión. En la compu, un archivo local y `public/uploads/` |
+| Tests | **Vitest** (entorno `node`, con DOM falso donde hace falta) — dominio, motor (matemática, efectos, el loop y la intro), tokens de movimiento, la URL pública (`constants/siteUrl`), `tripMetrics` de `content/trips`, funciones puras de los features (`checklistPanels`, `contactMail`, `fanNavigation`, `panelPhotoSizes`) e `isRouterHref` de `LinkButton`, el contenido editable (esquema, validación, `buildSiteContent`) y el servidor del panel: consultas de verdad contra un Postgres en memoria (**PGlite**), contraseñas, sesión y freno de intentos |
 | Calidad | ESLint 9 (flat config, `eslint-config-next`) + Prettier |
 | Deploy | **Vercel**: `npm run build` en cada push a `main` (§10) |
 
-Decisiones explícitas: App Router (no Pages), CSS Modules (no Tailwind), motor propio (no GSAP), sin estado global (no hace falta ningún Context), sin HTTP (no hay backend: todo el contenido es estático y se prerenderiza, también las páginas de viaje con `generateStaticParams`).
+Decisiones explícitas: App Router (no Pages), CSS Modules (no Tailwind), motor propio (no GSAP), sin estado global (no hace falta ningún Context), sin API propia (el panel guarda con Server Actions) y el sitio sigue siendo estático: el home y las páginas de viaje se prerenderizan con el contenido guardado, cacheado, y la caché se invalida al guardar (§4.8).
 
 > **Next 16 no es el Next que uno recuerda.** Cambió APIs y convenciones respecto de 15 (por ejemplo: `next lint` ya no existe, `next/image` usa `preload` en vez de `priority`, el dev escribe en `.next/dev`, el build ya no imprime el tamaño de First Load JS). Antes de usar una API de Next, leer la guía de la versión instalada en **`node_modules/next/dist/docs/`**. `next.config.ts` tiene `agentRules: false` para que `next dev` no le agregue a este archivo su propio bloque con este mismo aviso.
 
@@ -60,12 +61,13 @@ Decisiones explícitas: App Router (no Pages), CSS Modules (no Tailwind), motor 
 ### 4.1 Capas
 
 ```
-app/            → rutas de Next (layout, home, viajes/[slug], metadata, robots, sitemap)
+app/            → rutas de Next: (site)/ (home, viajes/[slug]), admin/ (el panel), metadata, robots, sitemap
   ↓ compone
-features/       → una carpeta por sección del home, la página de viaje (trip-detail) y site-chrome
+features/       → una carpeta por sección del home, la página de viaje (trip-detail), site-chrome y admin
   ↓ usa
 components/     → UI reutilizable, presentacional (atoms / molecules / organisms)
-content/        → todo el texto visible + las instancias del dominio (catálogo de viajes, salidas, fotos…)
+server/         → solo servidor: dónde se guarda el contenido (Neon / archivo local), fotos (Blob), sesión del panel
+content/        → todo el texto visible + el contenido editable (records/, seed/) y cómo se arma el sitio
   ↓ instancia
 domain/         → clases del negocio (Trip, Price, WhatsAppLink…) — TypeScript puro, sin React
 motion/         → motor de animación (clases) + contrato de atributos data-*
@@ -74,34 +76,39 @@ constants/      → configuración de marca, URL pública, rutas de páginas, ID
 utils/          → helpers (cn)
 ```
 
-Las flechas son la única dirección permitida: `domain/` no importa nada del resto; `components/` no importa `features/` ni `content/`; `motion/core` y `motion/effects` no importan React.
+Las flechas son la única dirección permitida: `domain/` no importa nada del resto; `components/` no importa `features/` ni `content/`; `motion/core` y `motion/effects` no importan React; `server/` lo importan solo `app/` y `features/admin` (lleva `server-only`), y `content/` no lo importa.
 
 ### 4.2 Estructura
 
 ```
 src/
+├── proxy.ts                  # protege /admin (Next 16: el antiguo middleware): sin sesión, a /admin/login
 ├── app/
-│   ├── layout.tsx            # <html>, fuentes, metadata (SITE_URL, imagen para compartir), fondo que cambia, nav, site-chrome, footer, runtime del motor
-│   ├── layout.module.css     # envoltorio del fondo que cambia + "Saltar al contenido"
-│   ├── page.tsx              # el home: <Landing />
-│   ├── viajes/[slug]/page.tsx  # una página por viaje: generateStaticParams + dynamicParams = false (otro slug da 404) y metadata propia
+│   ├── layout.tsx            # raíz: <html>, fuentes, metadata (SITE_URL, imagen para compartir), globals.css. La comparten el sitio y el panel
+│   ├── (site)/layout.tsx     # el sitio: fondo que cambia, nav, site-chrome, footer, runtime del motor (+ layout.module.css)
+│   ├── (site)/page.tsx       # el home: <Landing content={getSiteContent().landing} />, revalidate 1 h
+│   ├── (site)/viajes/[slug]/page.tsx  # una página por viaje visible: generateStaticParams y metadata propia; otro slug o uno oculto da 404
+│   ├── admin/                # el panel (§4.8): login/ y (panel)/ (inicio, viajes, viajes/nuevo, viajes/editar/[slug], salidas, preguntas, testimonios, textos)
 │   ├── globals.css           # importa el design system (tokens + base + intro + print)
 │   ├── icon.png · apple-icon.png  # favicon 64×64 y apple-touch-icon 180×180 (el logo en un cuadrado)
-│   └── robots.ts · sitemap.ts     # el sitemap lista el home y las cuatro páginas de viaje
+│   └── robots.ts · sitemap.ts     # el sitemap lista el home y las páginas de los viajes visibles; robots excluye /admin
 ├── components/               # UI reutilizable (Atomic Design) — presentacional, CSS Modules
 │   ├── atoms/                # Button (+ LinkButton, que navega con next/link en las rutas del sitio: isRouterHref), Tag, Container, Section, Eyebrow, WashedImage, BrandLogo, Dot, WhatsAppIcon, ContourLines (curvas de nivel: el fondo del sitio), StarRating, VisuallyHidden
 │   ├── molecules/            # SectionHeading, BulletList, SurfaceCard, FormField (TextField, SelectField, TextAreaField)
 │   └── organisms/            # Navbar/, Marquee (+ MarqueePauseGroup, el botón que pausa las cintas), Timeline (línea de tiempo: TimelineGroup, TimelineItem, TimelineText, TimelineTags, TimelinePhoto), CoverPair (cortina entre dos secciones)
-├── constants/                # site.ts (marca, WhatsApp, CONTACT_EMAIL, redes, flags), siteUrl.ts (SITE_URL, solo servidor), routes.ts (ROUTES, tripPath), sections.ts (IDs/anclas del home y de la página de viaje), assets.ts (rutas + imagen para compartir), links.ts (atributos de links externos)
-├── content/                  # TODO el texto visible + instancias del dominio
-│   ├── index.ts              # landingContent: un slice por sección del home
+├── constants/                # site.ts (marca, WhatsApp, CONTACT_EMAIL, redes, flags), siteUrl.ts (SITE_URL, solo servidor), routes.ts (ROUTES, tripPath, ADMIN_ROUTES, adminTripPath), sections.ts (IDs/anclas del home y de la página de viaje), assets.ts (rutas + imagen para compartir), links.ts (atributos de links externos)
+├── content/                  # TODO el texto visible + el contenido editable y cómo se arma el sitio (§4.7)
+│   ├── index.ts              # buildSiteContent(record, today): catálogo, calendario, LandingContent (un slice por sección) y tripDetail(slug)
+│   ├── records/              # schema.ts (SiteRecord y sus partes, zod), validate.ts (forma + invariantes del dominio), photos.ts
+│   ├── seed/                 # SEED_RECORD: el contenido inicial (el que estaba en el código) y el respaldo del sitio
+│   ├── admin.ts              # los textos del panel
 │   ├── types.ts              # tipos compartidos (CallToAction, …)
-│   ├── media.ts              # PHOTOS: cada foto una sola vez (ruta, dimensiones, alt, encuadre)
+│   ├── media.ts              # PHOTOS: cada foto del repo una sola vez (ruta, dimensiones, alt, encuadre)
 │   ├── whatsapp.ts           # la instancia de WhatsAppLink
-│   ├── catalog/trips.ts      # tripCatalog (los 4 viajes)
-│   ├── catalog/departures.ts # departureSchedule: las salidas (hoy, fechas de ejemplo: [completar])
-│   ├── sections/*.ts         # un slice por sección del home (hero.ts, trips.ts, calendar.ts, faq.ts, contact.ts, …) + site.ts (nav, metadata)
-│   └── trips/                # la página de cada viaje: un TripDetailContent por slug (calle-stepanek.ts, …), builders comunes (common.ts), tripMetrics
+│   ├── catalog/trips.ts      # buildTripCatalog (los viajes visibles) y toTrip
+│   ├── catalog/departures.ts # buildDepartureSchedule (sin las salidas pasadas) y todayInBusinessTimeZone
+│   ├── sections/*.ts         # una función por sección del home que arma su slice (heroContent, tripsContent, calendarContent, faqContent…) + site.ts (nav, metadata)
+│   └── trips/                # la página de cada viaje: buildTripDetail (build.ts), copys de la plantilla (common.ts), tripMetrics
 ├── design-system/            # tokens.css, base.css, intro.css, print.css, fonts.ts, tokens/motion.ts, README.md
 ├── domain/                   # clases del negocio + tests (*.test.ts al lado de cada clase)
 ├── features/
@@ -109,8 +116,10 @@ src/
 │   ├── site-chrome/          # cursor, barra de progreso, WhatsApp flotante
 │   ├── hero/ · why-us/ · trips/ · calendar/ · team/   # secciones del home, en orden…
 │   ├── testimonials/ · gallery/ · faq/ · contact/      # …(contact incluye el formulario y el SiteFooter que monta el layout)
-│   └── trip-detail/          # TripDetail.tsx: la plantilla de la página de un viaje (portada, sobre el viaje, cronograma, ¿Puedo?/¿Es para mí?, qué incluye, pensión, salidas, cierre)
+│   ├── trip-detail/          # TripDetail.tsx: la plantilla de la página de un viaje (portada, sobre el viaje, cronograma, ¿Puedo?/¿Es para mí?, qué incluye, pensión, salidas, cierre)
+│   └── admin/                # el panel: actions/ (Server Actions), components/ (AdminShell, TripEditor, ListEditors, PhotoField…), resizePhoto
 ├── motion/                   # motor de animación (ver §6)
+├── server/                   # solo servidor (§4.8): content/ (ContentStore: Postgres o archivo; siteContent, editableContent), db/ (SqlClient, Neon, tablas), photos/ (Blob, local), auth/ (contraseña, sesión, freno de intentos), env.ts
 └── utils/                    # cn()
 ```
 
@@ -132,7 +141,7 @@ Un feature repite el patrón: `Hero.tsx` + `Hero.module.css` + `index.ts`, y sus
 ### 4.4 Presentacionales vs. lógica
 
 - Los componentes de `components/` **reciben props y renderizan**. No leen `content/`, no conocen el dominio (reciben strings y datos planos, o tipos estructurales compatibles).
-- Los features **leen su slice de `content/` por props** (`<TripsShowcase content={landingContent.trips} />`, `<TripDetail content={findTripDetail(slug)} />`), eligen los componentes y marcan qué se anima.
+- Los features **leen su slice de `content/` por props** (`<TripsShowcase content={landing.trips} />`, `<TripDetail content={site.tripDetail(slug)} />`), eligen los componentes y marcan qué se anima.
 - La lógica de negocio (formatear un precio, armar el link de WhatsApp, ordenar las salidas por fecha, decidir qué stats tiene un día del itinerario) vive en **clases de `domain/`**.
 - La lógica de animación vive en **clases de `motion/`**. Los componentes solo esparcen atributos: `<h2 {...reveal('up', { delay: 1 })}>`.
 
@@ -145,6 +154,7 @@ Un feature repite el patrón: `Hero.tsx` + `Hero.module.css` + `index.ts`, y sus
 | `features/faq` › `FaqAccordion` | Qué pregunta está abierta; hasta hidratar muestra todas las respuestas |
 | `features/contact` › `ContactForm` | Validación y armado del `mailto:`; sin JS se envía igual (`action="mailto:…"`) |
 | `components/organisms/Marquee` › `MarqueePauseGroup` | El botón que pausa las cintas de testimonios y galería |
+| `features/admin` › editores, `PhotoField`, `LoginForm`, `AdminNav`, `ConfirmSubmit` | El panel: estado de los formularios, subir fotos, marcar la sección actual, confirmar un borrado |
 
 Las piezas de `site-chrome` (cursor, barra de progreso, WhatsApp flotante) son Server Components: las mueve el motor por atributos. `FaqAccordion` y `ContactForm` detectan la hidratación con el mismo patrón (`useSyncExternalStore` con un `subscribe` vacío); si aparece un tercer uso, se extrae a `utils/useHydrated.ts`.
 
@@ -162,20 +172,37 @@ Regla: **clase cuando hay comportamiento o invariantes; tipo plano cuando es sol
 ### 4.6 Sin strings mágicos
 
 - IDs de sección y anclas → `constants/sections.ts` (`anchorTo('trips')` dentro del home, `homeAnchorTo('trips')` desde cualquier página, `tripAnchorTo('schedule')` en la página de un viaje).
-- Rutas de páginas → `constants/routes.ts` (`ROUTES.home`, `tripPath(slug)`).
+- Rutas de páginas → `constants/routes.ts` (`ROUTES.home`, `tripPath(slug)`, `ADMIN_ROUTES`, `adminTripPath(slug)`).
 - Marca, teléfono, mail de contacto, redes → `constants/site.ts`. URL pública → `constants/siteUrl.ts` (`SITE_URL`, §10).
 - Rutas de imágenes → `constants/assets.ts` + `content/media.ts`.
 - Atributos de links externos → `constants/links.ts` (`EXTERNAL_LINK_PROPS`).
 - Atributos de animación → helpers de `motion/attributes.ts`.
-- **Todo texto visible → `content/`.** Ningún texto de UI inline en JSX (tampoco `aria-label` ni `alt`).
+- **Todo texto visible → `content/`.** Ningún texto de UI inline en JSX (tampoco `aria-label` ni `alt`). El panel también: `content/admin.ts`. Los mensajes de validación salen del esquema (`content/records/schema.ts`) y los de error del servidor, de sus Server Actions.
 
 ### 4.7 Contenido
 
-`content/` es la única fuente de lo que se lee en pantalla. Cada sección tiene su slice (`content/sections/trips.ts`) con su tipo exportado (`TripsContent`), y `content/index.ts` los junta en `landingContent`. `Landing.tsx` le pasa **a cada sección solo su slice**, como Kora hace con los diccionarios: una sección no puede leer texto que no le corresponde. La página de cada viaje recibe su `TripDetailContent` de `content/trips/` (`findTripDetail(slug)`): un archivo por viaje, armado con los builders de `content/trips/common.ts`. `tripDetails` es un `Record<TripSlug, …>`, así que un viaje nuevo en el catálogo no compila sin su página.
+`content/` es la única fuente de lo que se lee en pantalla. Desde el panel (§4.8) tiene dos partes:
 
-Los datos con comportamiento son **instancias del dominio** (`tripCatalog`, `departureSchedule`, `PHOTOS`, `whatsapp`). Si mañana los viajes vienen de un CMS o una API, se reemplaza el módulo de `content/` por un servicio que devuelva **las mismas clases**, y ningún componente se entera.
+- **Copy fijo**: lo de la plantilla y de cada sección que no se edita (eyebrows, botones, "Cronograma", "Consultar"…), en `content/sections/*.ts` y `content/trips/common.ts`.
+- **Contenido editable** (`SiteRecord`, `content/records/schema.ts`): viajes (datos del catálogo + todo lo de su página), salidas, preguntas, testimonios y textos del home, como datos planos (JSON) validados con zod. El inicial —el que estaba en el código— es `SEED_RECORD` (`content/seed/`).
 
-Un solo idioma: **español rioplatense** (`es-AR`). Si se suma otro, se sigue el patrón de Kora (`app/[locale]/`, diccionarios tipados contra el español) convirtiendo `landingContent` en `getLandingContent(locale)`.
+`buildSiteContent(record, today)` (`content/index.ts`) junta las dos: arma las clases del dominio (`TripCatalog` con los viajes visibles, `DepartureSchedule` sin las salidas pasadas), un slice por sección del home (`LandingContent`) y la página de cada viaje visible (`tripDetail(slug)`, con `buildTripDetail`). Es una función pura (no lee la base ni el reloj); las páginas la piden con `getSiteContent()` (`server/content/siteContent.ts`). `Landing.tsx` le pasa **a cada sección solo su slice**, como Kora hace con los diccionarios: una sección no puede leer texto que no le corresponde.
+
+Los componentes siguen recibiendo **instancias del dominio** (`Trip`, `Departure`, `Testimonial`, `PHOTOS`, `whatsapp`): de dónde sale el contenido no les cambia nada. Los slugs de viaje son un string con formato validado (`isTripSlug`: minúsculas, números y guiones), no una unión cerrada: los viajes se crean desde el panel.
+
+Un solo idioma: **español rioplatense** (`es-AR`). Si se suma otro, se sigue el patrón de Kora (`app/[locale]/`, diccionarios tipados contra el español) y el contenido editable pasa a tener un `SiteRecord` por idioma.
+
+### 4.8 Panel de administración
+
+Panel de uso personal en `/admin` (pedido del cliente, octubre 2026). Guía de uso y de puesta en marcha: **`docs/panel-admin.md`**.
+
+- **Un documento con versión.** Todo el contenido editable es un `SiteRecord` en una fila de `site_content` (Postgres en Neon). Cada pantalla cambia solo su parte sobre lo último guardado (`saveEditableContent`), con control de versión optimista; la versión anterior queda en `site_content_revisions` (últimas 50). Las tablas se crean solas (`server/db/schema.ts`).
+- **Dónde se guarda** (`getContentStore()`): con `DATABASE_URL`, Postgres; en Vercel sin `DATABASE_URL`, ninguno (el sitio muestra `SEED_RECORD` y el panel avisa); en la compu, `.data/content.json`. Las fotos: Vercel Blob con `BLOB_READ_WRITE_TOKEN`, `public/uploads/` en la compu (las dos carpetas locales, fuera de git).
+- **Validar antes de guardar.** `validateSiteRecord` pasa el esquema y arma el sitio entero (también los viajes ocultos) con las clases del dominio: lo que se guarda siempre se puede mostrar. Los errores vuelven a cada campo por su ruta (`itinerary.2.title`).
+- **El sitio sigue estático.** `getSiteContent()` lee lo guardado con `unstable_cache` (etiqueta `site-content`) y el panel la invalida con `updateTag` al guardar. Si la base falla o lo guardado no valida, se muestra `SEED_RECORD` y el error queda en el log (y no se cachea). Las páginas se rearman cada hora (`revalidate = 3600`) para que las salidas pasadas desaparezcan solas. Un viaje nuevo tiene página la primera vez que alguien entra.
+- **Seguridad.** Un solo administrador (`ADMIN_EMAIL`). La contraseña nunca está en el código: `ADMIN_PASSWORD_HASH` es un hash scrypt (`npm run admin:credentials`). Sesión en cookie `httpOnly` con un JWT HS256 (`ADMIN_SESSION_SECRET`), 7 días, solo para `/admin`. `proxy.ts` filtra y **cada página y Server Action vuelve a verificar** con `requireAdmin()`. Freno de intentos por IP y global (`LoginThrottle`). `/admin` lleva `noindex`, `X-Robots-Tag` y `Disallow`.
+- **Fotos.** El navegador las achica (lado mayor 2400 px, WebP; JPG en Safari) antes de subirlas por una Server Action (`bodySizeLimit: '5mb'`, por el límite de 4,5 MB de Vercel); el servidor revisa el tipo por el contenido. `photoSchema` y `images.remotePatterns` solo aceptan `/images/`, `/uploads/` y Vercel Blob.
+- El panel no usa nada del sitio (nav, footer, motor): su layout es `app/admin/`, hermano de `app/(site)/` bajo el layout raíz.
 
 ---
 
@@ -222,7 +249,7 @@ Por pedido del cliente (octubre 2026, §9.6) se sacaron el telón de entrada (`C
 | `core/MotionEffect` | Clases base abstractas: `FrameEffect` (corre cada frame), `ScrollEffect` (mide y escribe solo en los frames que tocan layout), `PointerEffect` (reacciona al puntero) |
 | `core/StyleWriter` | Escribe un estilo solo si cambió (evita recalcular estilos en cada frame) |
 | `core/ScrollTracker` · `PointerTracker` · `IntroClock` | Scroll + velocidad suavizada · posición del mouse · progreso 0→1 de la intro (arranca en el primer frame del motor) |
-| `effects/*` | Un efecto por atributo: reveal, parallax, marquee, timeline, counter, tilt, magnet, background shift, scroll progress, cursor, nav (`NavBarEffect`) y cortina (`CoverPairEffect`) |
+| `effects/*` | Un efecto por atributo: reveal, parallax, marquee, timeline, counter, tilt, magnet, background shift, scroll progress, cursor, nav (`NavBarEffect`), cortina (`CoverPairEffect`) y la secuencia fija del Contacto (`PinSplitEffect`) |
 | `math/*` | Funciones puras (clamp, easing, avance y transformaciones de cada reveal, formato de los contadores) — con tests |
 | `react/MotionRuntime` | Componente cliente que crea el motor al montar y lo destruye al desmontar. No renderiza nada |
 
@@ -261,12 +288,12 @@ En octubre de 2026 el cliente pidió reestructurar el sitio (§9.6): home con in
 | Hero + cinta | `hero` | ✅ | Falta mirar la carga en un navegador visible, con el panel al frente, para confirmar que la intro no parpadea |
 | Por qué viajar con nosotros | `why-us` | ✅ | |
 | Viajes (abanico) | `trips` | ✅ | Se revisó en capturas a 1440, 1900 y 390 px. Falta probarlo en un teléfono real (toques) y con lector de pantalla |
-| Calendario | `calendar` | ✅ | **Fechas de ejemplo** (`content/catalog/departures.ts`, cada una con `[completar]`) y un aviso visible que lo dice (`placeholderNote` en `content/sections/calendar.ts`): se borra al cargar las salidas reales. Si no hay salidas, la línea de tiempo queda vacía (no hay texto para ese caso) |
+| Calendario | `calendar` | ✅ | **Fechas de ejemplo** (las de `SEED_RECORD`) y un aviso visible que lo dice: las salidas y el aviso se cambian desde el panel (Salidas y Textos del home). Si no hay salidas, la línea de tiempo queda vacía (no hay texto para ese caso) |
 | ¿Quiénes somos? (solo Lucas) | `team` | ✅ | Al imprimir, si el guía salta de hoja, el aro de su avatar deja un arco de ~2 px al pie de la hoja anterior (Chromium) |
 | Testimonios | `testimonials` | ✅ | |
 | Galería | `gallery` | ✅ | |
-| Preguntas frecuentes | `faq` | ✅ | **8 de las 12 respuestas empiezan con `[confirmar]`** y se ven así en la página (equipo, reserva y seña, medios de pago, clima y reprogramación, cancelación, edad mínima, condición médica, precios): cada una tiene arriba un comentario con lo que falta. Al abrir o cerrar una respuesta sin scrollear, los reveals de más abajo no se actualizan hasta el próximo scroll (la firma del frame no incluye el alto del documento, §6.2). Falta probar el acordeón con un lector de pantalla, y en Safari si al entrar por `/#contacto` la página salta cuando la FAQ se colapsa al hidratar |
-| Contacto (+ formulario) | `contact` | ✅ | |
+| Preguntas frecuentes | `faq` | ✅ | **8 de las 12 respuestas empiezan con `[confirmar]`** y se ven así en la página (equipo, reserva y seña, medios de pago, clima y reprogramación, cancelación, edad mínima, condición médica, precios): se corrigen desde el panel. Al abrir o cerrar una respuesta sin scrollear, los reveals de más abajo no se actualizan hasta el próximo scroll (la firma del frame no incluye el alto del documento, §6.2). Falta probar el acordeón con un lector de pantalla, y en Safari si al entrar por `/#contacto` la página salta cuando la FAQ se colapsa al hidratar |
+| Contacto (+ formulario) | `contact` | ✅ | La secuencia fija se revisó en capturas a 1440 × 900 y 390 px. Falta probar el scroll real (rueda y trackpad), el foco con Tab y un lector de pantalla, y en Safari (`svh`, `sticky` con `filter`) |
 
 **Páginas de viaje** (`app/viajes/[slug]` + `features/trip-detail`):
 
@@ -277,12 +304,14 @@ En octubre de 2026 el cliente pidió reestructurar el sitio (§9.6): home con in
 | Laguna Negra | Parcial | **Falta el itinerario**: muestra "Itinerario próximamente" con el botón de WhatsApp. Tampoco tiene texto de presentación, "¿Puedo?", qué incluye, pensión ni precio: solo los datos del catálogo |
 | Cajón del Azul | Parcial | Igual que Laguna Negra |
 
-Además, en las páginas de viaje no se revisó la impresión.
+Además, en las páginas de viaje no se revisó la impresión. Laguna Negra y Cajón del Azul se completan desde el panel.
+
+**Panel de administración** (`/admin`, §4.8): ✅ en la compu (modo local). Se probó en el navegador de punta a punta (Puppeteer contra el dev server): contraseña equivocada, entrada y vuelta a la ruta pedida, guardar una pregunta y verla en el home, error de validación junto al campo, subir una foto, crear un viaje (queda oculto: su página da 404), ocultar y borrar; capturas a 1366 y 390 px. Las consultas a Postgres y el freno de intentos se prueban contra PGlite. **Pendiente:** conectar Neon y Blob en Vercel, cargar las variables (§10) y probarlo ahí (Blob no se probó); no hay pantalla para volver a una versión anterior (quedan en `site_content_revisions`); las fotos reemplazadas quedan en Blob; no se probó con lector de pantalla ni en un teléfono real.
 
 Fuera de las secciones:
 
 - **Assets (pedido al cliente).** Las fotos de los platos (196 px) y de Lucas (216 px) y el logo (PNG de 149×172; el fondo gris del original se volvió transparente con un relleno desde los bordes, pero sigue siendo chico) son los únicos originales que hay, y agrandarlos no agrega detalle. Hacen falta platos y retrato de ≥ 440 px, y el logo en SVG o en PNG transparente de ≥ 360 px.
-- **Deploy.** Cargar `NEXT_PUBLIC_APP_URL=https://<dominio>` en las variables de Production de Vercel (o confirmar que `VERCEL_PROJECT_PRODUCTION_URL` es el dominio correcto) y revisar en el deploy el `<head>` (canonical, `og:url`, `og:image`) del home y de una página de viaje, `/robots.txt` y `/sitemap.xml` (§10).
+- **Deploy.** Conectar Neon y Blob y cargar las variables del panel (`docs/panel-admin.md`). Cargar `NEXT_PUBLIC_APP_URL=https://<dominio>` en las variables de Production de Vercel (o confirmar que `VERCEL_PROJECT_PRODUCTION_URL` es el dominio correcto) y revisar en el deploy el `<head>` (canonical, `og:url`, `og:image`) del home y de una página de viaje, `/robots.txt` y `/sitemap.xml` (§10).
 
 ---
 
@@ -365,7 +394,7 @@ El cliente pidió reestructurar el sitio: un home con la información general y 
 **Estructura**
 
 - **Home** (`/`), solo información general, en este orden: Hero (+ cinta) → Por qué viajar → Viajes → Calendario → Quiénes somos → Testimonios → Galería → Preguntas frecuentes → Contacto (+ formulario) → footer. Salieron del home las secciones del diseño 04 Calle & Stepanek, 05 ¿Puedo?/¿Es para mí?, 06 la banda "La montaña te espera.", 07 Lago Lolog, 08 Pensión completa y 09 Servicios y equipo: su contenido pasó a la página de cada viaje. La frase de la banda sobrevive como primer renglón del título del cierre de cada viaje.
-- **Una página por viaje** (`/viajes/<slug>`, `tripPath()` de `constants/routes.ts`): se prerenderizan con `generateStaticParams` (`dynamicParams = false`: otro slug da 404) y cada una tiene su metadata (título con el template del layout, descripción, canonical, Open Graph y Twitter con la foto del viaje). Una sola plantilla, `features/trip-detail/TripDetail.tsx`, con este orden: **portada** (`h1`, foto a sangre con el parallax del hero, tags, "Consultar" y "Ver cronograma"), **Sobre el viaje** (stats con contador), **Cronograma** (siempre una línea de tiempo, `Timeline`; en Lolog con la foto de cada día), **¿Puedo? / ¿Es para mí?**, **¿Qué incluye y qué necesito?** (todos los grupos a la vista, sin pestañas), **Pensión completa**, **Próximas salidas** (`departureSchedule.forTrip`; no se muestra si no hay) y el **cierre** (sin precio: el título, una bajada que invita a consultar fechas y disponibilidad del viaje, y "Consultar por WhatsApp" con el mensaje "Hola! Quiero consultar por <viaje>"). Los copys de Calle & Stepanek y de Lolog se movieron tal cual. Laguna Negra y Cajón del Azul muestran los datos del catálogo y "Itinerario próximamente", con un botón a WhatsApp.
+- **Una página por viaje** (`/viajes/<slug>`, `tripPath()` de `constants/routes.ts`): se prerenderizan con `generateStaticParams` (`dynamicParams = false`: otro slug da 404) y cada una tiene su metadata (título con el template del layout, descripción, canonical, Open Graph y Twitter con la foto del viaje). Una sola plantilla, `features/trip-detail/TripDetail.tsx`, con este orden: **portada** (`h1`, foto a sangre con el parallax del hero, tags, "Consultar" y "Ver cronograma"), **Sobre el viaje** (stats con contador), **Cronograma** (siempre una línea de tiempo, `Timeline`; en Lolog con la foto de cada día), **¿Puedo? / ¿Es para mí?**, **¿Qué incluye y qué necesito?** (todos los grupos a la vista, sin pestañas), **Pensión completa**, **Próximas salidas** (`schedule.forTrip`; no se muestra si no hay) y el **cierre** (sin precio: el título, una bajada que invita a consultar fechas y disponibilidad del viaje, y "Consultar por WhatsApp" con el mensaje "Hola! Quiero consultar por <viaje>"). Los copys de Calle & Stepanek y de Lolog se movieron tal cual. Laguna Negra y Cajón del Azul muestran los datos del catálogo y "Itinerario próximamente", con un botón a WhatsApp.
 - Copys agregados para la plantilla (no están en el diseño; viven en `content/trips/common.ts`): "Sobre el viaje", "El viaje en números", "Datos del viaje", "Todos los viajes", "Ver cronograma", "Próximas salidas" y los epígrafes de stats "De travesía", "En refugio", "En la montaña" y "Cumbre más alta". La nota al pie de la pensión de Lolog pasa a "…No incluye día 0 ni la cena del día 4." (ya no hace falta decir "En Lago Lolog": está en su página).
 - **Navbar**: Viajes · Calendario · Quiénes somos · Preguntas frecuentes + "Escribinos" (WhatsApp). Los links usan `homeAnchorTo()` (`/#viajes`), así andan también desde una página de viaje, y la marca lleva a `ROUTES.home`. `LinkButton` y los links del nav navegan con `next/link` cuando el `href` es una ruta del sitio (`isRouterHref`): las anclas `#…`, `mailto:` y los links externos siguen siendo `<a>`.
 
@@ -389,7 +418,7 @@ El cliente pidió reestructurar el sitio: un home con la información general y 
 - **Fondo general de curvas de nivel** (`components/atoms/ContourLines`): el layout lo monta como una capa fija detrás de todo el sitio. Preguntas frecuentes ya no tiene franja propia: va sobre ese fondo. Contacto y el footer lo tapan con su verde.
 - **Nav transparente sobre la foto** (`NavBarEffect`): el hero y la portada de cada viaje pasan por debajo del nav (`margin-top` negativo del alto del nav, `navOverlay()`). Arriba de todo el nav es transparente, con el texto crema; en los primeros 140 px de scroll (`NAV_OVERLAY`) se vuelve crema opaco. Sin el vidrio esmerilado del diseño: las curvas de nivel desenfocadas detrás del logo y los links se veían como manchas. El motor escribe `--nav-solid` (0→1) y el CSS mezcla todos los colores con ese número. Sin JS, o en una página sin foto de portada, el nav es sólido.
 - **Cortinas** (`components/organisms/CoverPair` + `CoverPairEffect`): Por qué viajar, Calendario y Testimonios se quedan fijas y la sección siguiente (Viajes, Quiénes somos, Galería) sube como una hoja blanca y lisa (`--color-paper`, sin curvas de nivel), redondeada y con una sombra, y las tapa; las dos llevan abajo el aire entre secciones, así la hoja no corta el contenido de la fija ni termina pegada al suyo; mientras tanto, la fija se achica y se apaga un poco (`COVER`). Una sección más alta que la pantalla (el Calendario en un teléfono) se ve entera antes de fijarse (`--cover-top`, lo mide el motor). Sin JS, sin cortina. Con el movimiento apagado, la cortina queda pero la fija no se mueve.
-- **Contacto a pantalla completa**: la sección pinta su propio verde (el de `CLOSING_BACKGROUND`) y mide al menos una pantalla, con la tarjeta centrada; el footer verde sigue abajo. Así no queda una franja crema arriba mientras el fondo de la página todavía no cambió.
+- **Contacto como el del portafolio del cliente** (`PinSplitEffect`, `pinSplit()`): una secuencia fija de 240 pantallas % que el scroll recorre. Entra la frase gigante "La montaña te espera." cerrada y centrada, con su reflejo; se parte y cada mitad viaja a su costado; debajo aparecen, en dos columnas y sin tarjeta, el título "¿Te animás a subir?" con la bajada, WhatsApp y el mail (desde la izquierda) y el formulario (desde la derecha); al final el footer (`pinExit()`) sube por encima, como una hoja redondeada, y el Contacto se achica y se desenfoca. El motor escribe `--enter`, `--open`, `--reveal` y `--exit` (`math/pinSplit.ts`, con tests) y el CSS las convierte en movimiento. Si el foco llega al formulario antes de que aparezca, el motor scrollea hasta donde se ve entero. En un teléfono no se fija (el formulario no entra en una pantalla): la frase va en dos renglones y se abre a medida que la sección entra. Sin JS o con reduced motion, todo a la vista y sin fijarse. La sección pinta su propio verde (el de `CLOSING_BACKGROUND`).
 - **Sin precios en el sitio** (pedido del cliente): ni en las cards ni en el cierre de los viajes. El dato sigue en el catálogo (`content/catalog/trips.ts`) sin mostrarse, por si vuelve.
 - **Logo de WhatsApp** (`components/atoms/WhatsAppIcon`, con el trazo de `simple-icons`) en el botón flotante y en todos los botones que llevan a WhatsApp. Reemplaza al globito `ChatIcon`, que se borró.
 
@@ -407,6 +436,7 @@ npm run type-check   # tsc --noEmit
 npm run test         # vitest
 npm run check        # type-check + lint + test
 npm run format       # prettier (ts, tsx y css de src/)
+npm run admin:credentials  # genera ADMIN_PASSWORD_HASH y ADMIN_SESSION_SECRET (pide la contraseña sin mostrarla)
 ```
 
 Variables de entorno — copiar `.env.example` a `.env.local`:
@@ -414,11 +444,18 @@ Variables de entorno — copiar `.env.example` a `.env.local`:
 ```
 NEXT_PUBLIC_APP_URL=        # URL pública (canonical, Open Graph, robots, sitemap). Vacía: en Vercel cae a https://$VERCEL_PROJECT_PRODUCTION_URL; fuera de Vercel, a http://localhost:3000 (obligatoria en producción fuera de Vercel)
 NEXT_PUBLIC_MOTION_LEVEL=   # suave | equilibrado | exagerado | apagado (por defecto, exagerado). Se fija en el build
+DATABASE_URL=               # Postgres (Neon) del panel. La crea Vercel → Storage → Neon. Vacía en la compu: .data/content.json
+BLOB_READ_WRITE_TOKEN=      # Vercel Blob (fotos del panel). La crea Vercel → Storage → Blob. Vacía en la compu: public/uploads/
+ADMIN_EMAIL=                # el único mail que entra a /admin
+ADMIN_PASSWORD_HASH=        # hash scrypt de la contraseña (npm run admin:credentials). NUNCA la contraseña en texto
+ADMIN_SESSION_SECRET=       # secreto de las sesiones (≥ 32 caracteres; lo genera el mismo comando)
 ```
+
+**Panel en Vercel.** Una sola vez: Storage → Neon y Storage → Blob conectados al proyecto (crean `DATABASE_URL` y `BLOB_READ_WRITE_TOKEN`), y las tres `ADMIN_*` en Settings → Environment Variables. Paso a paso en `docs/panel-admin.md`. La contraseña del cliente no va en el repo: solo su hash, en las variables.
 
 **URL pública.** `SITE_URL` vive en `src/constants/siteUrl.ts` (`resolveSiteUrl`, con tests). Orden: `NEXT_PUBLIC_APP_URL` si no está vacía → `https://${VERCEL_PROJECT_PRODUCTION_URL}` → `http://localhost:3000`. Un deploy con `VERCEL_ENV=production` que termine en localhost falla en el build, a propósito (es el bug que publicó el canonical, Open Graph, robots y sitemap apuntando a `http://localhost:3000`); un `npm run build` local sin variables sigue andando (no se mira `NODE_ENV`). Solo lo importan `app/layout.tsx`, `robots.ts` y `sitemap.ts`: `constants/site.ts` corre también en el cliente y no lee variables de entorno.
 
-**Deploy.** GitHub (`origin/main`) → Vercel, que corre `npm run build` en cada push. Next type-chequea en el build todo lo que incluye `tsconfig.json`, tests y fixtures incluidos: un fixture que no compila tumba el deploy aunque Vercel no corra los tests. Antes de pushear, `npm run check` y `npm run build`.
+**Deploy.** GitHub (`origin/main`) → Vercel, que corre `npm run build` en cada push. El build lee el contenido guardado (con `DATABASE_URL`) para prerenderizar; si la base no responde, prerenderiza con `SEED_RECORD` y se corrige sola en la próxima hora o al guardar. Next type-chequea en el build todo lo que incluye `tsconfig.json`, tests y fixtures incluidos: un fixture que no compila tumba el deploy aunque Vercel no corra los tests. Antes de pushear, `npm run check` y `npm run build`.
 
 **Node 22.** `engines.node` es `"22.x"` y no un rango abierto (`">=20.9.0"`): con un rango abierto, Vercel avisa que la versión de Node se actualiza sola con cada major nueva. 22 es la versión con la que se desarrolla y se testea.
 

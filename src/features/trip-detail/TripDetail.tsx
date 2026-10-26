@@ -11,7 +11,7 @@ import { TripSchedule } from './components/TripSchedule';
 
 /** Props de `TripDetail`. */
 export type TripDetailProps = {
-  /** `tripDetails[slug]`: todo el contenido de la página del viaje. */
+  /** `getSiteContent().tripDetail(slug)`: todo el contenido de la página del viaje. */
   content: TripDetailContent;
 };
 

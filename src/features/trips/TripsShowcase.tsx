@@ -15,7 +15,7 @@ const TITLE_ID = `${SECTION_IDS.trips}-titulo`;
 
 /** Props de `TripsShowcase`: solo su slice de contenido. */
 export type TripsShowcaseProps = {
-  /** `landingContent.trips`. */
+  /** `getSiteContent().landing.trips`. */
   content: TripsContent;
 };
 

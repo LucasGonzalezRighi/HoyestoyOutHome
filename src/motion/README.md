@@ -123,6 +123,7 @@ Fuera del loop:
 | `data-scroll-progress` | `scrollProgress()` | `ScrollProgressEffect` | Barra de progreso de lectura |
 | `data-nav-bar` · `data-nav-overlay` | `navBar()` · `navOverlay()` | `NavBarEffect` | El nav transparente sobre la foto de portada y sólido al scrollear (`--nav-solid`, pedido del cliente, octubre 2026) |
 | `data-cover-pair` | `coverPair()` | `CoverPairEffect` | Cortina entre dos secciones: dónde se fija la primera (`--cover-top`) y cómo se achica y apaga mientras la segunda la tapa (pedido del cliente, octubre 2026) |
+| `data-pin-split` · `data-pin-exit` | `pinSplit()` · `pinExit()` | `PinSplitEffect` | Secuencia fija del Contacto: la frase gigante se parte hacia los costados, aparece el contenido y el footer sube por encima (`--enter`, `--open`, `--reveal`, `--exit`; pedido del cliente, octubre 2026) |
 | `data-cursor` | `cursor()` | `CursorEffect` | Cursor montaña; con `pointer: fine` lo muestra y marca `<html data-cursor-active>` |
 
 Atributos de estado que pone el motor en `<html>` (`MOTION_STATE`, no se esparcen en JSX): `data-cursor-active` (el cursor custom anda: `base.css` oculta el del sistema) y `data-intro-controlled` (el motor ya posó la intro: `design-system/intro.css` deja de sostenerla).

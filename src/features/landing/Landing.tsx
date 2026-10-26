@@ -1,6 +1,6 @@
 import { CoverPair } from '@/components/organisms/CoverPair';
 import { SECTION_IDS } from '@/constants/sections';
-import { landingContent } from '@/content';
+import type { LandingContent } from '@/content';
 import { Calendar } from '@/features/calendar';
 import { Contact } from '@/features/contact';
 import { Faq } from '@/features/faq';
@@ -11,13 +11,19 @@ import { Testimonials } from '@/features/testimonials';
 import { TripsShowcase } from '@/features/trips';
 import { WhyUs } from '@/features/why-us';
 
+/** Props de `Landing`: el contenido del home ya armado (`getSiteContent().landing`). */
+export type LandingProps = {
+  /** Un slice por sección. */
+  content: LandingContent;
+};
+
 /**
  * Composición del home: solo información general. Lo propio de cada viaje
  * (cronograma, qué incluye, pensión, precio) vive en su página
  * (`/viajes/<slug>`), por pedido del cliente (octubre 2026).
  *
  * Es el `<main>` del home y el destino del link "Saltar al contenido". Cada
- * sección recibe **solo su slice** de `landingContent` —como Kora hace con los
+ * sección recibe **solo su slice** del contenido —como Kora hace con los
  * diccionarios—: así ninguna puede leer texto que no le corresponde, y su tipo
  * dice exactamente qué usa.
  *
@@ -27,9 +33,7 @@ import { WhyUs } from '@/features/why-us';
  *
  * El footer no va acá: lo renderiza el layout, igual en todas las páginas.
  */
-export function Landing() {
-  const content = landingContent;
-
+export function Landing({ content }: LandingProps) {
   return (
     <main id={SECTION_IDS.content}>
       <Hero content={content.hero} />

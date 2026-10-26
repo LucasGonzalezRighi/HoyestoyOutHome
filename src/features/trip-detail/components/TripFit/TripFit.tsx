@@ -15,7 +15,7 @@ const AUDIENCE_TITLE_ID = `${TRIP_SECTION_IDS.fit}-es-para-mi`;
 
 /** Props de `TripFit`. */
 export type TripFitProps = {
-  /** `tripDetails[slug].fit`. */
+  /** `getSiteContent().tripDetail(slug).fit`. */
   content: TripFitContent;
 };
 

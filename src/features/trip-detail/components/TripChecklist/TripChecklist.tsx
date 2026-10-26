@@ -14,7 +14,7 @@ const TITLE_ID = `${TRIP_SECTION_IDS.checklist}-titulo`;
 
 /** Props de `TripChecklist`. */
 export type TripChecklistProps = {
-  /** `tripDetails[slug].checklist`. */
+  /** `getSiteContent().tripDetail(slug).checklist`. */
   content: TripChecklistContent;
 };
 

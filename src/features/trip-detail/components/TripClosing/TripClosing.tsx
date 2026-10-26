@@ -40,7 +40,7 @@ const TITLE_ID = `${TRIP_SECTION_IDS.closing}-titulo`;
 
 /** Props de `TripClosing`. */
 export type TripClosingProps = {
-  /** `tripDetails[slug].closing`. */
+  /** `getSiteContent().tripDetail(slug).closing`. */
   content: TripClosingContent;
 };
 

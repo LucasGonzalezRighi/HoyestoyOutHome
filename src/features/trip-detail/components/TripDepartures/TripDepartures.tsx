@@ -12,7 +12,7 @@ const TITLE_ID = `${TRIP_SECTION_IDS.departures}-titulo`;
 
 /** Props de `TripDepartures`. */
 export type TripDeparturesProps = {
-  /** `tripDetails[slug].departures`. */
+  /** `getSiteContent().tripDetail(slug).departures`. */
   content: TripDeparturesContent;
 };
 

@@ -14,7 +14,7 @@ const TITLE_ID = `${SECTION_IDS.faq}-titulo`;
 
 /** Props de `Faq`: solo su slice de contenido. */
 export type FaqProps = {
-  /** `landingContent.faq`. */
+  /** `getSiteContent().landing.faq`. */
   content: FaqContent;
 };
 

@@ -26,7 +26,7 @@ const CTA_ICON_SIZE = 18;
 
 /** Props de `TripSchedule`. */
 export type TripScheduleProps = {
-  /** `tripDetails[slug].schedule`. */
+  /** `getSiteContent().tripDetail(slug).schedule`. */
   content: TripScheduleContent;
 };
 

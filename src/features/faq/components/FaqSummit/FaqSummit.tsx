@@ -22,7 +22,7 @@ const RINGS_VIEW_BOX = `${-SUMMIT_RINGS_EXTENT} ${-SUMMIT_RINGS_EXTENT} ${RINGS_
 
 /** Props de `FaqSummit`: solo su parte del contenido de la sección. */
 export type FaqSummitProps = {
-  /** `landingContent.faq.summit`. */
+  /** `getSiteContent().landing.faq.summit`. */
   content: FaqSummitContent;
 };
 

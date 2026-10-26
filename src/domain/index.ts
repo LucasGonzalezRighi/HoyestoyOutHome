@@ -32,10 +32,17 @@ export {
 } from './services/ServiceChecklist';
 
 export { formatCount, formatKilometers, formatMeters, formatNumber } from './shared/formatters';
+export { CalendarDate } from './shared/CalendarDate';
 export { Photo, type PhotoParams } from './shared/Photo';
 export { Price } from './shared/Price';
 
 export { DIFFICULTIES, difficultyLabel, isDifficulty, type Difficulty } from './trips/Difficulty';
-export { TRIP_SLUGS, Trip, isTripSlug, type TripParams, type TripSlug } from './trips/Trip';
+export {
+  TRIP_SLUG_MAX_LENGTH,
+  Trip,
+  isTripSlug,
+  type TripParams,
+  type TripSlug,
+} from './trips/Trip';
 export { TripCatalog } from './trips/TripCatalog';
 export { TripDuration } from './trips/TripDuration';

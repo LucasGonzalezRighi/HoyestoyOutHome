@@ -22,7 +22,7 @@ const PLATE_SIZES = '220px';
 
 /** Props de `TripMeals`. */
 export type TripMealsProps = {
-  /** `tripDetails[slug].meals`. */
+  /** `getSiteContent().tripDetail(slug).meals`. */
   content: TripMealsContent;
 };
 

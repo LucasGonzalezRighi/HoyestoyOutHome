@@ -21,7 +21,7 @@ const PARAGRAPH_REVEAL_SPAN = 0.2;
 
 /** Props de `TripOverview`. */
 export type TripOverviewProps = {
-  /** `tripDetails[slug].overview`. */
+  /** `getSiteContent().tripDetail(slug).overview`. */
   content: TripOverviewContent;
 };
 

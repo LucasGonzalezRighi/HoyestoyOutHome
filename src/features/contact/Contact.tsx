@@ -30,7 +30,7 @@ function GiantHalf({ text, className }: { text: string; className?: string }) {
 
 /** Props de `Contact`: solo su slice de contenido. */
 export type ContactProps = {
-  /** `landingContent.contact`. */
+  /** `getSiteContent().landing.contact`. */
   content: ContactContent;
 };
 

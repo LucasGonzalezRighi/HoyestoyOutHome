@@ -1,34 +1,54 @@
-import { Departure, DepartureSchedule } from '@/domain';
+import type { DepartureRecord } from '@/content/records/schema';
+import { Departure, DepartureSchedule, type TripCatalog } from '@/domain';
 
-import { tripCatalog } from './trips';
+/**
+ * Zona horaria del negocio: "hoy" es el día en Argentina, no en el servidor
+ * (Vercel corre en UTC, y a las 22 h de Mendoza ya sería mañana).
+ */
+const BUSINESS_TIME_ZONE = 'America/Argentina/Buenos_Aires';
+
+/**
+ * La fecha de hoy en Argentina, `AAAA-MM-DD`. El formato `en-CA` es justo
+ * ese (año-mes-día con ceros), así que no hace falta armarlo a mano.
+ */
+export function todayInBusinessTimeZone(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: BUSINESS_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+}
 
 /**
  * El calendario de salidas: la línea de tiempo "Calendario" del home y las
- * próximas fechas de la página de cada viaje (`departureSchedule.forTrip(slug)`).
+ * próximas fechas de la página de cada viaje (`schedule.forTrip(slug)`).
  *
- * **Son FECHAS DE EJEMPLO.** El cliente todavía no tiene el calendario de la
- * temporada: cada salida lleva `// [completar]` hasta que confirme la fecha
- * real. Solo se carga el día de salida; el de regreso sale de la duración del
- * viaje en el catálogo.
+ * Deja afuera las salidas que ya pasaron (salen antes de `today`) y las de
+ * viajes ocultos o borrados: así el calendario se limpia solo, sin que haya
+ * que entrar al panel a borrar fechas viejas. Solo se guarda el día de
+ * salida; el de regreso sale de la duración del viaje en el catálogo.
  *
- * El orden en que se cargan no importa: `DepartureSchedule` las ordena por
- * fecha y tira si el mismo viaje sale dos veces el mismo día.
+ * @param today `AAAA-MM-DD` (`todayInBusinessTimeZone()`). Es un parámetro
+ *   para que los tests no dependan del reloj.
  */
-export const departureSchedule = new DepartureSchedule([
-  // [completar] fecha de ejemplo.
-  new Departure({ trip: tripCatalog.get('calle-stepanek'), startsOn: '2026-11-13' }),
-  // [completar] fecha de ejemplo.
-  new Departure({ trip: tripCatalog.get('lago-lolog-laguna-verde'), startsOn: '2026-12-05' }),
-  // [completar] fecha de ejemplo.
-  new Departure({ trip: tripCatalog.get('laguna-negra'), startsOn: '2027-01-09' }),
-  // [completar] fecha de ejemplo.
-  new Departure({ trip: tripCatalog.get('cajon-del-azul'), startsOn: '2027-02-06' }),
-  // [completar] fecha de ejemplo.
-  new Departure({ trip: tripCatalog.get('calle-stepanek'), startsOn: '2027-03-12' }),
-]);
+export function buildDepartureSchedule(
+  records: readonly DepartureRecord[],
+  catalog: TripCatalog,
+  today: string,
+): DepartureSchedule {
+  return new DepartureSchedule(
+    records.flatMap((record) => {
+      const trip = catalog.find(record.tripSlug);
+      return trip && record.startsOn >= today
+        ? [new Departure({ trip, startsOn: record.startsOn })]
+        : [];
+    }),
+  );
+}
 
 /**
  * Los tipos para leer el calendario desde un slice o un feature sin ir a
- * buscarlos al dominio: `departureSchedule.byMonth()` devuelve `DepartureMonth[]`.
+ * buscarlos al dominio: `schedule.byMonth()` devuelve `DepartureMonth[]`.
  */
-export type { Departure, DepartureMonth } from '@/domain';
+export type { Departure, DepartureMonth, DepartureSchedule } from '@/domain';

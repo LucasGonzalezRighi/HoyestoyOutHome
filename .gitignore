@@ -16,3 +16,7 @@ yarn-error.log*
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# Panel de administración en modo local (src/server/content/store.ts)
+.data/
+public/uploads/

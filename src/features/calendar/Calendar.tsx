@@ -52,7 +52,7 @@ function placeMonths(months: readonly DepartureMonth[]): PlacedMonth[] {
 
 /** Props de `Calendar`: solo su slice de contenido. */
 export type CalendarProps = {
-  /** `landingContent.calendar`. */
+  /** `getSiteContent().landing.calendar`. */
   content: CalendarContent;
 };
 

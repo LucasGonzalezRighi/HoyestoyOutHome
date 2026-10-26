@@ -1,12 +1,23 @@
 import { describe, expect, it } from 'vitest';
 
-import { tripDetails } from '@/content/trips';
+import { buildSiteContent } from '@/content';
+import { SEED_RECORD } from '@/content/seed';
 
 import { checklistPanels } from './checklistPanels';
 
+/** Las páginas de viaje del contenido inicial. */
+const site = buildSiteContent(SEED_RECORD, '2026-01-01');
+
+/** La página de un viaje del contenido inicial (tira si no está). */
+function detailOf(slug: string) {
+  const detail = site.tripDetail(slug);
+  if (!detail) throw new Error(`${slug} no tiene página`);
+  return detail;
+}
+
 /** La checklist de un viaje que la tiene (tira si el contenido la perdió). */
-function checklistOf(slug: 'calle-stepanek' | 'lago-lolog-laguna-verde') {
-  const { checklist } = tripDetails[slug];
+function checklistOf(slug: string) {
+  const { checklist } = detailOf(slug);
   if (!checklist) throw new Error(`${slug} no tiene checklist`);
   return checklist;
 }
@@ -50,7 +61,7 @@ describe('checklistPanels', () => {
   });
 
   it('los viajes sin programa no tienen checklist (la página no muestra el bloque)', () => {
-    expect(tripDetails['laguna-negra'].checklist).toBeUndefined();
-    expect(tripDetails['cajon-del-azul'].checklist).toBeUndefined();
+    expect(detailOf('laguna-negra').checklist).toBeUndefined();
+    expect(detailOf('cajon-del-azul').checklist).toBeUndefined();
   });
 });
