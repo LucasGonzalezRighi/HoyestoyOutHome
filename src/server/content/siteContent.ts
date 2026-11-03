@@ -42,13 +42,31 @@ async function readPublishedRecord(): Promise<SiteRecord> {
 }
 
 /**
+ * Huella del contenido inicial (FNV-1a de 32 bits sobre su JSON): cambia cada
+ * vez que se edita `SEED_RECORD` en el código.
+ */
+function seedFingerprint(): string {
+  let hash = 0x811c9dc5;
+  for (const char of JSON.stringify(SEED_RECORD)) {
+    hash ^= char.codePointAt(0) ?? 0;
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16);
+}
+
+/**
  * Lo guardado, cacheado entre pedidos: la base se consulta una vez y el sitio
- * se sirve estático hasta que el panel guarda algo. La versión del formato va
- * en la clave para que un deploy que cambia la forma no lea la caché vieja.
+ * se sirve estático hasta que el panel guarda algo.
+ *
+ * La clave lleva la versión del formato y la huella del contenido inicial.
+ * why: la caché de Next sobrevive a los deploys (y a reiniciar `next dev`).
+ * Mientras no haya nada guardado, lo cacheado es `SEED_RECORD`; sin la huella,
+ * un cambio de copy en `content/seed/` no se vería hasta el primer guardado
+ * del panel.
  */
 const getCachedRecord = unstable_cache(
   readPublishedRecord,
-  ['site-record', String(SITE_RECORD_SCHEMA_VERSION)],
+  ['site-record', String(SITE_RECORD_SCHEMA_VERSION), seedFingerprint()],
   { tags: [CONTENT_CACHE_TAG] },
 );
 

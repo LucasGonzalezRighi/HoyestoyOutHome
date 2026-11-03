@@ -8,8 +8,8 @@ Panel de uso personal en **`/admin`** para editar el sitio sin tocar código. Lo
 |---|---|---|
 | Inicio | `/admin` | Muestra dónde se está guardando, el último cambio y un acceso a cada pantalla |
 | Viajes | `/admin/viajes` | Orden del abanico del home, mostrar/ocultar, borrar. **Nuevo viaje** arranca oculto |
-| Editor de un viaje | `/admin/viajes/editar/<slug>` | Datos y foto, portada, "Sobre el viaje" y sus números, cronograma con fotos por día, "¿Puedo? / ¿Es para mí?", qué incluye y pensión |
-| Salidas | `/admin/salidas` | Fechas del calendario del home y de cada página de viaje. Las que ya pasaron dejan de verse solas |
+| Editor de un viaje | `/admin/viajes/editar/<slug>` | Datos y foto, precio por persona y su nota (se ven al final de la página del viaje; sin precio, no se muestra), portada, "Sobre el viaje" y sus números, cronograma con fotos por día, "¿Puedo? / ¿Es para mí?", qué incluye y pensión |
+| Salidas | `/admin/salidas` | Fechas del calendario del home y de cada página de viaje: viaje, día de salida, día de vuelta (sale de la duración del viaje, o se cambia a mano) y "Fecha a confirmar" (el sitio la muestra con la etiqueta "A confirmar"). Las que ya pasaron dejan de verse solas |
 | Preguntas | `/admin/preguntas` | Preguntas frecuentes del home, en orden |
 | Testimonios | `/admin/testimonios` | La cinta de testimonios |
 | Textos del home | `/admin/textos` | Titular, bajada y cinta del hero, "Por qué viajar" y los títulos y bajadas de Viajes, Calendario, Testimonios, Preguntas y Contacto (incluido el aviso de "fechas de ejemplo") |
@@ -29,7 +29,7 @@ sitio (/, /viajes/<slug>, sitemap) ◀── getSiteContent() ◀── caché d
 ```
 
 - **Un documento.** Todo el contenido editable es un JSON (`SiteRecord`, `src/content/records/schema.ts`) guardado en una fila de `site_content`, con número de versión. Cada pantalla cambia solo su parte sobre lo último guardado: dos pestañas que editan cosas distintas no se pisan. Cada versión anterior queda en `site_content_revisions` (las últimas 50), por si hay que volver atrás a mano.
-- **Contenido inicial y respaldo.** `src/content/seed/` tiene el contenido tal como estaba en el código. Es lo que se ve hasta el primer guardado, y lo que muestra el sitio si la base no responde o lo guardado no pasa la validación (el error queda en el log). El sitio nunca queda en blanco.
+- **Contenido inicial y respaldo.** `src/content/seed/` tiene el contenido inicial (lo que estaba en el código, con los cambios de copy que pidió el cliente). La caché del sitio lleva una huella de ese contenido: si se edita en el código, el sitio lo toma en el próximo deploy aunque nadie haya guardado nada. Es lo que se ve hasta el primer guardado, y lo que muestra el sitio si la base no responde o lo guardado no pasa la validación (el error queda en el log). El sitio nunca queda en blanco.
 - **El sitio sigue siendo estático.** El home y las páginas de viaje se prerenderizan y se sirven cacheados; la base se consulta una vez y la caché se invalida al guardar. Además se rearman cada hora (`revalidate = 3600`) para que las salidas pasadas desaparezcan sin que nadie guarde nada.
 - **Viajes nuevos.** Un viaje creado en el panel tiene su página la primera vez que alguien entra (`/viajes/<slug>`); un viaje oculto responde 404. Sin días de cronograma, la página muestra "Itinerario próximamente".
 - **Fotos.** El navegador las achica antes de subirlas (lado mayor 2400 px, WebP o JPG) y el servidor revisa que sean JPG, PNG o WebP de verdad (por su contenido) y de hasta 4 MB. Van a Vercel Blob con un nombre único. Una foto reemplazada no se borra de Blob.

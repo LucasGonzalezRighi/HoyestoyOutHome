@@ -87,11 +87,11 @@ export type TripCoverContent = {
 /*  Presentación                                                              */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-/** Las stats con contador de la presentación ("24 km", "4 días"…). */
+/** Las stats de la presentación ("24 km", "4 días"…), fijas. */
 export type TripStatsContent = {
   /** Nombre accesible de la lista de stats. */
   readonly label: string;
-  /** Las stats, en orden. Cada valor es un entero (lo anima el contador). */
+  /** Las stats, en orden. Cada valor es un entero. */
   readonly items: readonly Metric[];
 };
 
@@ -105,7 +105,7 @@ export type TripOverviewContent = {
   readonly highlight?: string;
   /** Nota de modalidad y dificultad, debajo de las stats (Lago Lolog). Opcional. */
   readonly modality?: string;
-  /** Las stats con contador. */
+  /** Las stats ("24 km", "4 días"…). */
   readonly stats: TripStatsContent;
 };
 
@@ -241,6 +241,8 @@ export type TripMealsContent = {
 export type TripDeparturesContent = {
   /** El `<h2>`: "Próximas salidas". */
   readonly title: string;
+  /** "A confirmar": la etiqueta de las salidas cuya fecha no es definitiva. */
+  readonly toConfirmLabel: string;
   /** Las salidas del viaje, en orden. Vacío: el bloque no se muestra. */
   readonly departures: readonly Departure[];
 };
@@ -249,15 +251,26 @@ export type TripDeparturesContent = {
 /*  Cierre                                                                    */
 /* ────────────────────────────────────────────────────────────────────────── */
 
+/** El precio por persona del cierre (`dc.html:366-368`). */
+export type TripPriceContent = {
+  /** Renglón sobre el precio: "Calle & Stepanek · Precio por persona". */
+  readonly kicker: string;
+  /** El monto: "$690.000". */
+  readonly amount: string;
+  /** Nota debajo (la seña). Opcional. */
+  readonly note?: string;
+};
+
 /**
- * Cierre de la página: la invitación a consultar y el botón grande a WhatsApp.
- * No lleva montos: el cliente pidió que el sitio no muestre ningún precio, y
- * fechas, disponibilidad y valores se conversan por WhatsApp.
+ * Cierre de la página: el precio por persona (si el viaje lo tiene), la
+ * invitación a consultar y el botón grande a WhatsApp.
  */
 export type TripClosingContent = {
   /** Alt del logo de la chapita crema. */
   readonly logoAlt: string;
-  /** El `<h2>` en sus renglones ("La montaña te espera." / "¿Te animás a subir?"). */
+  /** El precio por persona. Sin precio cargado, no se muestra. */
+  readonly price?: TripPriceContent;
+  /** El `<h2>` en sus renglones ("La montaña te espera…" / "¿Te animás a subir?"). */
   readonly titleLines: readonly string[];
   /** Bajada que invita a consultar las fechas y la disponibilidad de este viaje. */
   readonly lead: string;

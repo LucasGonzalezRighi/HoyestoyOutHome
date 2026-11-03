@@ -93,19 +93,55 @@
   mix-blend-mode: normal;
 }
 
+/* ── Precio por persona (dc.html:366-368) ──────────────────────────────── */
+
+.price {
+  margin: 0 0 30px;
+}
+
+/* "Calle & Stepanek · Precio por persona" (dc.html:366). */
+.priceKicker {
+  margin: 0;
+  font-size: 16px;
+}
+
 /*
- * "La montaña te espera. / ¿Te animás a subir?" (dc.html:369). Es lo más grande
- * de la tarjeta, donde antes estaba el monto: sube del `clamp(34px, 4.4vw, 60px)`
- * del diseño a un tope de 72px (desde ~1385px de ancho).
+ * "$690.000" (dc.html:367). El diseño llega a 120px; acá el tope es 104px
+ * para que no le gane tanto al título, que en esta tarjeta es más grande que
+ * en el diseño (hasta 72px).
+ */
+.priceAmount {
+  margin: 10px 0 6px;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: clamp(52px, 8vw, 104px);
+  line-height: 1.1;
+  color: var(--color-bg);
+}
+
+/* La nota de la seña (dc.html:368). */
+.priceNote {
+  max-width: 40ch;
+  margin: 0 auto;
+  font-size: 15.5px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+/*
+ * "La montaña te espera… / ¿Te animás a subir?" (dc.html:369). Sube del
+ * `clamp(34px, 4.4vw, 60px)` del diseño a un tope de 72px (desde ~1385px de
+ * ancho): sin precio, es lo más grande de la tarjeta.
  *
- * El tramo fluido (`16px + 4.05vw`) está calculado para que cada oración entre
- * en su renglón también en un teléfono: a 390px da 31,8px y "La montaña te
- * espera." mide ~294px en los ~311px que deja la tarjeta. Con el piso de 34px
- * del diseño partía en "La montaña / te espera." y la pregunta quedaba suelta.
+ * El tramo fluido (`14px + 4.05vw`) está calculado para que cada oración entre
+ * en su renglón también en un teléfono: a 390px da 29,8px y "La montaña te
+ * espera…" entra en los ~311px que deja la tarjeta (con 31,8px, y los puntos
+ * suspensivos, partía en dos). Con el piso de 34px del diseño partía en
+ * "La montaña / te espera…" y la pregunta quedaba suelta.
  */
 .title {
   margin: 0;
-  font-size: clamp(30px, 16px + 4.05vw, 72px);
+  font-size: clamp(28px, 14px + 4.05vw, 72px);
   font-style: italic;
   line-height: 1.04;
   color: var(--color-bg);

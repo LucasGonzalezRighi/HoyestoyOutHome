@@ -105,7 +105,7 @@ export function tripsContent(
     eyebrow: 'Próximos viajes',
     title: texts.title,
     lead: texts.lead,
-    facts: [tripCountLabel(catalog.size), 'Mendoza y Patagonia', 'Grupos chicos'],
+    facts: [tripCountLabel(catalog.size), 'Mendoza y Patagonia', 'Grupos reducidos'],
     controls: {
       previousLabel: 'Viaje anterior',
       nextLabel: 'Viaje siguiente',

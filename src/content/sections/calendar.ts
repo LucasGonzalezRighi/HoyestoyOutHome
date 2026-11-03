@@ -1,5 +1,6 @@
 import type { DepartureMonth, DepartureSchedule } from '@/content/catalog/departures';
 import type { HomeTextsRecord } from '@/content/records/schema';
+import { TO_CONFIRM_LABEL } from '@/content/trips/common';
 import type { SectionHeadingContent } from '@/content/types';
 
 /**
@@ -21,6 +22,8 @@ export type CalendarContent = Required<SectionHeadingContent> & {
    * CLAUDE.md, "label in name").
    */
   readonly viewTripLabel: string;
+  /** "A confirmar": la etiqueta de las salidas cuya fecha no es definitiva. */
+  readonly toConfirmLabel: string;
   /**
    * Aviso visible arriba del calendario (hoy, que las fechas son de ejemplo).
    * Se edita desde el panel: vacío, no se muestra.
@@ -44,6 +47,7 @@ export function calendarContent(
     title: texts.title,
     lead: texts.lead,
     viewTripLabel: 'Ver viaje',
+    toConfirmLabel: TO_CONFIRM_LABEL,
     ...(texts.note ? { placeholderNote: texts.note } : {}),
     months: schedule.byMonth(),
   };

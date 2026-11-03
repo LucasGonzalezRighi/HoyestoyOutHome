@@ -44,6 +44,13 @@
   text-transform: uppercase;
 }
 
+/* El rango y, si la fecha no es definitiva, "A confirmar" debajo. */
+.text {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
 .range {
   font-size: 17px;
   font-weight: 600;

@@ -29,6 +29,8 @@ export const SEED_TRIPS: readonly TripRecord[] = [
     // El Cerro Adolfo Calle: la altura del cartel de la foto ("4.290 m s.n.m.").
     summitElevationM: 4290,
     priceArs: 690000,
+    // La seña del cierre del diseño (`dc.html:368`).
+    priceNote: '*Seña de $200.000. La diferencia la podés abonar el día de encuentro.',
     // La portada la encuadra más abajo que el registro (`pos: 'center 62%'` en el diseño).
     photo: toPhotoRecord(PHOTOS.calleSummitSign.withPosition('center 62%')),
     // En el panel del home, con `center 62%` el cartel de cumbre cae justo

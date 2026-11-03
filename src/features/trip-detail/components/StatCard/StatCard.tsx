@@ -1,13 +1,12 @@
-import { VisuallyHidden } from '@/components/atoms/VisuallyHidden';
 import { SurfaceCard } from '@/components/molecules/SurfaceCard';
 import type { Metric } from '@/domain';
-import { counter, reveal } from '@/motion/attributes';
+import { reveal } from '@/motion/attributes';
 
 import styles from './StatCard.module.css';
 
 /** Props de `StatCard`. */
 export type StatCardProps = {
-  /** El dato: valor final del contador, prefijo y sufijo, y su bajada. */
+  /** El dato: valor con su prefijo y sufijo, y su bajada. */
   metric: Metric;
   /** Escalón de la entrada: la posición de la stat en la grilla (0, 1, 2, 3). */
   revealDelay: number;
@@ -21,13 +20,9 @@ export type StatCardProps = {
  * `SurfaceCard` separa las dos animaciones: su envoltorio recibe la entrada
  * (`reveal('scale')`) y su card la inclinación (`tilt()`).
  *
- * Solo el número es el contador: prefijo y sufijo quedan quietos alrededor
- * mientras sube. El HTML trae el valor final (`formattedValue()`), así que sin
- * JS (o con el movimiento apagado) se lee el número correcto.
- *
- * Lo visible va con `aria-hidden` y el lector de pantalla lee el valor final
- * en texto oculto (CLAUDE.md §9.2, "Contadores accesibles"): con JS, el motor
- * pone el número en 0 al cargar y lo sube al entrar en pantalla.
+ * El número va fijo, sin el contador del diseño que lo subía desde 0 al
+ * scrollear (pedido del cliente, noviembre 2026): la distancia, los días, las
+ * noches y la altura se leen enteros desde el primer momento.
  */
 export function StatCard({ metric, revealDelay }: StatCardProps) {
   return (
@@ -39,14 +34,7 @@ export function StatCard({ metric, revealDelay }: StatCardProps) {
         innerClassName={styles.card}
         {...reveal('scale', { delay: revealDelay })}
       >
-        <p className={styles.value}>
-          <span aria-hidden="true">
-            {metric.prefix}
-            <span {...counter(metric.value)}>{metric.formattedValue()}</span>
-            {metric.suffix}
-          </span>
-          <VisuallyHidden>{metric.format()}</VisuallyHidden>
-        </p>
+        <p className={styles.value}>{metric.format()}</p>
         <p className={styles.label}>{metric.label}</p>
       </SurfaceCard>
     </li>

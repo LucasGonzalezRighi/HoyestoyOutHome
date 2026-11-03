@@ -21,13 +21,14 @@ export type TripDetailProps = {
  * contenido:
  *
  * 1. Portada (`<h1>`, tags, "Consultar" y "Ver cronograma").
- * 2. Sobre el viaje (presentación y stats con contador).
+ * 2. Sobre el viaje (presentación y stats fijas).
  * 3. Cronograma (línea de tiempo, o "Itinerario próximamente").
  * 4. ¿Puedo? / ¿Es para mí? — si el viaje lo tiene.
  * 5. ¿Qué incluye y qué necesito? — si el viaje lo tiene.
  * 6. Pensión completa — si el viaje lo tiene.
  * 7. Próximas salidas — si hay fechas en el calendario.
- * 8. Cierre: la invitación a consultar y el botón grande a WhatsApp.
+ * 8. Cierre: el precio por persona (si lo tiene), la invitación a consultar y
+ *    el botón grande a WhatsApp.
  *
  * Bloques cortos con aire entre ellos, en vez de un texto largo: cada uno
  * responde una pregunta (qué es, cómo es cada día, si puedo, qué llevo,

@@ -3,7 +3,7 @@ import { assertInteger, assertText } from '../shared/invariants';
 
 /** Datos para crear una `Metric`. */
 export type MetricParams = {
-  /** El número: un entero ≥ 0 (lo anima el contador, que muestra enteros). */
+  /** El número: un entero ≥ 0. */
   value: number;
   /** Texto pegado antes del número: `'+'`. */
   prefix?: string;
@@ -14,17 +14,15 @@ export type MetricParams = {
 };
 
 /**
- * Una stat con contador animado (las cards verdes de Lago Lolog: "44 km",
+ * Una stat de la presentación de un viaje (las cards verdes: "44 km",
  * "+1.900 m", "4 días", "3 noches").
  *
- * El valor se guarda como número y no como texto porque el contador lo anima
- * de 0 a `value`: el prefijo y el sufijo quedan quietos alrededor del número
- * que sube.
- *
- * Invariante: `value` es un entero ≥ 0, porque el contador anima enteros.
- * Siempre sube (de 0 a `value`) y redondea cada paso al entero, también el
- * último: una stat de `11.3` se leería "11,3 km" sin JS y "11 km" con el
- * motor. La clase promete solo lo que la UI puede mostrar igual en los dos casos.
+ * El valor se guarda como número y no como texto para formatearlo con los
+ * separadores del sitio (`1.900`), con el prefijo y el sufijo alrededor. Las
+ * stats se muestran fijas (pedido del cliente, noviembre 2026); en el diseño
+ * subían con un contador de 0 a `value`, y por eso la invariante: `value` es
+ * un entero ≥ 0 (el contador anima enteros, y así la stat se lee igual con o
+ * sin él si vuelve).
  */
 export class Metric {
   private readonly props: Readonly<Required<MetricParams>>;
@@ -51,10 +49,7 @@ export class Metric {
     return this.props.label;
   }
 
-  /**
-   * Solo el número formateado (`"1.900"`): el texto inicial del contador, para
-   * que sin JS se lea el valor final.
-   */
+  /** Solo el número formateado, sin prefijo ni sufijo: `"1.900"`. */
   formattedValue(): string {
     return formatNumber(this.props.value);
   }

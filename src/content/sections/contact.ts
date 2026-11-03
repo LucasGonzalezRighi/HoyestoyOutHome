@@ -93,7 +93,7 @@ export type ContactChannelsContent = {
 export type ContactContent = {
   /**
    * La frase gigante, en sus dos mitades: cada una viaja a un costado al
-   * scrollear ("La montaña" / "te espera.").
+   * scrollear ("La montaña" / "te espera…").
    */
   readonly giant: { readonly start: string; readonly end: string };
   /** El título de la sección (`h2`), debajo de la frase: "¿Te animás a subir?". */
@@ -121,7 +121,7 @@ export function contactContent(
   texts: HomeTextsRecord['contact'],
 ): ContactContent {
   return {
-    giant: { start: 'La montaña', end: 'te espera.' },
+    giant: { start: 'La montaña', end: 'te espera…' },
     title: texts.title,
     lead: texts.lead,
     email: CONTACT_EMAIL,

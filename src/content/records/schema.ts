@@ -113,7 +113,7 @@ export const itineraryDaySchema = z.object({
   photo: photoSchema.optional(),
 });
 
-/** Una stat con contador de "Sobre el viaje": "+1.900 m · Desnivel positivo acumulado". */
+/** Una stat de "Sobre el viaje": "+1.900 m · Desnivel positivo acumulado". */
 export const metricSchema = z.object({
   value: integer(0, 1_000_000),
   prefix: z.string().max(10).optional(),
@@ -174,8 +174,13 @@ export const tripRecordSchema = z
     difficulty: z.enum(DIFFICULTIES),
     distanceKm: positive(2000),
     summitElevationM: integer(1, 9000).optional(),
-    /** No se muestra en el sitio (pedido del cliente): queda guardado por si vuelve. */
+    /**
+     * Precio por persona, en pesos. Se muestra en el cierre de la página del
+     * viaje; sin precio, el cierre solo invita a consultar.
+     */
     priceArs: integer(1, 1_000_000_000).optional(),
+    /** Nota debajo del precio: la seña, qué incluye el valor… */
+    priceNote: optionalText(200),
     /** Foto del viaje: portada de su página, panel del home y la que se comparte. */
     photo: photoSchema,
     /** Encuadre de la foto en el panel del home, si no es el de la portada. */
@@ -207,12 +212,24 @@ export const tripRecordSchema = z
 
 /* ── Salidas, preguntas y testimonios ──────────────────────────────────── */
 
-/** Una salida del calendario: qué viaje y qué día sale (el regreso lo da la duración). */
-export const departureRecordSchema = z.object({
-  id: recordIdSchema,
-  tripSlug: z.string().refine(isTripSlug, 'Viaje inválido.'),
-  startsOn: isoDateSchema,
-});
+/**
+ * Una salida del calendario: qué viaje, qué día sale y, si no es el que da la
+ * duración del viaje, qué día vuelve; además, si la fecha está "a confirmar".
+ */
+export const departureRecordSchema = z
+  .object({
+    id: recordIdSchema,
+    tripSlug: z.string().refine(isTripSlug, 'Viaje inválido.'),
+    startsOn: isoDateSchema,
+    /** Día de regreso cargado a mano. Sin esto, sale de la duración del viaje. */
+    endsOn: isoDateSchema.optional(),
+    /** La fecha todavía no es definitiva: el sitio la marca "A confirmar". */
+    toConfirm: z.boolean().optional(),
+  })
+  .refine((departure) => !departure.endsOn || departure.endsOn >= departure.startsOn, {
+    message: 'La vuelta no puede ser antes de la salida.',
+    path: ['endsOn'],
+  });
 
 /** Una pregunta frecuente. */
 export const faqRecordSchema = z.object({
@@ -323,7 +340,7 @@ export const siteRecordSchema = z
 export type PhotoRecord = z.infer<typeof photoSchema>;
 /** Un día del cronograma guardado. */
 export type ItineraryDayRecord = z.infer<typeof itineraryDaySchema>;
-/** Una stat con contador guardada. */
+/** Una stat de "Sobre el viaje" guardada. */
 export type MetricRecord = z.infer<typeof metricSchema>;
 /** "¿Puedo?" / "¿Es para mí?" guardados. */
 export type TripFitRecord = z.infer<typeof tripFitSchema>;

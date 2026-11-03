@@ -1,5 +1,6 @@
 import { Container } from '@/components/atoms/Container';
 import { Section } from '@/components/atoms/Section';
+import { Tag } from '@/components/atoms/Tag';
 import { TRIP_SECTION_IDS } from '@/constants/sections';
 import type { TripDeparturesContent } from '@/content/trips';
 import { reveal } from '@/motion/attributes';
@@ -19,7 +20,8 @@ export type TripDeparturesProps = {
 /**
  * "Próximas salidas": las fechas de este viaje en el calendario del home,
  * cada una como una ficha con el día y el mes de salida y el rango completo
- * ("13 al 16 de noviembre"). Si el viaje no tiene fechas, no se muestra.
+ * ("13 al 16 de noviembre"), con "A confirmar" si la fecha no es definitiva.
+ * Si el viaje no tiene fechas, no se muestra.
  *
  * El marcador (día y mes abreviado) va con `aria-hidden`: el rango que va al
  * lado ya dice la fecha entera, y el lector de pantalla la leería dos veces.
@@ -40,9 +42,12 @@ export function TripDepartures({ content }: TripDeparturesProps) {
                   <span className={styles.markerDay}>{day}</span>
                   <span className={styles.markerMonth}>{month}</span>
                 </span>
-                <time dateTime={departure.startsOn} className={styles.range}>
-                  {departure.rangeLabel()}
-                </time>
+                <span className={styles.text}>
+                  <time dateTime={departure.startsOn} className={styles.range}>
+                    {departure.rangeLabel()}
+                  </time>
+                  {departure.toConfirm && <Tag variant="accent">{content.toConfirmLabel}</Tag>}
+                </span>
               </li>
             );
           })}

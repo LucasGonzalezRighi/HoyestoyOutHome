@@ -79,7 +79,7 @@ export type CalendarProps = {
  * Server Component: no tiene estado.
  */
 export function Calendar({ content }: CalendarProps) {
-  const { eyebrow, title, lead, viewTripLabel, placeholderNote, months } = content;
+  const { eyebrow, title, lead, viewTripLabel, toConfirmLabel, placeholderNote, months } = content;
   const placedMonths = placeMonths(months);
   const stops = months.reduce((count, month) => count + month.departures.length, 0);
 
@@ -123,6 +123,7 @@ export function Calendar({ content }: CalendarProps) {
                           departure={departure}
                           stop={firstStop + index}
                           viewTripLabel={viewTripLabel}
+                          toConfirmLabel={toConfirmLabel}
                         />
                       ))}
                     </ol>
@@ -150,11 +151,14 @@ type DepartureCardProps = {
   stop: number;
   /** Texto visible del botón ("Ver viaje"). */
   viewTripLabel: string;
+  /** "A confirmar": se muestra como tag si la fecha no es definitiva. */
+  toConfirmLabel: string;
 };
 
 /**
- * Una salida: la fecha grande ("13 nov"), el viaje, el rango de fechas, destino
- * y duración como tags, y el botón a la página del viaje.
+ * Una salida: la fecha grande ("13 nov"), el viaje, el rango de fechas,
+ * "A confirmar" si la fecha no es definitiva, destino y duración como tags, y
+ * el botón a la página del viaje.
  *
  * La fecha muestra "13 nov" pero el lector de pantalla lee "13 de noviembre"
  * (`startLabel()`), y es un `<time>` con la fecha ISO. El título es el nombre
@@ -162,7 +166,7 @@ type DepartureCardProps = {
  * nombre completo en texto oculto: "Ver viaje" se repite en cada salida y en
  * la lista de links no se distinguirían (§9.1, "label in name").
  */
-function DepartureCard({ departure, stop, viewTripLabel }: DepartureCardProps) {
+function DepartureCard({ departure, stop, viewTripLabel, toConfirmLabel }: DepartureCardProps) {
   const { trip } = departure;
   const { day, month } = departure.marker();
 
@@ -179,11 +183,16 @@ function DepartureCard({ departure, stop, viewTripLabel }: DepartureCardProps) {
         <h4 className={styles.trip}>{trip.shortName}</h4>
         <p className={styles.range}>{departure.rangeLabel()}</p>
         <ul className={styles.tags}>
+          {departure.toConfirm && (
+            <li className={styles.tagItem}>
+              <Tag variant="accent">{toConfirmLabel}</Tag>
+            </li>
+          )}
           <li className={styles.tagItem}>
             <Tag variant="outline">{trip.destination}</Tag>
           </li>
           <li className={styles.tagItem}>
-            <Tag variant="outline">{trip.duration.label()}</Tag>
+            <Tag variant="outline">{departure.duration.label()}</Tag>
           </li>
         </ul>
         <LinkButton href={tripPath(trip.slug)} variant="secondary" className={styles.cta}>

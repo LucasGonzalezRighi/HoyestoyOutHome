@@ -43,7 +43,7 @@ const AVATARS = {
 export const teamContent: TeamContent = {
   eyebrow: 'Sobre nosotros',
   title: '¿Quiénes somos?',
-  lead: `Somos ${SITE.name}: guías que armamos travesías para que descubras nuevos paisajes y superes tus propios límites, de forma segura y responsable. Grupos chicos y atención personalizada, antes y durante cada salida.`,
+  lead: `Somos ${SITE.name}: guías que armamos travesías para que descubras nuevos paisajes y superes tus propios límites, de forma segura y responsable. Grupos reducidos y atención personalizada, antes y durante cada salida.`,
   guides: [
     new Guide({
       name: 'Lucas Chichizola',

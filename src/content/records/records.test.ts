@@ -97,9 +97,48 @@ describe('buildSiteContent', () => {
     expect(detail?.schedule.days).toEqual([]);
     expect(detail?.checklist).toBeUndefined();
   });
+
+  it('el cierre muestra el precio por persona con su nota, solo si el viaje tiene precio', () => {
+    const site = buildSiteContent(SEED_RECORD, TODAY);
+    expect(site.tripDetail('calle-stepanek')?.closing.price).toEqual({
+      kicker: 'Calle & Stepanek · Precio por persona',
+      amount: '$690.000',
+      note: '*Seña de $200.000. La diferencia la podés abonar el día de encuentro.',
+    });
+    expect(site.tripDetail('laguna-negra')?.closing.price).toBeUndefined();
+  });
+
+  it('una salida puede tener la vuelta cargada a mano y estar a confirmar', () => {
+    const record = seed();
+    record.departures = [
+      {
+        id: 'x',
+        tripSlug: 'calle-stepanek',
+        startsOn: '2026-11-13',
+        endsOn: '2026-11-18',
+        toConfirm: true,
+      },
+    ];
+    const [departure] = buildSiteContent(record, TODAY).schedule.all();
+    expect(departure?.endsOn).toBe('2026-11-18');
+    expect(departure?.toConfirm).toBe(true);
+  });
 });
 
 describe('validateSiteRecord', () => {
+  it('rechaza una salida que vuelve antes de salir', () => {
+    const record = seed();
+    record.departures = [
+      { id: 'x', tripSlug: 'calle-stepanek', startsOn: '2026-11-13', endsOn: '2026-11-12' },
+    ];
+    expect(validateSiteRecord(record, TODAY)).toEqual({
+      ok: false,
+      issues: [
+        { path: 'departures.0.endsOn', message: 'La vuelta no puede ser antes de la salida.' },
+      ],
+    });
+  });
+
   it('rechaza slugs repetidos o que no sirven como URL', () => {
     const record = seed();
     record.trips.push({ ...firstTrip(record) });

@@ -48,17 +48,19 @@ export type TripClosingProps = {
  * Cierre de la página de viaje, con el patrón del cierre del diseño
  * (`dc.html:361-373`): una tarjeta verde musgo que se expande al entrar, dos
  * círculos con parallax en sentidos opuestos y, encima, el logo que rueda, el
+ * precio por persona con su nota (si el viaje tiene precio cargado), el
  * título en dos renglones, la bajada que invita a consultar por el viaje y el
- * botón grande a WhatsApp con su mensaje. Mientras la sección cruza el centro
+ * botón grande a WhatsApp con su mensaje. Mientras la tarjeta cruza el centro
  * del viewport, el fondo de la página pasa al verde más oscuro (y sigue así en
  * el footer, que lleva la misma marca).
  *
- * Sin montos, por pedido del cliente: donde el diseño ponía el valor por
- * persona y la nota de reserva, el título pasa a ser lo más grande de la
- * tarjeta y todo lleva a un solo gesto, escribir por WhatsApp.
+ * El precio va fijo, sin el contador del diseño (pedido del cliente,
+ * noviembre 2026). Sin precio, el título es lo más grande de la tarjeta.
  */
 export function TripClosing({ content }: TripClosingProps) {
-  const { logoAlt, titleLines, lead, cta } = content;
+  const { logoAlt, price, titleLines, lead, cta } = content;
+  // Lo que viene después del precio entra unos escalones más tarde.
+  const step = price ? (price.note ? 3 : 2) : 0;
 
   return (
     <Section
@@ -66,9 +68,18 @@ export function TripClosing({ content }: TripClosingProps) {
       aria-labelledby={TITLE_ID}
       spacing="none"
       className={styles.section}
-      {...backgroundShift(CLOSING_BACKGROUND)}
     >
-      <div className={styles.card} {...reveal('expand', { span: CARD_REVEAL_SPAN })}>
+      {/*
+        why: el fondo cambia cuando la tarjeta (no la sección, con su aire de
+        arriba) llega a la franja central. Desde la sección, en un teléfono el
+        verde llegaba con "Próximas salidas" todavía a la vista, y su título
+        oscuro quedaba sobre el verde.
+      */}
+      <div
+        className={styles.card}
+        {...backgroundShift(CLOSING_BACKGROUND)}
+        {...reveal('expand', { span: CARD_REVEAL_SPAN })}
+      >
         {/* Los círculos son capas de parallax: el motor las mueve según la posición de su padre, la tarjeta. */}
         <div
           className={cn(styles.circle, styles.circleTop)}
@@ -83,7 +94,22 @@ export function TripClosing({ content }: TripClosingProps) {
 
         <div className={styles.content}>
           <BrandLogo width={LOGO_WIDTH} alt={logoAlt} className={styles.logo} {...reveal('roll')} />
-          <h2 id={TITLE_ID} className={styles.title} {...reveal('up', { delay: 1 })}>
+          {price && (
+            <div className={styles.price}>
+              <p className={styles.priceKicker} {...reveal('up', { delay: 1 })}>
+                {price.kicker}
+              </p>
+              <p className={styles.priceAmount} {...reveal('zoom', { delay: 2 })}>
+                {price.amount}
+              </p>
+              {price.note && (
+                <p className={styles.priceNote} {...reveal('up', { delay: 3 })}>
+                  {price.note}
+                </p>
+              )}
+            </div>
+          )}
+          <h2 id={TITLE_ID} className={styles.title} {...reveal('up', { delay: step + 1 })}>
             {/*
               Cada renglón es un bloque: el corte es parte del copy, como el `<br>` del diseño.
               El espacio entre los dos no se ve (queda entre bloques); está para que el nombre
@@ -96,10 +122,10 @@ export function TripClosing({ content }: TripClosingProps) {
               </Fragment>
             ))}
           </h2>
-          <p className={styles.lead} {...reveal('up', { delay: 2 })}>
+          <p className={styles.lead} {...reveal('up', { delay: step + 2 })}>
             {lead}
           </p>
-          <div className={styles.actions} {...reveal('scale', { delay: 3 })}>
+          <div className={styles.actions} {...reveal('scale', { delay: step + 3 })}>
             <LinkButton
               href={cta.href}
               external={cta.external}

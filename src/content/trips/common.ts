@@ -31,7 +31,7 @@ import type {
 /**
  * Lo que se le ofrece contar a quien escribe por un viaje que todavía no tiene
  * itinerario: va en el aviso del cronograma y en la descripción de la página.
- * Sin montos (el sitio no muestra ninguno).
+ * Sin montos: el precio, si el viaje lo tiene, va en el cierre.
  */
 const UPCOMING_INVITATION =
   'Escribinos y te contamos las fechas, la disponibilidad y todo lo que incluye.';
@@ -131,10 +131,11 @@ export function tripSchedule(trip: Trip, days: readonly ItineraryDay[]): TripSch
 /* ── Qué incluye y qué necesito ────────────────────────────────────────── */
 
 /**
- * "¿Qué incluye y qué necesito?" con la checklist del viaje. Títulos de grupo
- * y composición de las cards son los de "09 Servicios y equipo" del diseño
- * (`dc.html:285-312`, `panels` en `dc.html:702-707`): [incluidos] ·
- * [traslados + NO incluidos] · [ropa] · [equipo].
+ * "¿Qué incluye y qué necesito?" con la checklist del viaje. Composición de
+ * las cards de "09 Servicios y equipo" del diseño (`dc.html:285-312`, `panels`
+ * en `dc.html:702-707`): [incluidos] · [traslados + NO incluidos] · [ropa] ·
+ * [equipo]. Ropa y Equipo van sin el "¿Qué necesito? ·" del diseño (pedido
+ * del cliente, noviembre 2026): el título de la sección ya lo pregunta.
  */
 export function tripChecklist(checklist: ServiceChecklist): TripChecklistContent {
   return {
@@ -145,8 +146,8 @@ export function tripChecklist(checklist: ServiceChecklist): TripChecklistContent
       included: 'Servicios incluidos',
       transfers: 'Traslados',
       notIncluded: 'Servicios NO incluidos',
-      clothing: '¿Qué necesito? · Ropa',
-      gear: '¿Qué necesito? · Equipo',
+      clothing: 'Ropa',
+      gear: 'Equipo',
     },
     panels: [['included'], ['transfers', 'notIncluded'], ['clothing'], ['gear']],
   };
@@ -177,24 +178,40 @@ export function tripMeals(footnote: string): TripMealsContent {
 
 /* ── Próximas salidas ──────────────────────────────────────────────────── */
 
+/** Etiqueta de una salida cuya fecha todavía no es definitiva (también en el calendario del home). */
+export const TO_CONFIRM_LABEL = 'A confirmar';
+
 /** Las próximas salidas de este viaje (`schedule.forTrip(slug)`). Vacío: el bloque no se muestra. */
 export function tripDepartures(departures: readonly Departure[]): TripDeparturesContent {
-  return { title: 'Próximas salidas', departures };
+  return { title: 'Próximas salidas', toConfirmLabel: TO_CONFIRM_LABEL, departures };
 }
 
 /* ── Cierre ────────────────────────────────────────────────────────────── */
 
 /**
- * Cierre: el título del cierre del diseño (`dc.html:369`), una bajada que
- * invita a consultar por este viaje y el botón a WhatsApp con su mensaje.
+ * Cierre: el precio por persona con su nota (como "13 Precio y contacto" del
+ * diseño, `dc.html:366-368`), el título del cierre (`dc.html:369`), una bajada
+ * que invita a consultar por este viaje y el botón a WhatsApp con su mensaje.
  *
- * Sin montos, por pedido del cliente: el valor del viaje sigue en el catálogo
- * (`trip.price`) pero no se muestra, se conversa por WhatsApp.
+ * El precio vuelve por pedido del cliente (noviembre 2026), fijo: sin el
+ * contador del diseño. Un viaje sin precio cargado no muestra el bloque.
+ *
+ * @param priceNote La nota debajo del precio (la seña), si el viaje la tiene.
  */
-export function tripClosing(trip: Trip): TripClosingContent {
+export function tripClosing(trip: Trip, priceNote?: string): TripClosingContent {
+  const { price } = trip;
   return {
     logoAlt: SITE.shortName,
-    titleLines: ['La montaña te espera.', '¿Te animás a subir?'],
+    ...(price.isOnRequest
+      ? {}
+      : {
+          price: {
+            kicker: `${trip.shortName} · Precio por persona`,
+            amount: price.label(),
+            ...(priceNote ? { note: priceNote } : {}),
+          },
+        }),
+    titleLines: ['La montaña te espera…', '¿Te animás a subir?'],
     lead: `Escribinos y te contamos las próximas fechas y la disponibilidad de ${trip.shortName}.`,
     cta: consultCta(trip, 'Consultar por WhatsApp'),
   };

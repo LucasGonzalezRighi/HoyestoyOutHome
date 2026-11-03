@@ -7,8 +7,8 @@ import { Price, Trip, TripCatalog, TripDuration } from '@/domain';
  * home, la página del viaje y el calendario. Tira si el dato rompe una
  * invariante del dominio (el panel lo valida antes de guardar).
  *
- * El precio no se muestra en el sitio (pedido del cliente), pero el dominio lo
- * conserva: sin monto cargado, queda "a consultar".
+ * El precio se muestra solo en el cierre de la página del viaje; sin monto
+ * cargado, queda "a consultar" y el cierre no muestra el bloque.
  */
 export function toTrip(record: TripRecord): Trip {
   return new Trip({

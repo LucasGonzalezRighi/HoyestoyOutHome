@@ -439,15 +439,15 @@
     .departure::before {
       animation: calendar-drop linear both;
       animation-timeline: --calendar;
-      animation-range: entry calc(60px + var(--stop) * 200px / var(--stops))
-        entry calc(110px + var(--stop) * 200px / var(--stops));
+      animation-range: entry calc(60px + var(--stop) * 200px / var(--stops)) entry
+        calc(110px + var(--stop) * 200px / var(--stops));
     }
 
     .card {
       animation: calendar-rise var(--ease-reveal) both;
       animation-timeline: --calendar;
-      animation-range: entry calc(70px + var(--stop) * 200px / var(--stops))
-        entry calc(220px + var(--stop) * 200px / var(--stops));
+      animation-range: entry calc(70px + var(--stop) * 200px / var(--stops)) entry
+        calc(220px + var(--stop) * 200px / var(--stops));
     }
   }
 }

@@ -91,6 +91,6 @@ export function buildTripDetail(
     ...(checklist ? { checklist: tripChecklist(new ServiceChecklist(checklist)) } : {}),
     ...(meals ? { meals: tripMeals(meals.footnote) } : {}),
     departures: tripDepartures(departures),
-    closing: tripClosing(trip),
+    closing: tripClosing(trip, record.priceNote),
   };
 }

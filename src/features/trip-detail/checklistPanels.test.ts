@@ -33,8 +33,8 @@ describe('checklistPanels', () => {
       ).toEqual([
         ['Servicios incluidos'],
         ['Traslados', 'Servicios NO incluidos'],
-        ['¿Qué necesito? · Ropa'],
-        ['¿Qué necesito? · Equipo'],
+        ['Ropa'],
+        ['Equipo'],
       ]);
     }
   });

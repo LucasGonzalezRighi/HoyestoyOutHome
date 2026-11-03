@@ -92,6 +92,41 @@ describe('Departure', () => {
     );
   });
 
+  it('acepta un día de regreso cargado a mano, en vez del que da la duración', () => {
+    const longer = new Departure({ trip: calle, startsOn: '2026-11-13', endsOn: '2026-11-18' });
+    expect(longer.endsOn).toBe('2026-11-18');
+    expect(longer.rangeLabel()).toBe('13 al 18 de noviembre');
+    expect(
+      new Departure({ trip: calle, startsOn: '2026-11-13', endsOn: '2026-11-13' }).endsOn,
+    ).toBe('2026-11-13');
+  });
+
+  it('tira si el regreso cargado a mano es antes de la salida', () => {
+    expect(
+      () => new Departure({ trip: calle, startsOn: '2026-11-13', endsOn: '2026-11-12' }),
+    ).toThrow('vuelve antes de salir');
+  });
+
+  it('la duración es la del viaje, o la del rango si la vuelta se cargó a mano', () => {
+    expect(new Departure({ trip: calle, startsOn: '2026-11-13' }).duration.label()).toBe(
+      calle.duration.label(),
+    );
+    const longer = new Departure({ trip: calle, startsOn: '2026-11-13', endsOn: '2026-11-18' });
+    expect([longer.duration.days, longer.duration.nights]).toEqual([6, 5]);
+    const shorter = new Departure({ trip: calle, startsOn: '2026-11-13', endsOn: '2026-11-13' });
+    expect([shorter.duration.days, shorter.duration.nights]).toEqual([1, 0]);
+    // Cruza de mes y de año sin perder días.
+    const newYear = new Departure({ trip: calle, startsOn: '2026-12-30', endsOn: '2027-01-02' });
+    expect(newYear.duration.days).toBe(4);
+  });
+
+  it('una salida puede estar a confirmar (por defecto, no)', () => {
+    expect(new Departure({ trip: calle, startsOn: '2026-11-13' }).toConfirm).toBe(false);
+    expect(new Departure({ trip: calle, startsOn: '2026-11-13', toConfirm: true }).toConfirm).toBe(
+      true,
+    );
+  });
+
   it('tira si el viaje dura 0 días', () => {
     const noDays = buildTrip({ duration: new TripDuration(0, 0) });
     expect(() => new Departure({ trip: noDays, startsOn: '2026-11-13' })).toThrow('al menos uno');

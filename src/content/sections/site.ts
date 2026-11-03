@@ -44,7 +44,7 @@ export const siteContent: SiteContent = {
     // entera en un resultado de búsqueda, que corta cerca de los 155).
     title: `${SITE.name} — Trekkings y ascensos guiados en Mendoza y la Patagonia`,
     description:
-      'Trekkings y ascensos guiados por Mendoza y la Patagonia. Grupos chicos, atención personalizada y la montaña de verdad.',
+      'Trekkings y ascensos guiados por Mendoza y la Patagonia. Grupos reducidos, atención personalizada y la montaña de verdad.',
     keywords: [
       'trekking',
       'ascensos guiados',

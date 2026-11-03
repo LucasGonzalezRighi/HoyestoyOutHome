@@ -18,14 +18,6 @@ const PLUS_SIZE = 18;
 /** Lado de la banderita del mojón en px: entra con aire en su círculo de 36px (30px en mobile). */
 const FLAG_SIZE = 16;
 
-/**
- * Escalones del reveal: las preguntas entran con retraso 0, 1, 2, 0, 1, 2…
- * Cada escalón corre la entrada un 2% del viewport; con el índice entero, la
- * duodécima pregunta tendría que subir un 22% más que la primera para
- * aparecer. Como ya están apiladas, el ciclo alcanza para que entren de a una.
- */
-const REVEAL_STEPS = 3;
-
 /*
  * `useSyncExternalStore` sin fuente externa (como en `ContactForm`): no se
  * suscribe a nada, solo distingue el HTML del servidor y la hidratación
@@ -113,6 +105,10 @@ export function FaqAccordion({ entries, className }: FaqAccordionProps) {
         animated && styles.animated,
         className,
       )}
+      // why: la lista entra entera de una vez (pedido del cliente, noviembre
+      // 2026). Con un reveal por pregunta, las de abajo aparecían de a una
+      // mientras se scrolleaba y el listado nunca se veía completo.
+      {...reveal('up', { delay: 3 })}
     >
       {entries.map((entry, index) => {
         const buttonId = `${baseId}-pregunta-${index}`;
@@ -120,11 +116,7 @@ export function FaqAccordion({ entries, className }: FaqAccordionProps) {
         const isOpen = !enhanced || openIndex === index;
 
         return (
-          <li
-            key={entry.question}
-            className={cn(styles.item, isOpen && styles.itemOpen)}
-            {...reveal('up', { delay: index % REVEAL_STEPS })}
-          >
+          <li key={entry.question} className={cn(styles.item, isOpen && styles.itemOpen)}>
             <div className={styles.card}>
               <h3 className={styles.heading}>
                 {enhanced ? (

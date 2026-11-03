@@ -17,7 +17,7 @@ import { saveDepartures, saveFaq, saveHomeTexts, saveTestimonials } from '../act
 
 import styles from './ListEditors.module.css';
 import { EditorForm } from './ui/EditorForm';
-import { NumberInput, SelectInput, TextInput } from './ui/fields';
+import { NumberInput, SelectInput, TextInput, Toggle } from './ui/fields';
 import { AddButton, ListField, StringListField, removeItem, replaceItem } from './ui/lists';
 import ui from './ui/ui.module.css';
 
@@ -42,21 +42,40 @@ export type DepartureTripOption = {
   readonly visible: boolean;
 };
 
-/** El día de vuelta de una salida ("16 de noviembre de 2026"), o `undefined` si la fecha no sirve. */
-function returnLabel(startsOn: string, days: number): string | undefined {
+/**
+ * El día de vuelta que da la duración del viaje (`AAAA-MM-DD`), o vacío si la
+ * fecha de salida todavía no sirve.
+ */
+function defaultReturn(startsOn: string, days: number): string {
   try {
-    return CalendarDate.parse(startsOn, 'La fecha')
-      .addDays(Math.max(days, 1) - 1)
-      .dayMonthLabel(true);
+    return CalendarDate.parse(startsOn, 'La fecha').addDays(Math.max(days, 1) - 1).iso;
   } catch {
-    return undefined;
+    return '';
   }
+}
+
+/** La salida sin el día de vuelta cargado a mano: vuelve a salir de la duración del viaje. */
+function withAutomaticReturn(departure: DepartureRecord): DepartureRecord {
+  const next = { ...departure };
+  delete next.endsOn;
+  return next;
+}
+
+/**
+ * Lo que se guarda de una salida: si el día de vuelta quedó vacío (se borró
+ * mientras se escribía), vuelve a salir de la duración del viaje. Mientras se
+ * edita, el vacío se respeta: si no, el campo saltaría a la fecha automática
+ * apenas se borra una parte de la fecha.
+ */
+function normalizeReturn(departure: DepartureRecord): DepartureRecord {
+  return departure.endsOn === '' ? withAutomaticReturn(departure) : departure;
 }
 
 /**
  * Las salidas del calendario, ordenadas por fecha. Cada una es un viaje y un
- * día; la vuelta se calcula con la duración del viaje. Las que ya pasaron se
- * marcan (el sitio ya no las muestra) y se pueden borrar.
+ * día de salida; el de vuelta sale de la duración del viaje salvo que se
+ * cambie a mano, y una salida puede quedar "a confirmar". Las que ya pasaron
+ * se marcan (el sitio ya no las muestra) y se pueden borrar.
  */
 export function DeparturesEditor({
   departures,
@@ -79,7 +98,7 @@ export function DeparturesEditor({
   }));
 
   return (
-    <EditorForm action={saveDepartures} payload={items}>
+    <EditorForm action={saveDepartures} payload={items.map(normalizeReturn)}>
       <div className={ui.card}>
         <p className={ui.hint}>{t.sortHint}</p>
         {items.length === 0 ? (
@@ -88,44 +107,65 @@ export function DeparturesEditor({
           <ol className={ui.list}>
             {items.map((departure, index) => {
               const trip = tripOf(departure.tripSlug);
-              const back = returnLabel(departure.startsOn, trip?.days ?? 1);
+              const automaticReturn = defaultReturn(departure.startsOn, trip?.days ?? 1);
               const past = departure.startsOn !== '' && departure.startsOn < today;
+              const update = (next: DepartureRecord) => setItems(replaceItem(items, index, next));
+              const notes = [
+                past ? t.past : departure.toConfirm ? t.toConfirmHint : '',
+                trip && !trip.visible ? t.hiddenTrip : '',
+              ].filter(Boolean);
               return (
-                <li
-                  key={departure.id}
-                  className={cn(ui.listItem, styles.departure, past && styles.past)}
-                >
-                  <SelectInput
-                    label={t.trip}
-                    path={`${index}.tripSlug`}
-                    value={departure.tripSlug}
-                    options={options}
-                    onChange={(tripSlug) =>
-                      setItems(replaceItem(items, index, { ...departure, tripSlug }))
-                    }
-                  />
-                  <div className={ui.field}>
+                <li key={departure.id} className={cn(ui.listItem, past && styles.past)}>
+                  <div className={styles.departure}>
+                    <SelectInput
+                      label={t.trip}
+                      path={`${index}.tripSlug`}
+                      value={departure.tripSlug}
+                      options={options}
+                      onChange={(tripSlug) => update({ ...departure, tripSlug })}
+                    />
                     <TextDate
                       label={t.startsOn}
                       path={`${index}.startsOn`}
                       value={departure.startsOn}
-                      onChange={(startsOn) =>
-                        setItems(replaceItem(items, index, { ...departure, startsOn }))
-                      }
+                      onChange={(startsOn) => update({ ...departure, startsOn })}
                     />
-                    <p className={ui.hint}>
-                      {past ? t.past : back ? t.ends(back) : ' '}
-                      {trip && !trip.visible && ` · ${t.hiddenTrip}`}
-                    </p>
+                    <div className={ui.field}>
+                      <TextDate
+                        label={t.endsOn}
+                        path={`${index}.endsOn`}
+                        value={departure.endsOn ?? automaticReturn}
+                        onChange={(endsOn) => update({ ...departure, endsOn })}
+                      />
+                      {departure.endsOn !== undefined ? (
+                        <button
+                          type="button"
+                          className={styles.linkButton}
+                          onClick={() => update(withAutomaticReturn(departure))}
+                        >
+                          {t.endsReset}
+                        </button>
+                      ) : (
+                        <p className={ui.hint}>{t.endsAuto}</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className={cn(ui.iconButton, ui.danger, styles.remove)}
+                      aria-label={`${adminContent.list.remove} ${t.trip.toLowerCase()} ${trip?.name ?? ''} ${departure.startsOn}`}
+                      onClick={() => setItems(removeItem(items, index))}
+                    >
+                      <Trash2 size={18} strokeWidth={2.75} aria-hidden="true" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className={cn(ui.iconButton, ui.danger, styles.remove)}
-                    aria-label={`${adminContent.list.remove} ${t.trip.toLowerCase()} ${trip?.name ?? ''} ${departure.startsOn}`}
-                    onClick={() => setItems(removeItem(items, index))}
-                  >
-                    <Trash2 size={18} strokeWidth={2.75} aria-hidden="true" />
-                  </button>
+                  <div className={styles.departureFooter}>
+                    <Toggle
+                      label={t.toConfirm}
+                      checked={departure.toConfirm ?? false}
+                      onChange={(toConfirm) => update({ ...departure, toConfirm })}
+                    />
+                    {notes.length > 0 && <p className={ui.hint}>{notes.join(' · ')}</p>}
+                  </div>
                 </li>
               );
             })}

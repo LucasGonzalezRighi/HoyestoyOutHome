@@ -46,7 +46,7 @@ export const SEED_RECORD: SiteRecord = {
       id: 'seed-guias',
       question: '¿Las salidas son guiadas? ¿Cuántos somos por grupo?',
       answer:
-        'Sí, todas van con guías habilitados de Turismo Aventura y de Montaña. Armamos grupos chicos, para darte atención personalizada antes y durante cada salida.',
+        'Sí, todas van con guías habilitados de Turismo Aventura y de Montaña. Armamos grupos reducidos, para darte atención personalizada antes y durante cada salida.',
     },
     {
       id: 'seed-incluye',
@@ -87,7 +87,7 @@ export const SEED_RECORD: SiteRecord = {
       id: 'seed-solo',
       question: '¿Puedo ir solo o sola?',
       answer:
-        'Sí. Los grupos son chicos y compartís cada jornada con el resto, así que te integrás enseguida.',
+        'Sí. Los grupos son reducidos y compartís cada jornada con el resto, así que te integrás enseguida.',
     },
     {
       id: 'seed-edad',
@@ -173,7 +173,7 @@ export const SEED_RECORD: SiteRecord = {
       headline: ['Creo experiencias en la montaña', 'para reconectar con lo esencial.'],
       lead: [
         'Trekkings y ascensos guiados por Mendoza y la Patagonia.',
-        'Grupos chicos, atención personalizada y la montaña de verdad.',
+        'Grupos reducidos, atención personalizada y la montaña de verdad.',
       ],
       ribbon: [
         'Tu primer 4mil',
@@ -219,7 +219,7 @@ export const SEED_RECORD: SiteRecord = {
     testimonials: { title: 'Lo que se traen de la montaña' },
     faq: {
       title: 'Lo que nos preguntan antes de salir',
-      lead: 'Experiencia, equipo, reservas y clima: lo que conviene tener claro antes de anotarte.',
+      lead: 'Experiencia, equipo, reservas y clima: lo que hay que saber antes de anotarte.',
       summitTitle: '¿Tu duda no está en el camino?',
       summitLead: 'Escribinos por WhatsApp o desde el formulario de contacto y te respondemos.',
     },

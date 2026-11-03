@@ -78,7 +78,7 @@ if (stdin.isTTY) {
   password = await promptHidden('Contraseña del panel: ');
   const again = await promptHidden('Repetila: ');
   if (password !== again) {
-    console.error('Las contraseñas no coinciden.');
+    process.stderr.write('Las contraseñas no coinciden.\n');
     process.exit(1);
   }
 } else {
@@ -86,9 +86,12 @@ if (stdin.isTTY) {
 }
 
 if (password.length < MIN_PASSWORD_LENGTH) {
-  console.error(`La contraseña tiene que tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
+  process.stderr.write(
+    `La contraseña tiene que tener al menos ${MIN_PASSWORD_LENGTH} caracteres.\n`,
+  );
   process.exit(1);
 }
 
-console.log(`ADMIN_PASSWORD_HASH=${await hash(password)}`);
-console.log(`ADMIN_SESSION_SECRET=${randomBytes(32).toString('base64url')}`);
+// La salida es para copiar y pegar en `.env.local` y en Vercel.
+stdout.write(`ADMIN_PASSWORD_HASH=${await hash(password)}\n`);
+stdout.write(`ADMIN_SESSION_SECRET=${randomBytes(32).toString('base64url')}\n`);

@@ -179,6 +179,22 @@ export function TripEditor({ trip }: TripEditorProps) {
               onChange={(summitElevationM) => setBase({ summitElevationM })}
             />
           </div>
+          <div className={cn(ui.row, ui.rowWide)}>
+            <NumberInput
+              label={copy.basics.price}
+              hint={copy.basics.priceHint}
+              path="priceArs"
+              value={base.priceArs}
+              onChange={(priceArs) => setBase({ priceArs })}
+            />
+            <TextInput
+              label={copy.basics.priceNote}
+              hint={copy.basics.priceNoteHint}
+              path="priceNote"
+              value={base.priceNote}
+              onChange={(priceNote) => setBase({ priceNote })}
+            />
+          </div>
           <TextInput
             label={copy.basics.description}
             hint={copy.basics.descriptionHint}

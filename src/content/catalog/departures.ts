@@ -26,8 +26,8 @@ export function todayInBusinessTimeZone(now: Date = new Date()): string {
  *
  * Deja afuera las salidas que ya pasaron (salen antes de `today`) y las de
  * viajes ocultos o borrados: así el calendario se limpia solo, sin que haya
- * que entrar al panel a borrar fechas viejas. Solo se guarda el día de
- * salida; el de regreso sale de la duración del viaje en el catálogo.
+ * que entrar al panel a borrar fechas viejas. El día de regreso, si no se
+ * cargó a mano, sale de la duración del viaje en el catálogo.
  *
  * @param today `AAAA-MM-DD` (`todayInBusinessTimeZone()`). Es un parámetro
  *   para que los tests no dependan del reloj.
@@ -41,7 +41,14 @@ export function buildDepartureSchedule(
     records.flatMap((record) => {
       const trip = catalog.find(record.tripSlug);
       return trip && record.startsOn >= today
-        ? [new Departure({ trip, startsOn: record.startsOn })]
+        ? [
+            new Departure({
+              trip,
+              startsOn: record.startsOn,
+              ...(record.endsOn ? { endsOn: record.endsOn } : {}),
+              ...(record.toConfirm ? { toConfirm: true } : {}),
+            }),
+          ]
         : [];
     }),
   );
