@@ -36,7 +36,7 @@ export const WHATSAPP = {
  * `mailto:` con el asunto y el cuerpo ya escritos, y el cliente de mail de
  * quien escribe lo envía a esta dirección.
  */
-export const CONTACT_EMAIL = 'lucaschichizola@gmail.com';
+export const CONTACT_EMAIL = 'lucaschichizola01@gmail.com';
 
 /** Perfiles públicos de la marca (footer y galería). */
 export const SOCIAL_PROFILES = {
